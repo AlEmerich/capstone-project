@@ -1,0 +1,53 @@
+\documentclass{article}
+\usepackage[english]{babel}
+\usepackage[square,comma,sort,numbers]{natbib}
+\usepackage{glossaries}
+
+\makeglossaries
+\input{glossary}
+
+\title{\textbf{Capstone Proposal}\\Train a 3D avatar to walk}
+\date{\today}
+\author{Guitard Alan}
+
+\begin{document}
+	\maketitle	
+	\section{Domain Background}
+
+  For a human, the ability to walk is one of the most basic knowledge he learnt
+  during his childhood. Since we are trying with AI to, when we can't do better,
+  mimic the ability of human being, the idea of teaching a robot to walk comes
+  naturally in our mind.\\
+  One of the first attempt to do that was to develop an algorithm by trying to
+  understand the physics formula of that movement. In 1993,
+  \citet{1993-TrunkMotion} tried to make a little robot by trunk motion
+  using the ZMP (\gls{ZMP}) and the three
+  axis (pitch, yaw and roll)\cite{1993-TrunkMotion}. In 1999, \citeauthor{1999-KHR-2}
+  added the OGM (Optimal Gradient Method) to that approach
+  to "optimizes the horizontal motion of a trunk to reduce the
+  deviation of the calculated ZMP from its
+  reference." \cite{1999-KHR-2} and design the KHR-2 robot.
+  The result was good but the gait of the robot wasnot very natural because
+  it is very difficult to take all the factors in account for making
+  the robot walk with a human gait.\\
+  \cite{2013-TOG-MuscleBasedBipeds}
+  
+  
+	\section{Problem Statement}
+	
+	\section{Datasets and Inputs}
+	
+	\section{Solution Statement}
+	
+	\section{Benchmark Model}
+	
+	\section{Evaluation Metrics}
+	
+	\section{Project Design}
+
+  \clearpage
+  \bibliography{proposal}
+  \bibliographystyle{plainnat}
+  
+  \printglossary
+\end{document}

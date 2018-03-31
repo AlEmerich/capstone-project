@@ -1,0 +1,29 @@
+\begin{thebibliography}{3}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Geijtenbeek et~al.(2013)Geijtenbeek, van~de Panne, and van~der
+  Stappen]{2013-TOG-MuscleBasedBipeds}
+Thomas Geijtenbeek, Michiel van~de Panne, and A.~Frank van~der Stappen.
+\newblock Flexible muscle-based locomotion for bipedal creatures.
+\newblock \emph{ACM Transactions on Graphics}, 32\penalty0 (6), 2013.
+
+\bibitem[Nagasaka et~al.(1999)Nagasaka, Inoue, and Inaba]{1999-KHR-2}
+Ken'ichiro Nagasaka, Hirochika Inoue, and Masayuki Inaba.
+\newblock Dynamic walking pattern generation for a humanoid robot based on
+  optimal gradient method.
+\newblock \emph{1999 IEEE International Conference}, 6:\penalty0 908 -- 913
+  vol.6, 02 1999.
+
+\bibitem[Yamaguchi et~al.(1993)Yamaguchi, TAKANISHI, and
+  KATO]{1993-TrunkMotion}
+J.-I Yamaguchi, Atsuo TAKANISHI, and Ichiro KATO.
+\newblock Development of a biped walking robot compensating for three-axis
+  moment by trunk motion.
+\newblock \emph{1993 IEEE/RSJ International Conference}, 11:\penalty0 561 --
+  566 vol.1, 08 1993.
+
+\end{thebibliography}

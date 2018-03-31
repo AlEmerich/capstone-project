@@ -1,0 +1,30 @@
+\ifglsentryexists{ZMP}{}%
+{%
+\gls@defglossaryentry{ZMP}%
+{%
+name={Zero Moment Point},%
+sort={Zero Moment Point},%
+type={main},%
+first={Zero Moment Point},%
+firstplural={Zero Moment Points},%
+text={Zero Moment Point},%
+plural={Zero Moment Points},%
+description={A definition},%
+descriptionplural={A definition},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={},%
+longplural={},%
+short={},%
+shortplural={},%
+counter={page},%
+parent={},%
+%
+}%
+}%
