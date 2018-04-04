@@ -1,0 +1,10 @@
+\BOOKMARK [1][-]{section.1}{Domain Background}{}% 1
+\BOOKMARK [1][-]{section.2}{Problem Statement}{}% 2
+\BOOKMARK [1][-]{section.3}{Datasets and Inputs}{}% 3
+\BOOKMARK [2][-]{subsection.3.1}{Action space}{section.3}% 4
+\BOOKMARK [2][-]{subsection.3.2}{Observation space}{section.3}% 5
+\BOOKMARK [2][-]{subsection.3.3}{Reward}{section.3}% 6
+\BOOKMARK [1][-]{section.4}{Solution Statement}{}% 7
+\BOOKMARK [1][-]{section.5}{Benchmark Model}{}% 8
+\BOOKMARK [1][-]{section.6}{Evaluation Metrics}{}% 9
+\BOOKMARK [1][-]{section.7}{Project Design}{}% 10

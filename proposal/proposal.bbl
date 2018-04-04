@@ -1,9 +1,15 @@
-\begin{thebibliography}{3}
+\begin{thebibliography}{5}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Brockman et~al.(2016)Brockman, Cheung, Pettersson, Schneider,
+  Schulman, Tang, and Zaremba]{1606.01540}
+Greg Brockman, Vicki Cheung, Ludwig Pettersson, Jonas Schneider, John Schulman,
+  Jie Tang, and Wojciech Zaremba.
+\newblock Openai gym, 2016.
 
 \bibitem[Geijtenbeek et~al.(2013)Geijtenbeek, van~de Panne, and van~der
   Stappen]{2013-TOG-MuscleBasedBipeds}
@@ -17,6 +23,17 @@ Ken'ichiro Nagasaka, Hirochika Inoue, and Masayuki Inaba.
   optimal gradient method.
 \newblock \emph{1999 IEEE International Conference}, 6:\penalty0 908 -- 913
   vol.6, 02 1999.
+
+\bibitem[Silver et~al.(2017)Silver, Schrittwieser, Simonyan, Antonoglou, Huang,
+  Guez, Hubert, Baker, Lai, Bolton, Chen, Lillicrap, Hui, Sifre, van~den
+  Driessche, Graepel, and Hassabis]{silver2017mastering}
+David Silver, Julian Schrittwieser, Karen Simonyan, Ioannis Antonoglou, Aja
+  Huang, Arthur Guez, Thomas Hubert, Lucas Baker, Matthew Lai, Adrian Bolton,
+  Yutian Chen, Timothy Lillicrap, Fan Hui, Laurent Sifre, George van~den
+  Driessche, Thore Graepel, and Demis Hassabis.
+\newblock Mastering the game of go without human knowledge.
+\newblock \emph{Nature}, 550:\penalty0 354--, October 2017.
+\newblock URL \url{http://dx.doi.org/10.1038/nature24270}.
 
 \bibitem[Yamaguchi et~al.(1993)Yamaguchi, TAKANISHI, and
   KATO]{1993-TrunkMotion}

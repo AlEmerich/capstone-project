@@ -2,22 +2,33 @@
 \usepackage[english]{babel}
 \usepackage[square,comma,sort,numbers]{natbib}
 \usepackage{glossaries}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{multicol}
+\usepackage[T1]{fontenc}
+\renewcommand{\familydefault}{\sfdefault}
+\setlength{\columnsep}{1cm}
+\graphicspath{ {images/} }
 
 \makeglossaries
 \input{glossary}
 
-\title{\textbf{Capstone Proposal}\\Train a 3D avatar to walk}
+\title{\textbf{Capstone Proposal}\\Arise and walk}
 \date{\today}
 \author{Guitard Alan}
 
 \begin{document}
+\raggedright
 	\maketitle	
 	\section{Domain Background}
-
+  \paragraph{}
   For a human, the ability to walk is one of the most basic knowledge he learnt
   during his childhood. Since we are trying with AI to, when we can't do better,
   mimic the ability of human being, the idea of teaching a robot to walk comes
-  naturally in our mind.\\
+  naturally in our mind.
+  \paragraph{}
   One of the first attempt to do that was to develop an algorithm by trying to
   understand the physics formula of that movement. In 1993,
   \citet{1993-TrunkMotion} tried to make a little robot by trunk motion
@@ -29,18 +40,147 @@
   reference." \cite{1999-KHR-2} and design the KHR-2 robot.
   The result was good but the gait of the robot wasnot very natural because
   it is very difficult to take all the factors in account for making
-  the robot walk with a human gait.\\
-  \cite{2013-TOG-MuscleBasedBipeds}
-  
+  the robot walk with a human gait.
+  \paragraph{}
+  Nowadays, Boston Dynamics made a huge advances in humanoïd robotic by
+  designing Atlas, who was able to do a perfect backflip, or walk on a non-flat
+  ground. In terms of simulation, \citeauthor{2013-TOG-MuscleBasedBipeds}
+  desgined a muscle based avatar with two legs which can take a lot of shape.
+  According to that shape and environment (e.g. the gravity), they were able to
+  teach the creature to stand and walk, and it learned the proper gait (one
+  creature with small legs figured out itself it is easier to
+  jump).\cite{2013-TOG-MuscleBasedBipeds}
+  All that studies could be used in many areas. Healthcare institute could
+  design better articial arm or leg, or could give more efficient companion
+  robots to their patient. That last one could be use in all fields of life,
+  like a buttler. In a more ludic ways, we will be able to design a more
+  realistic gait for our 3D avatar, even for non-player characters. 
   
 	\section{Problem Statement}
+
+  The problem I want to solve is then to teach a 3D avatar to walk. That kind of
+  problem is solved with reinforcement learning and this is the solution I will
+  try to solve. For a human, walking is a simple task but we did learn after
+  many trials, step by step, with the help of our hand at the beggining and then
+  stand and walk.
+  \paragraph{}
+  To teach that to a 3D avatar, we need to define algorithm
+  which allow not only the avatar to walk but to walk with a human gait to avoid
+  too much movement for a single step, or avoid doing a false movement and fail
+  down after three steps because of that false movement. At each step, without
+  thinking about it, humans take care of the two/three steps we will do in the
+  future. We have to design our model to be able to do that and optimally with
+  the same gait as human, that we can consider as the optimal gait for our shape.
 	
 	\section{Datasets and Inputs}
+
+  I will use OpenAI with the Gym python library\cite{1606.01540}, load the
+  Roboschool environment (because the default Mujoco is not free) and use deep
+  reinforcement learning to make the robot stands and walks.
+  
+  \subsection{Action space}
+  The action space is a vector of 17 float values in the range [-1, 1]. Each
+  value corresponds to the joints of the avatar by this order
+  \href{https://github.com/openai/roboschool/blob/master/roboschool/mujoco_assets/humanoid_symmetric.xml}{XML}:
+  \begin{multicols}{2}
+  \begin{itemize}
+  \item{abdomen\_y}
+  \item{abdomen\_z}
+  \item{abdomen\_x}
+  \item{right\_hip\_x}
+  \item{right\_hip\_z}
+  \item{right\_hip\_y}
+  \item{right\_knee}
+  \item{left\_hip\_x}
+  \item{left\_hip\_z}
+  \item{left\_hip\_y}
+  \item{left\_knee}
+  \item{right\_shoulder1}
+  \item{right\_shoulder2}
+  \item{right\_elbow}
+  \item{left\_shoulder1}
+  \item{left\_shoulder2}
+  \item{left\_elbow}
+  \end{itemize}
+\end{multicols}
+  At each step, these values are applied to all the joints of the body by the code
+\begin{verbatim}
+for n,j in enumerate(self.ordered_joints):
+    j.set_motor_torque( self.power*j.power_coef \
+                         *float(np.clip(a[n], -1, +1)) )
+\end{verbatim}
+
+in the \verb?apply_action? function in the class which extends the
+\verb?gym.Env? class (\verb?RoboschoolMujocoXmlEnv?) to set the torque value
+into the respective motor.
+
+\subsection{Observation space}
+The state space (or observation space) is a vector of 44 float values in the
+range [-5, 5] (Roboschool clip the vector with numpy before returning it in the
+\verb?step? function). That vector is a concatenation of three subvectors:
+\begin{itemize}
+    \item{\textbf{more}: It is a vector of 8 values defined as follows:
+        \begin{itemize}
+            \item{The distance between the last position of the body and the current one.}
+            \item{The sinus of the angle to the target.}
+            \item{The cosinus of the angle to the target.}
+            \item{The three next values is the X, Y and Z values of the matrix multiplication between
+                \begin{itemize}
+                   \item{\[\left(
+ \begin{matrix}
+  \cos(-yaw) & -\sin(-yaw) & 0 \\
+  \sin(-yaw) & \cos(yaw) & 0 \\
+  0 & 0 & 1
+ \end{matrix}\right)
+\]}
+                   \item{The speed vector of the body.}
+                \end{itemize}}
+            \item{The roll value of the body}
+            \item{The pitch value of the body}
+        \end{itemize}}
+     \item{\textbf{j}: This is the current relative position of the joint described earlier and their current speed. The position is in the even position, and the speed in the odds (34 values).}
+     \item{\textbf{feet\_contact}: Boolean values, 0 or 1, for left and right feet, indicating if the respective feet is touching the ground or not.}
+\end{itemize}
+
+\subsection{Reward}
+
+The reward is a sum of 5 computed values: \begin{itemize}
+  \item{\textbf{alive}: -1 or +1 wether is on the ground or not}
+  \item{\textbf{progress}: potential minus the old potential. The potential is defined by
+    the speed multiplied by the distance to target point, to the negative.}
+  \item{\textbf{electricity\_cost}: The amount of energy needed for the last action}
+  \item{\textbf{joints\_at\_limit\_cost}: The amount of collision between joints of body
+      during the last action}
+  \item{\textbf{feet\_collsion\_cost}: The amount of feet collision taken during the last action}
+  \end{itemize}
 	
 	\section{Solution Statement}
-	
+
+  In my research, I figured out two I can't decide which one would be the best
+  to train my avatat to walk: A2C (Advantage Actor Critic) and Deep Q-Learning.
+  For the sake of my learning, I am really interested in the A2C algorithm since
+  it is the one who made great progress in Reinforcment Learning (I am thinking
+  about AlphaGO\cite{silver2017mastering}). But I did understand that this
+  algorithm will suit more on that problem since the walk of the robot is a
+  continuous learning, and not an episodic, for which Deep Q-Learning is more
+  suitable.
+  
 	\section{Benchmark Model}
-	
+
+  The random action model makes the avatar lying down on the ground convulsing
+  because it doesn't know how to stand up and it is just moving its joints
+  randomly.
+
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=.5\textwidth,height=.5\textheight,keepaspectratio]{Humanoid}
+  \end{figure}
+
+  In the above benchmark, we can see that Advantage Actor Critc algorithm is
+  able to converge at around 100000 episodes. That tells me that I have to be
+  patient on my training and have good metrics to tell if my model will converge
+  or not.
+  
 	\section{Evaluation Metrics}
 	
 	\section{Project Design}
