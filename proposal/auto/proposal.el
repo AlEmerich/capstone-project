@@ -2,7 +2,7 @@
  "proposal"
  (lambda ()
    (TeX-add-to-alist 'LaTeX-provided-package-options
-                     '(("babel" "english") ("natbib" "square" "comma" "sort" "numbers")))
+                     '(("babel" "english") ("natbib" "square" "comma" "sort" "numbers") ("fontenc" "T1")))
    (TeX-run-style-hooks
     "latex2e"
     "glossary"
@@ -10,7 +10,13 @@
     "art10"
     "babel"
     "natbib"
-    "glossaries")
+    "glossaries"
+    "hyperref"
+    "graphicx"
+    "xcolor"
+    "amsmath"
+    "multicol"
+    "fontenc")
    (LaTeX-add-bibliographies))
  :latex)
 
