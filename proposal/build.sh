@@ -1,5 +1,5 @@
-latex proposal
+pdflatex proposal
 bibtex proposal
 makeglossaries proposal
-latex proposal
-latex proposal
+pdflatex proposal
+pdflatex proposal
