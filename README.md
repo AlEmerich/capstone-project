@@ -157,12 +157,7 @@ three subvectors:
     -   The three next values is the X, Y and Z values of the matrix
         multiplication between
 
-        -   <span>$$\left(
-             \begin{matrix}
-              \cos(-yaw) & -\sin(-yaw) & 0 \\
-              \sin(-yaw) & \cos(yaw) & 0 \\
-              0 & 0 & 1
-             \end{matrix}\right)$$</span>
+        -   ![image](proposal/images/equation1.gif){width=".5\textwidth" height=".5\textheight"}
 
         -   <span>The speed vector of the body.</span>
 
