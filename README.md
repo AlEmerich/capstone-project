@@ -282,6 +282,6 @@ I will design my network for the policy with experience replay, in order
 to feed the actor with a random set of its memory
 `<state, action, reward, state+1, Q>` weighted by the Q-value outputed
 by the critic network (in order to learn more on good actions and less
-on bad action). The policy will be \(\epsilon)-greedy, that means it will
-have an $\epsilon$ chance to take a random action. That value will
+on bad action). The policy will be epsilon-greedy, that means it will
+have an epsilon chance to take a random action. That value will
 decrease over time to have good exploration-exploitation policy.
