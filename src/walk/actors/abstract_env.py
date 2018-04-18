@@ -11,16 +11,27 @@ class AbstractHumanoidEnv(ABC):
     """
 
     def __init__(self, args):
-        """Instantiate Roboschool humanoid environment and reset it
+        """Instantiate Roboschool humanoid environment and reset it.
+
+        :param args: arguments of the program to send to the Params.
         """
         self.params = Params(args)
         self.total_reward = 0
         self.t = 0
+        # Title has to be define in child class
         self.board = Board(self.title)
         self.env = gym.make("RoboschoolHumanoid-v1")
         self.env.reset()
 
     def plotting(self, state, reward):
+        """Send values to plot to render it. 
+        Actually plot the total reward, the distance to the target,
+        the distance of the grivity center from the ground and the
+        angle to the target. 
+
+        :param state: The current state of the environment.
+        :param reward: The reward to plot.
+        """
         target_dist = self.env.unwrapped.walk_target_dist
         dist_center_ground = state[0]
         angle_to_target = self.env.unwrapped.angle_to_target
@@ -35,7 +46,8 @@ class AbstractHumanoidEnv(ABC):
 
     def reset(self):
         """Reset the time value and the total reward
-        and reset the gym environment"""
+        and reset the gym environment
+        """
         self.t = 0
         self.total_reward = 0
         self.env.reset()
