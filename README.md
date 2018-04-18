@@ -1,8 +1,10 @@
+# CAPSTONE PROPOSAL: Arise and walk
+
 ---
 author:
 - Guitard Alan
 bibliography:
-- 'proposal.bib'
+- 'proposal/proposal.bib'
 title: |
     **Capstone Proposal**\
     Arise and walk
@@ -85,10 +87,8 @@ Action space
 #### 
 
 The action space is a vector of 17 float values in the range \[-1, 1\].
-Each value corresponds to the joints of the avatar by this order
+Each value corresponds to the joints of the avatar by this order from
 [XML](https://github.com/openai/roboschool/blob/master/roboschool/mujoco_assets/humanoid_symmetric.xml):
-
-<span>2</span>
 
 -   <span>abdomen\_y</span>
 
@@ -157,7 +157,7 @@ three subvectors:
     -   The three next values is the X, Y and Z values of the matrix
         multiplication between
 
-        -   ![image](proposal/images/equation1.gif){width=".5\textwidth" height=".5\textheight"}
+        -   ![image](proposal/images/equation1.gif)
 
         -   <span>The speed vector of the body.</span>
 
@@ -233,7 +233,7 @@ The random action model makes the avatar lying down on the ground
 convulsing because it doesn’t know how to stand up and it is just moving
 its joints randomly.
 
-![image](Humanoid){width=".5\textwidth" height=".5\textheight"}
+![image](proposal/images/Humanoid.png)
 
 In the above benchmark, we can see that Advantage Actor Critc algorithm
 is able to converge rewards at around 100000 episodes. That tells me
@@ -274,7 +274,7 @@ Tensorflow, Keras for the simplicity and Tensorflow to have my first
 insight with it. Indeed, I think the simplicity of Keras will prevent me
 to implement properly the model below.
 
-![image](actor-critic.png){width=".5\textwidth" height=".5\textheight"}
+![image](proposal/images/actor-critic.png)
 
 For my models, I will use fully-connected layers with not more five 5
 hidden layers. The powerness of the actor-critc algorithm lies in the
