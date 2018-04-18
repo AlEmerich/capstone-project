@@ -1,14 +1,10 @@
 # CAPSTONE PROPOSAL: Arise and walk
 
 ---
-author:
-- Guitard Alan
-bibliography:
-- 'proposal/proposal.bib'
-title: |
-    **Capstone Proposal**\
-    Arise and walk
-...
+- author:
+   - Guitard Alan
+- bibliography:
+   - 'proposal/proposal.bib'
 
 Domain Background
 =================
@@ -24,11 +20,11 @@ a robot to walk comes naturally in our mind.
 
 One of the first attempt to do that was to develop an algorithm by
 trying to understand the physics formula of that movement. In 1993,
-@1993-TrunkMotion tried to make a little robot by trunk motion using the
-ZMP () and the three axis (pitch, yaw and roll)@1993-TrunkMotion. In
-1999, @1999-KHR-2 added the OGM (Optimal Gradient Method) to that
+Yamaguchi et al. tried to make a little robot by trunk motion using the
+ZMP (Zero Moment Point) and the three axis (pitch, yaw and roll). In
+1999, Nagasaka et al. added the OGM (Optimal Gradient Method) to that
 approach to “optimizes the horizontal motion of a trunk to reduce the
-deviation of the calculated ZMP from its reference.” @1999-KHR-2 and
+deviation of the calculated ZMP from its reference.” and
 design the KHR-2 robot. The result was good but the gait of the robot
 was not very natural because it is very difficult to take all the
 factors in account for making the robot walking with a human gait.
@@ -36,13 +32,13 @@ factors in account for making the robot walking with a human gait.
 #### 
 
 Nowadays, Boston Dynamics made a huge advances in humanoïd robotic by
-designing Atlas@doi:10.1002/rob.21559, who was able to do a perfect
+designing Atlas, who was able to do a perfect
 backflip, or walk on a non-flat ground. In terms of simulation,
-@2013-TOG-MuscleBasedBipeds desgined a muscle based avatar with two legs
+Geijtenbeek et al. desgined a muscle based avatar with two legs
 which can take a lot of shape. According to that shape and environment
 (e.g. the gravity), they were able to teach the creature to stand and
 walk, and it learned the proper gait (one creature with small legs
-figured out itself it is easier to jump).@2013-TOG-MuscleBasedBipeds All
+figured out itself it is easier to jump). All
 that studies could be used in many areas. Healthcare institute could
 design better articial arm or leg, or could give more efficient
 companion robots to their patient. That last one could be use in all
@@ -77,7 +73,7 @@ Datasets and Inputs
 
 #### 
 
-I will use OpenAI with the Gym python library@1606.01540, load the
+I will use OpenAI with the Gym python library, load the
 Roboschool environment (because the default Mujoco is not free) and use
 deep reinforcement learning to make the robot stands and walks.
 
@@ -147,31 +143,31 @@ three subvectors:
 
 -   **more**: It is a vector of 8 values defined as follows:
 
-    -   <span>The distance between the last position of the body and the
-        current one.</span>
+    -   The distance between the last position of the body and the
+        current one.
 
-    -   <span>The sinus of the angle to the target.</span>
+    -   The sinus of the angle to the target.
 
-    -   <span>The cosinus of the angle to the target.</span>
+    -   The cosinus of the angle to the target.
 
     -   The three next values is the X, Y and Z values of the matrix
         multiplication between
 
         -   ![image](proposal/images/equation1.gif)
 
-        -   <span>The speed vector of the body.</span>
+        -   The speed vector of the body.
 
-    -   <span>The roll value of the body</span>
+    -   The roll value of the body
 
-    -   <span>The pitch value of the body</span>
+    -   The pitch value of the body
 
--   <span>**j**: This is the current relative position of the joint
+-   **j**: This is the current relative position of the joint
     described earlier and their current speed. The position is in the
-    even position, and the speed in the odds (34 values).</span>
+    even position, and the speed in the odds (34 values).
 
--   <span>**feet\_contact**: Boolean values, 0 or 1, for left and right
+-   **feet\_contact**: Boolean values, 0 or 1, for left and right
     feet, indicating if the respective feet is touching the ground
-    or not.</span>
+    or not.
 
 Reward
 ------
@@ -180,20 +176,20 @@ Reward
 
 The reward is a sum of 5 computed values:
 
--   <span>**alive**: -1 or +1 wether is on the ground or not</span>
+-   **alive**: -1 or +1 wether is on the ground or not
 
--   <span>**progress**: potential minus the old potential. The potential
+-   **progress**: potential minus the old potential. The potential
     is defined by the speed multiplied by the distance to target point,
-    to the negative.</span>
+    to the negative.
 
--   <span>**electricity\_cost**: The amount of energy needed for the
-    last action</span>
+-   **electricity\_cost**: The amount of energy needed for the
+    last action
 
--   <span>**joints\_at\_limit\_cost**: The amount of collision between
-    joints of body during the last action</span>
+-   **joints\_at\_limit\_cost**: The amount of collision between
+    joints of body during the last action
 
--   <span>**feet\_collsion\_cost**: The amount of feet collision taken
-    during the last action</span>
+-   **feet\_collsion\_cost**: The amount of feet collision taken
+    during the last action
 
 NIPS2018: AI for prosthetics
 ----------------------------
@@ -204,7 +200,7 @@ Roboschool seems to be a good choice and I have a good understanding of
 the environment because the state space and the action space is not well
 documented and I had to dig into on my own to get it. I may do some
 mistakes in my knowledge and if I have problem problems with the
-environment, I will use the NIPS2018@kidzinski2018learningtorun. It has
+environment, I will use the NIPS2018. It has
 the benefits of being documented on its spaces and having a similar
 interface than gym environment. The only change is the model not having
 a torso, so a model performing well on Roboschool will probably not work
@@ -219,7 +215,7 @@ In my research, I figured out two candidar for the chosen algorithm: A2C
 (Advantage Actor Critic) and Deep Q-Learning. For the sake of my
 learning, I am really interested in the A2C algorithm since it is the
 one who made great progress in Reinforcment Learning (I am thinking
-about AlphaGO@silver2017mastering). And above all, I understand that
+about AlphaGO). And above all, I understand that
 this algorithm will suit more on that problem since the walk of the
 robot is a continuous learning, and not an episodic, for which Deep
 Q-Learning is more suitable.
@@ -286,6 +282,6 @@ I will design my network for the policy with experience replay, in order
 to feed the actor with a random set of its memory
 `<state, action, reward, state+1, Q>` weighted by the Q-value outputed
 by the critic network (in order to learn more on good actions and less
-on bad action). The policy will be $\epsilon$-greedy, that means it will
+on bad action). The policy will be \(\epsilon)-greedy, that means it will
 have an $\epsilon$ chance to take a random action. That value will
 decrease over time to have good exploration-exploitation policy.
