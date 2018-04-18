@@ -1,10 +1,10 @@
-# CAPSTONE PROPOSAL: Arise and walk
+# Capstone Proposal: Train a 3D avatar to walk
 
 ---
-- author:
-   - Guitard Alan
-- bibliography:
-   - 'proposal/proposal.bib'
+author:
+- Guitard Alan
+bibliography:
+- 'proposal/proposal.bib'
 
 Domain Background
 =================
@@ -38,8 +38,8 @@ Geijtenbeek et al. desgined a muscle based avatar with two legs
 which can take a lot of shape. According to that shape and environment
 (e.g. the gravity), they were able to teach the creature to stand and
 walk, and it learned the proper gait (one creature with small legs
-figured out itself it is easier to jump). All
-that studies could be used in many areas. Healthcare institute could
+figured out itself it is easier to jump). All that studies could be 
+used in many areas. Healthcare institute could
 design better articial arm or leg, or could give more efficient
 companion robots to their patient. That last one could be use in all
 fields of life, like a buttler. In a more ludic ways, we will be able to
