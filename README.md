@@ -1,10 +1,10 @@
 # Capstone Proposal: Train a 3D avatar to walk
 
 ---
-author:
-- Guitard Alan
-bibliography:
-- 'proposal/proposal.bib'
+- author:
+    - Alan Guitard
+- bibliography:
+    - 'proposal/proposal.bib'
 
 Domain Background
 =================
