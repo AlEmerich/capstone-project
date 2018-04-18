@@ -1,12 +1,10 @@
+# Capstone Proposal: Train a 3D avatar to walk
+
 ---
 author:
 - Guitard Alan
 bibliography:
-- 'proposal.bib'
-title: |
-    **Capstone Proposal**\
-    Arise and walk
-...
+- 'proposal/proposal.bib'
 
 Domain Background
 =================
@@ -88,8 +86,6 @@ The action space is a vector of 17 float values in the range \[-1, 1\].
 Each value corresponds to the joints of the avatar by this order
 [XML](https://github.com/openai/roboschool/blob/master/roboschool/mujoco_assets/humanoid_symmetric.xml):
 
-<span>2</span>
-
 -   <span>abdomen\_y</span>
 
 -   <span>abdomen\_z</span>
@@ -157,12 +153,12 @@ three subvectors:
     -   The three next values is the X, Y and Z values of the matrix
         multiplication between
 
-        -   <span>$$\left(
+        -   $$\left(
              \begin{matrix}
               \cos(-yaw) & -\sin(-yaw) & 0 \\
               \sin(-yaw) & \cos(yaw) & 0 \\
               0 & 0 & 1
-             \end{matrix}\right)$$</span>
+             \end{matrix}\right)$$
 
         -   <span>The speed vector of the body.</span>
 
@@ -238,7 +234,7 @@ The random action model makes the avatar lying down on the ground
 convulsing because it doesn’t know how to stand up and it is just moving
 its joints randomly.
 
-![image](Humanoid){width=".5\textwidth" height=".5\textheight"}
+![image](proposal/images/Humanoid.png){width=".5\textwidth" height=".5\textheight"}
 
 In the above benchmark, we can see that Advantage Actor Critc algorithm
 is able to converge rewards at around 100000 episodes. That tells me
