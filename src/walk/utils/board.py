@@ -41,11 +41,13 @@ class Board():
                 self.ax[i, j].grid()
                 # Set the label
                 self.ax[i, j].set_ylabel(labels[self._index2dto1d(i, j)])
+        plt.subplots_adjust(top=0.92, bottom=0.08, left=0.10, right=0.95, hspace=0.5,
+                            wspace=0.5)
         plt.ion()
 
     def on_running(self, ydatas, xdata):
         """Call to update the plots.
-        
+
         :param ydatas: data to add to the already render data. 
         The order of the data should match the order of the labels
         provided in on_launch()

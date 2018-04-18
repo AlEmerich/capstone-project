@@ -10,18 +10,19 @@ class AbstractHumanoidEnv(ABC):
     """ Super class of all policy.
     """
 
-    def __init__(self, args):
+    def __init__(self, args, title):
         """Instantiate Roboschool humanoid environment and reset it.
 
         :param args: arguments of the program to send to the Params.
         """
         self.params = Params(args)
-        self.total_reward = 0
+        self.rewards = []
         self.t = 0
         # Title has to be define in child class
         self.board = Board(self.title)
+        labels = ["Reward", "Distance to target", "Gravity center from ground", "Angle to target"]
+        self.board.on_launch(row=2, column=2, labels=labels)
         self.env = gym.make("RoboschoolHumanoid-v1")
-        self.env.reset()
 
     def plotting(self, state, reward):
         """Send values to plot to render it. 
@@ -38,9 +39,9 @@ class AbstractHumanoidEnv(ABC):
 
         # increment t and the total reward
         self.t += 1
-        self.total_reward += reward
+        self.rewards.append(reward)
 
-        ydatas = [self.total_reward, target_dist, dist_center_ground, angle_to_target]
+        ydatas = [np.average(self.rewards), target_dist, dist_center_ground, angle_to_target]
         # Data to plot in the Y axis of the subplots
         self.board.on_running(ydatas, self.t)
 
@@ -54,9 +55,9 @@ class AbstractHumanoidEnv(ABC):
         self.board.on_reset()
 
     @abstractmethod
-    def act(self):
+    def act(self, state):
         pass
 
     @abstractmethod
-    def train(self):
+    def run(self, train_pass, epochs):
         pass
