@@ -15,8 +15,39 @@ class AC_Policy(AbstractHumanoidEnv):
         self.critic_model = ActorCritic.critic_model(self.env)
         self.target_critic_model = ActorCritic.critic_model(self.env)
 
-    def train():
+    def _train_actor(self, state, action, reward, new_state, done):
         pass
+
+    def _train_critic(self, samples):
+        for sample in samples:
+            state, action, reward, new_state, done = sample
+            
+            # Get the Q-value of the action given the state
+            Q_value = self.critic_model.predict([state, action])
+
+            # Get the action the actor will take with new state
+            next_action = self.target_actor_model(new_state)
+
+            # Get the Q_+1-value 
+            Q_value_p1 = self.target_critic_model([new_state, new_action])
+
+            # Don't see in the future on action which lead to done
+            future_rewards = reward + self.params.gamma * Q_value_p1 * (1 - done)
+
+
+
+    def train(self):
+
+        # Don't train if there is not enough samples in the memory
+        if len(self.memory) < self.batch_size:
+            return
+
+        samples = self.memory.samples(self.batch_size)
+
+        # Let's try first to run samples on critic then on actor
+        # And after one sample per sample
+        _train_critic(samples)
+        _train_actor(samples)
 
     def act(self, state):
         epsilon = self.params.epsilon
@@ -41,3 +72,5 @@ class AC_Policy(AbstractHumanoidEnv):
                 self.memory.remember(state, action, reward, new_state, done)
 
                 state = new_state
+
+                self.train()

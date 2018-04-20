@@ -25,9 +25,9 @@ class ActorCritic():
 
         merge = concatenate([h1, h2])
         out_1 = Dense(64, activation="relu")(merge)
-        out_2 = Dense(128, activation="relu")(out_1)
-        out_3 = Dense(64, activation="relu")(out_2)
-        out_4 = Dense(32, activation="relu")(out_3)
+        out_2 = Dense(32, activation="relu")(out_1)
+        out_3 = Dense(16, activation="relu")(out_2)
+        out_4 = Dense(1, activation="relu")(out_3)
 
         model = Model(inputs=[input_state, input_action], outputs=out_4)
         model.compile(optimizer="adam", loss="mse")

@@ -1,5 +1,5 @@
 import argparse
-from walk.actors.random_policy import RandomPolicy
+from walk.agents.random_policy import RandomPolicy
 
 def str2bool(v):
     """Function to convert string respresenting a boolean
@@ -39,7 +39,7 @@ def main():
     args = parser.parse_args()
     # Send args to the actor and let it train
     humanoid = RandomPolicy(args)
-    humanoid.train(humanoid.params.train_pass, humanoid.params.epochs)
+    humanoid.run(humanoid.params.train_pass, humanoid.params.epochs)
 
 
 if __name__ == "__main__":

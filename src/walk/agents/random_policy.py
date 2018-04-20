@@ -11,7 +11,7 @@ class RandomPolicy(AbstractHumanoidEnv):
         and create the labels of the plot before initializing it.
         """
         super(RandomPolicy, self).__init__(args, "Random policy")
-
+    
     def act(self, state):
         """ Return a random action.
         """

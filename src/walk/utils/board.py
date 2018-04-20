@@ -83,8 +83,8 @@ class Board():
                 # Get the line
                 line = self.lines[self._index2dto1d(i, j)]
                 # Flush datas
-                line.set_xdata()
-                line.set_ydata()
+                line.set_xdata([])
+                line.set_ydata([])
 
     def _index2dto1d(self, row, column):
         """Convert X-Y coordinates in one index to 

@@ -19,7 +19,7 @@ class AbstractHumanoidEnv(ABC):
         self.rewards = []
         self.t = 0
         # Title has to be define in child class
-        self.board = Board(self.title)
+        self.board = Board(title)
         labels = ["Reward", "Distance to target", "Gravity center from ground", "Angle to target"]
         self.board.on_launch(row=2, column=2, labels=labels)
         self.env = gym.make("RoboschoolHumanoid-v1")

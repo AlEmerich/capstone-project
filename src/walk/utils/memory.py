@@ -25,3 +25,6 @@ class Memory():
                                    replace=False)
         idx = [self.mem[i] for i in indices]
         return idx
+
+    def __len__(self):
+        return len(self.mem)
