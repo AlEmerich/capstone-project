@@ -1,5 +1,6 @@
 import argparse
-from walk.agents.random_policy import RandomPolicy
+import json
+from walk.agents.ac_policy import AC_Policy
 
 def str2bool(v):
     """Function to convert string respresenting a boolean
@@ -12,12 +13,10 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
-def main():
-    """Entry point of the program.
-    """
+def load_param_from_json():
+    return json.load(open("params.json"))
 
-    # Parse args
-    parser = argparse.ArgumentParser()
+def load_param_from_cli():
     parser.add_argument("--reset", type=str2bool, default=False,
                         help="t to reset the environment when done, f if not. (default: f)")
     parser.add_argument("--render", type=str2bool, default=False,
@@ -26,6 +25,12 @@ def main():
                         help="t to plot metrics, f if not (default: t)")
 
     # Hyper parameters
+    parser.add_argument("--train", type=str2bool, default=True,
+                        help="True to perform training, false if not. (default: True)")
+    parser.add_argument("--load_weights", type=str2bool, default=False,
+                        help="True to load weights from file, false if not. (default: False)")
+    parser.add_argument("--batch_size", type=int, default=32,
+                        help="Size of batch to get from memory at every step. (default: 32)")
     parser.add_argument("--train_pass", type=int, default=10000,
                         help="Number of allowing reset, infinity if reset is false. (default: 100)")
     parser.add_argument("--epochs", type=int, default=100,
@@ -35,12 +40,21 @@ def main():
                         help="Epsilon value to make random decisions sometimes. (default: 0.8)")
     parser.add_argument("--epsilon_decay", type=float, default=0.001,
                         help="Decay to decrease epsilon. (default: 0.001)")
+    parser.add_argument("--learning_rate", type=float, default=0.01,
+                        help="How fast the model will learn. (default: 0.01)")
+    parser.add_argument("--tau", type=float, default=0.01,
+                        help="How much target modes wil lbe updated from models. (default: 0.01)")
+    parser.add_argument("--gamma", type=float, default=0.1,
+                        help="Discount factor. (default: 0.01)")
+    return vars(parser.parse_args())
 
-    args = parser.parse_args()
+def main(args):
+    """Entry point of the program.
+    """
     # Send args to the actor and let it train
-    humanoid = RandomPolicy(args)
+    humanoid = AC_Policy(args)
     humanoid.run(humanoid.params.train_pass, humanoid.params.epochs)
 
 
 if __name__ == "__main__":
-    main()
+    main(load_param_from_json())

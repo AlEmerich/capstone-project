@@ -9,7 +9,7 @@ class Memory():
     def __init__(self, length=1000):
         """Instantiate the queue
         """
-        self.mem = deque(maxlen=legnth)
+        self.mem = deque(maxlen=length)
 
     def remember(self, state, action, reward, next_action, done):
         """Put a new SARS in the memory

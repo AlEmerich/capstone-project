@@ -1,0 +1,16 @@
+{
+    "reset": true,
+    "render": false,
+    "plot": true,
+    "train": true,
+    "load_weights": false,
+
+    "batch_size": 32,
+    "train_pass": 10000,
+    "epochs": 100,
+    "epsilon": 0.9,
+    "epsilon_decay": 0.00001,
+    "learning_rate": 0.0001,
+    "tau": 0.125,
+    "gamma": 0.99
+}

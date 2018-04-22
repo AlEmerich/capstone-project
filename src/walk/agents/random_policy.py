@@ -11,7 +11,7 @@ class RandomPolicy(AbstractHumanoidEnv):
         and create the labels of the plot before initializing it.
         """
         super(RandomPolicy, self).__init__(args, "Random policy")
-    
+
     def act(self, state):
         """ Return a random action.
         """
@@ -33,12 +33,10 @@ class RandomPolicy(AbstractHumanoidEnv):
                 state, reward, done, info = self.env.step(self.act(state))
 
                 # Render the environment if asked to
-                if self.params.render:
-                    self.env.render()
+                self.render()
 
                 # Plot the different metrics if asked to
-                if self.params.plot:
-                    self.plotting(state, reward)
+                self.plotting(state, reward)
 
                 # Reset the environment when done if asked to
                 if done and self.params.reset:

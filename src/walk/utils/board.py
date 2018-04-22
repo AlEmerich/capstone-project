@@ -19,8 +19,8 @@ class Board():
         """
         nb_plots = len(labels)
         # Check if there is enough labels for the number of plots
-        if row * column != nb_plots:
-            raise Exception("row and column you provide is not equal to the number of labels")
+        if row * column < nb_plots:
+            raise Exception("row and column you provided is lower than the number of labels")
 
         self.row = row
         self.column = column
@@ -39,8 +39,11 @@ class Board():
                 self.ax[i, j].set_autoscalex_on(True)
                 self.ax[i, j].set_autoscaley_on(True)
                 self.ax[i, j].grid()
-                # Set the label
-                self.ax[i, j].set_ylabel(labels[self._index2dto1d(i, j)])
+                try:
+                    # Set the label
+                    self.ax[i, j].set_ylabel(labels[self._index2dto1d(i, j)])
+                except IndexError:
+                    break
         plt.subplots_adjust(top=0.92, bottom=0.08, left=0.10, right=0.95, hspace=0.5,
                             wspace=0.5)
         plt.ion()
@@ -54,17 +57,20 @@ class Board():
 
         :param xdata: the xdata to add to every subplots.
         """
-        if(len(ydatas) != self.row * self.column):
-            raise Exception("Number of data you want to plot is different than the number of plots")
+        if self.row * self.column < len(ydatas):
+            raise Exception("Number of data you want to plot is higher than the number of plots")
 
         for i in range(self.row):
             for j in range(self.column):
                 # Get the line
                 line = self.lines[self._index2dto1d(i, j)]
+                # Add the corresponding ydata to the already present one
+                try:
+                    line.set_ydata(np.append(line.get_ydata(), ydatas[self._index2dto1d(i, j)]))
+                except IndexError:
+                    break
                 # Add the xdata to the already present one
                 line.set_xdata(np.append(line.get_xdata(), xdata))
-                # Add the corresponding ydata to the already present one
-                line.set_ydata(np.append(line.get_ydata(), ydatas[self._index2dto1d(i, j)]))
                 # Recompute the limit
                 self.ax[i, j].relim()
                 # Autoscale the view
@@ -74,21 +80,27 @@ class Board():
         self.figure.canvas.draw()
         self.figure.canvas.flush_events()
 
-    def on_reset(self):
+    def on_reset(self, t):
         """Call when the environment is reset.
         It basically flush every subplots.
         """
         for i in range(self.row):
             for j in range(self.column):
+                try:
+                    self.ax[i, j].axvline(x=t,ymin=0,ymax=0.1,c="red",
+                                          linewidth=2, zorder=0,
+                                          clip_on=False)
+                except AttributeError:
+                    print("Attribute error: ",i,j)
                 # Get the line
-                line = self.lines[self._index2dto1d(i, j)]
+                # line = self.lines[self._index2dto1d(i, j)]
                 # Flush datas
-                line.set_xdata([])
-                line.set_ydata([])
+                # line.set_xdata([])
+                #line.set_ydata([])
 
     def _index2dto1d(self, row, column):
-        """Convert X-Y coordinates in one index to 
-        acces a 2-D flatten array by the equation 
+        """Convert X-Y coordinates in one index to
+        acces a 2-D flatten array by the equation
         `(length of row) * row_index + row_column`
 
         :Example:
