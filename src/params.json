@@ -6,11 +6,10 @@
     "load_weights": false,
 
     "batch_size": 32,
-    "train_pass": 10000,
-    "epochs": 100,
-    "epsilon": 0.9,
-    "epsilon_decay": 0.00001,
-    "learning_rate": 0.0001,
+    "epochs": 100000,
+    "epsilon": 1.0,
+    "epsilon_decay": 0.00000001,
+    "learning_rate": 0.01,
     "tau": 0.125,
-    "gamma": 0.99
+    "gamma": 0.95
 }

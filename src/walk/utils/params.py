@@ -3,7 +3,7 @@ class Params():
     """
 
     def __init__(self, args):
-        """Unpack args into memebrs."""
+        """Unpack args into members."""
         self.render = args["render"]
         self.reset = args["reset"]
         self.plot = args["plot"]
@@ -13,8 +13,7 @@ class Params():
         self.batch_size = args["batch_size"]
 
         self.epochs = args["epochs"]
-        self.train_pass = args["train_pass"]
-
+        
         self.base_epsilon = args["epsilon"]
         self.epsilon = self.base_epsilon
         self.epsilon_decay = args["epsilon_decay"]

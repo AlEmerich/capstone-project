@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import datetime
+import os
 
 plt.ion()
 class Board():
@@ -10,6 +12,9 @@ class Board():
         """Set the up title of the plot.
         """
         self.title = title
+        self.folder = "plots"
+        if not os.path.exists(self.folder):
+            os.makedirs(self.folder)
 
     def on_launch(self, row, column, labels):
         """Initialize the plot.
@@ -44,11 +49,17 @@ class Board():
                     self.ax[i, j].set_ylabel(labels[self._index2dto1d(i, j)])
                 except IndexError:
                     break
+        # Adjust the subplots
         plt.subplots_adjust(top=0.92, bottom=0.08, left=0.10, right=0.95, hspace=0.5,
                             wspace=0.5)
+
+        # Define a placeholder for information in the middle of the figure
+        self.text = self.figure.text(0.5, 0.5, "",
+                                     horizontalalignment='center',
+                                     verticalalignment='center')
         plt.ion()
 
-    def on_running(self, ydatas, xdata):
+    def on_running(self, ydatas, xdata, info=None):
         """Call to update the plots.
 
         :param ydatas: data to add to the already render data. 
@@ -76,27 +87,32 @@ class Board():
                 # Autoscale the view
                 self.ax[i, j].autoscale_view()
 
+        # Set new text if info is not None
+        if info:
+            self.text.set_text(info)
         #We need to draw *and* flush
         self.figure.canvas.draw()
         self.figure.canvas.flush_events()
 
     def on_reset(self, t):
         """Call when the environment is reset.
-        It basically flush every subplots.
+        It draws red line at the t to show when
+        the env had been resetted.
         """
         for i in range(self.row):
             for j in range(self.column):
                 try:
                     self.ax[i, j].axvline(x=t,ymin=0,ymax=0.1,c="red",
-                                          linewidth=2, zorder=0,
-                                          clip_on=False)
+                                          linewidth=1, zorder=0,
+                                          clip_on=True)
                 except AttributeError:
                     print("Attribute error: ",i,j)
-                # Get the line
-                # line = self.lines[self._index2dto1d(i, j)]
-                # Flush datas
-                # line.set_xdata([])
-                #line.set_ydata([])
+
+    def save(self):
+        """Save the plot at (datetime.now).png.
+        """
+        f = str(datetime.datetime.now()).replace(" ","")+".png"
+        plt.savefig(os.path.join(self.folder, f))
 
     def _index2dto1d(self, row, column):
         """Convert X-Y coordinates in one index to

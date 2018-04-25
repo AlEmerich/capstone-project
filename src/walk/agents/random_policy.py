@@ -25,23 +25,19 @@ class RandomPolicy(AbstractHumanoidEnv):
         """
         state = self.env.reset()
 
-        for i in range(train_pass):
-            if self.params.reset:
-                self.env.reset()
+        for j in range(epochs):
+            state, reward, done, info = self.env.step(self.act(state))
 
-            for j in range(epochs):
-                state, reward, done, info = self.env.step(self.act(state))
+            # Render the environment if asked to
+            self.render()
 
-                # Render the environment if asked to
-                self.render()
+            # Plot the different metrics if asked to
+            self.plotting(state, reward)
 
-                # Plot the different metrics if asked to
-                self.plotting(state, reward)
-
-                # Reset the environment when done if asked to
-                if done and self.params.reset:
-                    observation = self.reset()
-                    break
+            # Reset the environment when done if asked to
+            if done and self.params.reset:
+                observation = self.reset()
+                break
 
 
 if __name__ == "__main__":

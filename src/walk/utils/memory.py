@@ -4,7 +4,8 @@ import numpy as np
 class Memory():
     """Implement the Experience Replay logic in order to
     train over samples of the memory at each pass and not just
-    on the current state.
+    on the current state. Hold the queue of
+    <state, action, reward, next_state, done>.
     """
     def __init__(self, length=1000):
         """Instantiate the queue
@@ -24,7 +25,34 @@ class Memory():
                                    size=batch_size,
                                    replace=False)
         idx = [self.mem[i] for i in indices]
-        return idx
+
+        return self._stack_memory(idx)
+
+    def _stack_memory(self, samples):
+        """Separate the samples into numpy arrays of states, of
+        actions, of rewards, of new_states and of dones in order
+        to be in a good shape to feed neural network with it.
+        """
+        states = []
+        actions = []
+        rewards = []
+        new_states = []
+        dones = []
+        for sample in samples:
+            state, action, reward, new_state, done = sample
+            states.append(np.array(state))
+            actions.append(np.array(action))
+            rewards.append(reward)
+            new_states.append(np.array(new_state))
+            dones.append(done)
+        states = np.vstack(states)
+        actions = np.vstack(actions)
+        rewards = np.array(rewards)
+        new_states = np.vstack(new_states)
+        dones = np.array(done)
+        return states, actions, rewards, new_states, dones
 
     def __len__(self):
+        """return the length of the inner queue.
+        """
         return len(self.mem)

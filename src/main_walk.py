@@ -31,8 +31,6 @@ def load_param_from_cli():
                         help="True to load weights from file, false if not. (default: False)")
     parser.add_argument("--batch_size", type=int, default=32,
                         help="Size of batch to get from memory at every step. (default: 32)")
-    parser.add_argument("--train_pass", type=int, default=10000,
-                        help="Number of allowing reset, infinity if reset is false. (default: 100)")
     parser.add_argument("--epochs", type=int, default=100,
                         help="Number of maximum loop before reset at each train_pass. (default: 1000)")
 
@@ -53,7 +51,7 @@ def main(args):
     """
     # Send args to the actor and let it train
     humanoid = AC_Policy(args)
-    humanoid.run(humanoid.params.train_pass, humanoid.params.epochs)
+    humanoid.run()
 
 
 if __name__ == "__main__":
