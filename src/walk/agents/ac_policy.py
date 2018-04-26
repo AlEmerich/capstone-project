@@ -38,8 +38,7 @@ class AC_Policy(AbstractHumanoidEnv):
 
         # Define the placeholder for the gradients
         self.actor_critic_grad = tf.placeholder(tf.float32,
-                                                [None, self.params.batch_size,
-                                                 self.env.action_space.shape[0]])
+                                                [None, self.env.action_space.shape[0]])
         # Get the weight of the model needed to compute the gradients
         actor_model_weights = self.actor_model.trainable_weights
 
@@ -73,8 +72,6 @@ class AC_Policy(AbstractHumanoidEnv):
         """Train the actor, the policy network, against the critic
         gradients.
         """
-        # Get next actions from states
-        next_actions = self.actor_model.predict_on_batch(states)
 
         # Compute gradients from the critics
         grads = self.tf_session.run(self.critic_grads,
