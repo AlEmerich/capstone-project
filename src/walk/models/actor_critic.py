@@ -1,8 +1,9 @@
+from abc import ABC
 import tensorflow as tf
-from ..utils.memory import Memory
 import os
 
-class ActorCritic():
+
+class AbstractActorCritic(ABC):
     """Model manager for actor critic agents. It build models
     and have function to save it.
     """
@@ -24,56 +25,93 @@ class ActorCritic():
         if not os.path.exists(path):
             os.makedirs(path)
 
-    def actor_model(self):
+    def save_model_weights(self, model, filepath):
+        """Save the weights of thespecified model
+        to the specified file in folder specified
+        in __init__.
+        """
+        pass
+
+    def load_model_weights(self, model, filepath):
+        """Load the weights of the specified model
+        to the specified file in folder specified
+        in __init__.
+        """
+        pass
+
+
+class Actor(AbstractActorCritic):
+    """Policy network.
+    """
+    def __init__(self):
         """Create the actor model and return it with
         input layer in order to train with the gradients
         of the critic network.
         """
+        super(Actor, self).__init__()
 
-        self.actor_input = tf.placeholder([None, self.observation_space.shape[0]])
+        self.input_ph = tf.placeholder(
+            [None, self.observation_space.shape[0]])
 
-        self.actor_action_gradients = tf.placeholder([None, self.action_space.shape[0]])
+        self.action_gradients = tf.placeholder(
+            [None, self.action_space.shape[0]])
 
         h_out = None
         for nb_node in [256, 128, 64, 32]:
-            h_out = tf.layers.dense(h_out if h_out else self.actor_input,
+            h_out = tf.layers.dense(h_out if h_out
+                                    else self.input_ph,
                                     units=nb_node, activation=tf.nn.relu)
             h_out = tf.nn.batch_normalization(h_out)
 
         # Action space is from -1 to 1 and it is the range of
         # hyperbolic tangent
-        self.actor_output = tf.layers.dense(h_out, units=self.action_space.shape[0],
-                                            activation=tf.nn.tanh)
+        self.output = tf.layers.dense(h_out,
+                                      units=self.action_space.shape[0],
+                                      activation=tf.nn.tanh)
 
-        self.actor_loss = tf.reduce_mean(tf.multiply(-self.action_gradients, self.actor_output))
-        self.actor_opt = tf.optimizer.AdamOptimizer(self.lr).minimize(loss)
+        self.loss = tf.reduce_mean(
+            tf.multiply(-self.action_gradients, self.output))
 
-    def critic_model(self):
+        self.actor_opt = tf.optimizer.AdamOptimizer(
+            self.lr).minimize(self.loss)
+
+
+class Critic(AbstractActorCritic):
+    """Q network.
+    """
+    def __init__(self):
         """Create the critic model and return the two input layers
         in order to compute gradients from critic network.
         """
+        super(Critic, self).__init__()
+
+        self.true_target_ph = tf.placeholder(tf.float32)
+
         ################################################################
         # STATE
         ################################################################
-        self.critic_input_state = tf.placeholder([None, self.observation_space.shape[0]])
+        self.input_state_ph = tf.placeholder(
+            [None, self.observation_space.shape[0]])
 
         state_out = None
-        for nb_node in (256, 128, 64, 32):
-            state_out = tf.layers.dense(h_out if h_out else self.critic_input_state,
-                                     units=nb_node, activation=tf.nn.relu)
-            state_out = tf.nn.batch_normalization(h_out)
-
+        for nb_node in [256, 128, 64, 32]:
+            state_out = tf.layers.dense(state_out if state_out
+                                        else self.critic_input_state,
+                                        units=nb_node, activation=tf.nn.relu)
+            state_out = tf.nn.batch_normalization(state_out)
 
         ################################################################
         # ACTION
         ################################################################
-        self.critic_input_action = tf.placeholder([None, self.action_space.shape[0]])
+        self.input_action_ph = tf.placeholder(
+            [None, self.action_space.shape[0]])
 
         action_out = None
-        for nb_node in (128, 64):
-            action_out = tf.layers.dense(h_out if h_out else self.critic_input_action,
-                                 units=nb_node)
-            action_out = tf.nn.batch_normalization(h_out)
+        for nb_node in [128, 64]:
+            action_out = tf.layers.dense(action_out if action_out
+                                         else self.input_action_ph,
+                                         units=nb_node, activation=tf.nn.relu)
+            action_out = tf.nn.batch_normalization(action_out)
 
         merge = tf.add(state_out, action_out)
 
@@ -82,28 +120,9 @@ class ActorCritic():
         out_3 = tf.layers.dense(out_2, 16, activation=tf.nn.relu)
         self.Q = tf.layers.dense(out_3, 1, activation=tf.nn.relu)
 
-        s
-        self.critic_loss = tf.losses.mean_squared_error()
-        self.critic_opt = tf.optimizer.AdamOptimizer(self.lr).minimize(self.critic_loss)
+        self.action_gradients = tf.gradients(self.Q, self.critic_input_action)
 
-    def save_model_weights(self, model, filepath):
-        """Save the weights of thespecified model
-        to the specified file in folder specified
-        in __init__.
-        """
-        model.save_weights(os.path.join(self.folder, filepath))
-
-    def load_model_weights(self, model, filepath):
-        """Load the weights of the specified model
-        to the specified file in folder specified
-        in __init__.
-        """
-        model.load_weights(os.path.join(self.folder, filepath))
-
-    def callbacks(self, filepath):
-        """Defines Keras callback. Just checkpoint for now to save
-        the best only.
-        """
-        checkpoint = ModelCheckpoint(os.path.join(self.folder, filepath),
-                                     save_best_only=True, monitor="loss")
-        return [checkpoint]
+        self.critic_loss = tf.losses.mean_squared_error(
+            self.true_target, self.Q)
+        self.critic_opt = tf.optimizer.AdamOptimizer(
+            self.lr).minimize(self.critic_loss)

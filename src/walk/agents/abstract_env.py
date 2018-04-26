@@ -3,8 +3,8 @@ from abc import ABC, abstractmethod
 from ..utils.params import Params
 from ..utils.board import Board
 import numpy as np
-import matplotlib.pyplot as plt
 import roboschool, gym
+
 
 class AbstractHumanoidEnv(ABC):
     """ Super class of all policy.
