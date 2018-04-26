@@ -1,9 +1,8 @@
 from .abstract_env import AbstractHumanoidEnv
-from ..models.actor_critic import ActorCritic
+from ..models.actor_critic import Actor, Critic
 from ..utils.memory import Memory
 from ..utils.noise import Noise
 import numpy as np
-import keras.backend as K
 import tensorflow as tf
 
 # https://arxiv.org/pdf/1607.07086.pdf
@@ -20,91 +19,38 @@ class AC_Policy(AbstractHumanoidEnv):
         super(AC_Policy, self).__init__(args, "Actor Critic algorithm")
         self.memory = Memory()
         self.tf_session = tf.Session()
-        K.set_session(self.tf_session)
         self.noise = Noise(mu=np.zeros(self.env.action_space.shape[0]))
         self.actor_file = "actor.h5"
         self.critic_file = "critic.h5"
-        self.model_builder = ActorCritic(self.env.observation_space,
-                                         self.env.action_space)
-
+        
         ################################################################
         # ACTOR
         ################################################################
-        self.actor_input, self.actor_model = self.model_builder.actor_model(self.params)
+        self.actor_model = Actor(self.env.observation_space,
+                                 self.env.action_space,
+                                 self.params.learning_rate,
+                                 self.params.tau)
         # Get a second actor model to use it for target and copy the
         # weight of the first actor model to it
-        _, self.target_actor_model = self.model_builder.actor_model(self.params)
+        self.target_actor_model = Actor(self.env.observation_space,
+                                 self.env.action_space,
+                                        self.params.learning_rate,
+                                        self.params.tau)
         self._update_target_network(self.actor_model, self.target_actor_model, True)
-
-        # Define the placeholder for the gradients
-        self.actor_critic_grad = tf.placeholder(tf.float32,
-                                                [None, self.env.action_space.shape[0]])
-        # Get the weight of the model needed to compute the gradients
-        actor_model_weights = self.actor_model.trainable_weights
-
-        # Define the gradients computation
-        self.actor_grads = tf.gradients(self.actor_model.output,
-                                        actor_model_weights,
-                                        -self.actor_critic_grad)
-
-        grads = zip(self.actor_grads, actor_model_weights)
-        # Train applying the gradients
-        self.actor_optimizer = tf.train.AdamOptimizer(
-            self.params.learning_rate).apply_gradients(grads)
 
         ################################################################
         # CRITIC
         ################################################################
-        self.critic_state_input, self.critic_action_input,\
-            self.critic_model = self.model_builder.critic_model(self.params)
+        self.critic_model = Critic(self.env.observation_space,
+                                   self.env.action_space,
+                                   self.params.learning_rate,
+                                   self.params.tau)
         # Get a second critic model to use it for target and copy their
         # weight of the first critic model to it 
-        _, _, self.target_critic_model = self.model_builder.critic_model(self.params)
+        self.target_critic_model = Critic(self.env.observationn_space,
+                                   self.env.action_space,
+                                   self.params.learning_rate)
         self._update_target_network(self.critic_model, self.target_critic_model, True)
-
-        # Compute the gradients in order to give it to the actor
-        self.critic_grads = tf.gradients(self.critic_model.output,
-                                         self.critic_action_input)
-        # Initialize all global variables of tensorflow
-        self.tf_session.run(tf.global_variables_initializer())
-
-    def _train_actor(self, states, actions, rewards, new_states, dones):
-        """Train the actor, the policy network, against the critic
-        gradients.
-        """
-
-        # Compute gradients from the critics
-        grads = self.tf_session.run(self.critic_grads,
-                                    feed_dict = {
-                                        self.critic_state_input: states,
-                                        self.critic_action_input: actions
-                                    })
-
-        # Train the actor with states and gradients
-        self.tf_session.run(self.actor_optimizer,
-                            feed_dict = {
-                                self.actor_input: states,
-                                self.actor_critic_grad: grads
-                            })
-        # Save the model 
-        self.model_builder.save_model_weights(self.actor_model, self.actor_file)
-
-
-    def _train_critic(self, states, actions, rewards, new_states, dones):
-        """Train the critic network in a keras way with fit.
-        """
-        # predict next actions
-        next_actions = self.target_actor_model.predict_on_batch(states)
-
-        # Compute the Q+1 value with next s+1 and a+1
-        Q_values_p1 = self.target_critic_model.predict(
-            [new_states, next_actions])[0][0]
-        # Compute the expected reward with Bellman equation
-        future_rewards = rewards + self.params.gamma * Q_values_p1 * (1 - dones)
-        # Train the critic network with expected rewards as targets
-        self.critic_model.fit([states, actions], future_rewards,
-                              verbose=0,
-                              callbacks=self.model_builder.callbacks(self.critic_file))
 
     def train(self):
         """Train both network if asked to when the memory
@@ -118,12 +64,37 @@ class AC_Policy(AbstractHumanoidEnv):
         if len(self.memory) < self.params.batch_size:
             return
 
-        states, actions, rewards, new_states, dones = self.memory.samples(self.params.batch_size)
+        states, actions, rewards, next_states, dones = self.memory.samples(self.params.batch_size)
 
-        # Let's try first to run samples on critic then on actor
-        # And after one sample per sample
-        self._train_critic(states, actions, rewards, new_states, dones)
-        self._train_actor(states, actions, rewards, new_states, dones)
+        # Predicted actions
+        next_actions = self.tf_session.run(self.actor_model.output,
+                                           feed_dict={
+                                               self.actor_model.input_h: states
+                                           })
+        # Compute the Q+1 value with next s+1 and a+1
+        Q_next = self.tf_session.run(self.critic_model.Q, feed_dict={
+            self.critic_model.input_state_ph: next_actions,
+            self.critic_model.input_action_ph: next_states
+        })
+
+        Q = rewards + self.params.gamma * Q_next * (1 - dones)
+
+        feed_critic =  {
+                self.critic_model.input_state_ph: states,
+                self.critic_model.input_action_ph: actions,
+                self.critic_model.true_target: Q
+            }
+        critic_loss, _, critic_action_gradient = self.tf_session.run(
+            [self.critic_model.loss, self.critic_model.opt,
+             self.critic_model.action_gradients],
+            feed_dict=feed_critic)
+
+        feed_actor = {
+            self.actor_model.input_ph: states,
+            self.actor_model.action_gradients: critic_action_gradient
+        }
+        self.tf_session.run([self.actor_model.loss, self.actor_model.opt],
+                            feed_dict=feed_actor)
 
         self._update_target_network(self.actor_model, self.target_actor_model)
         self._update_target_network(self.critic_model, self.target_critic_model)
@@ -132,16 +103,12 @@ class AC_Policy(AbstractHumanoidEnv):
         """Update target network with soft update if just_copy is False
         and just copy weights from model to target if True.
         """
-        weights = model.get_weights()
-        target_weights = target.get_weights()
-
-        soft_update = lambda x, y: x * self.params.tau + (1 - self.params.tau) * y
-
-        for i in range(len(target_weights)):
-            target_weights[i] = weights[i] if just_copy else soft_update(
-                target_weights[i], weights[i])
-
-        target.set_weights(target_weights)
+        # feed = {
+        #     target.from_weights: model.global_variables,
+        #     target.just_copy: just_copy
+        # }
+        # self.tf_session.run(target.update_target, feed)
+        pass
 
     def act(self, state):
         """Return action given a state and add noise to it.
@@ -158,7 +125,8 @@ class AC_Policy(AbstractHumanoidEnv):
                 return self.env.action_space.sample()
 
         reshaped_state = state.reshape(1, self.env.observation_space.shape[0])
-        return self.actor_model.predict(reshaped_state)[0] + self.noise()
+        feed = {self.actor_model.input_ph: reshaped_state}
+        return self.tf_session.run(self.actor_model.output, feed) + self.noise()
 
     def run(self):
         """Run the simulation.
