@@ -22,7 +22,7 @@ class AC_Policy(AbstractHumanoidEnv):
         self.noise = Noise(mu=np.zeros(self.env.action_space.shape[0]))
         self.actor_file = "actor.h5"
         self.critic_file = "critic.h5"
-        
+
         ################################################################
         # ACTOR
         ################################################################
@@ -33,10 +33,12 @@ class AC_Policy(AbstractHumanoidEnv):
         # Get a second actor model to use it for target and copy the
         # weight of the first actor model to it
         self.target_actor_model = Actor(self.env.observation_space,
-                                 self.env.action_space,
+                                        self.env.action_space,
                                         self.params.learning_rate,
                                         self.params.tau)
-        self._update_target_network(self.actor_model, self.target_actor_model, True)
+        self._update_target_network(self.actor_model,
+                                    self.target_actor_model,
+                                    True)
 
         ################################################################
         # CRITIC
@@ -48,9 +50,11 @@ class AC_Policy(AbstractHumanoidEnv):
         # Get a second critic model to use it for target and copy their
         # weight of the first critic model to it 
         self.target_critic_model = Critic(self.env.observationn_space,
-                                   self.env.action_space,
-                                   self.params.learning_rate)
-        self._update_target_network(self.critic_model, self.target_critic_model, True)
+                                          self.env.action_space,
+                                          self.params.learning_rate)
+        self._update_target_network(self.critic_model,
+                                    self.target_critic_model,
+                                    True)
 
     def train(self):
         """Train both network if asked to when the memory
@@ -64,7 +68,8 @@ class AC_Policy(AbstractHumanoidEnv):
         if len(self.memory) < self.params.batch_size:
             return
 
-        states, actions, rewards, next_states, dones = self.memory.samples(self.params.batch_size)
+        states, actions, rewards, next_states, dones = \
+            self.memory.samples(self.params.batch_size)
 
         # Predicted actions
         next_actions = self.tf_session.run(self.actor_model.output,
@@ -79,7 +84,7 @@ class AC_Policy(AbstractHumanoidEnv):
 
         Q = rewards + self.params.gamma * Q_next * (1 - dones)
 
-        feed_critic =  {
+        feed_critic = {
                 self.critic_model.input_state_ph: states,
                 self.critic_model.input_action_ph: actions,
                 self.critic_model.true_target: Q
@@ -96,19 +101,17 @@ class AC_Policy(AbstractHumanoidEnv):
         self.tf_session.run([self.actor_model.loss, self.actor_model.opt],
                             feed_dict=feed_actor)
 
-        self._update_target_network(self.actor_model, self.target_actor_model)
-        self._update_target_network(self.critic_model, self.target_critic_model)
+        self._update_target_network(self.actor_model,
+                                    self.target_actor_model)
+        self._update_target_network(self.critic_model,
+                                    self.target_critic_model)
 
     def _update_target_network(self, model, target, just_copy=False):
         """Update target network with soft update if just_copy is False
         and just copy weights from model to target if True.
         """
-        # feed = {
-        #     target.from_weights: model.global_variables,
-        #     target.just_copy: just_copy
-        # }
-        # self.tf_session.run(target.update_target, feed)
-        pass
+        target._soft_update_weights(model.global_variables, just_copy)
+
 
     def act(self, state):
         """Return action given a state and add noise to it.
@@ -118,7 +121,8 @@ class AC_Policy(AbstractHumanoidEnv):
             epsilon = self.params.epsilon
             decay = self.params.epsilon_decay
             # Decaying function
-            self.params.epsilon = epsilon * ((1 - decay) ** (self.t % self.params.epochs))
+            self.params.epsilon = epsilon * ((1 - decay) ** (
+                self.t % self.params.epochs))
 
             # Return a random action epsilon percent of the time
             if np.random.random() < self.params.epsilon:
@@ -126,7 +130,8 @@ class AC_Policy(AbstractHumanoidEnv):
 
         reshaped_state = state.reshape(1, self.env.observation_space.shape[0])
         feed = {self.actor_model.input_ph: reshaped_state}
-        return self.tf_session.run(self.actor_model.output, feed) + self.noise()
+        return self.tf_session.run(self.actor_model.output,
+                                   feed) + self.noise()
 
     def run(self):
         """Run the simulation.
@@ -135,8 +140,10 @@ class AC_Policy(AbstractHumanoidEnv):
 
         # True to initialize actor and critic with saved weights
         if self.params.load_weights:
-            self.model_builder.load_model_weights(self.actor_model, self.actor_file)
-            self.model_builder.load_model_weights(self.critic_model, self.critic_file)
+            self.model_builder.load_model_weights(
+                self.actor_model, self.actor_file)
+            self.model_builder.load_model_weights(
+                self.critic_model, self.critic_file)
 
         for j in range(self.params.epochs):
             action = self.act(state)

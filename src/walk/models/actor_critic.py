@@ -37,23 +37,21 @@ class AbstractActorCritic(ABC):
         """
         pass
 
-    def _soft_update_weights(self):
+    def _soft_update_weights(self, from_weights, just_copy):
         #########################################
         # SOFT TARGET UPDATE
         #########################################
-        # self.global_variables = tf.get_collection(
-        #     tf.GraphKeys.GLOBAL_VARIABLES)
+        self.global_variables = tf.get_collection(
+            tf.GraphKeys.GLOBAL_VARIABLES)
 
-        # self.just_copy = tf.placeholder(tf.bool)
+        soft_update = lambda to_, from_: from_ * self.tau + (
+            1 - self.tau) * to_
 
-        # soft_update = lambda to_, from_: from_ * self.tau + (
-        #     1 - self.tau) * to_
+        self.update_target = [
+            tf.assign(to_, soft_update(to_, from_)) for to_, from_
+            in zip(self.global_variables, self.from_weights) 
+        ]
 
-        # self.update_target = [
-        #     tf.assign(to, soft_update(to_, from_)) for to, from_
-        #     in zip(self.global_variables, self.from_weights)
-        # ]
-        pass
 
 class Actor(AbstractActorCritic):
     """Policy network.
@@ -66,11 +64,11 @@ class Actor(AbstractActorCritic):
         super(Actor, self).__init__(observation_space,
                                     action_space, lr, tau)
 
-        self.input_ph = tf.placeholder(tf.float32,
-            [None, self.observation_space.shape[0]])
+        self.input_ph = tf.placeholder(
+            tf.float32, [None, self.observation_space.shape[0]])
 
-        self.action_gradients = tf.placeholder(tf.float32,
-            [None, self.action_space.shape[0]])
+        self.action_gradients = tf.placeholder(
+            tf.float32, [None, self.action_space.shape[0]])
 
         h_out = None
         for nb_node in [256, 128, 64, 32]:
@@ -107,8 +105,8 @@ class Critic(AbstractActorCritic):
         ################################################################
         # STATE
         ################################################################
-        self.input_state_ph = tf.placeholder(tf.float32,
-            [None, self.observation_space.shape[0]])
+        self.input_state_ph = tf.placeholder(
+            tf.float32, [None, self.observation_space.shape[0]])
 
         state_out = None
         for nb_node in [256, 128, 64, 32]:
@@ -120,8 +118,8 @@ class Critic(AbstractActorCritic):
         ################################################################
         # ACTION
         ################################################################
-        self.input_action_ph = tf.placeholder(tf.float32,
-            [None, self.action_space.shape[0]])
+        self.input_action_ph = tf.placeholder(
+            tf.float32, [None, self.action_space.shape[0]])
 
         action_out = None
         for nb_node in [128, 64]:
