@@ -45,10 +45,10 @@ class Memory():
             rewards.append(reward)
             new_states.append(np.array(new_state))
             dones.append(done)
-        states = np.vstack(states)
-        actions = np.vstack(actions)
+        states = np.array(states)
+        actions = np.array(actions)
         rewards = np.array(rewards)
-        new_states = np.vstack(new_states)
+        new_states = np.array(new_states)
         dones = np.array(done)
         return states, actions, rewards, new_states, dones
 
