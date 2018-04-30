@@ -1,4 +1,5 @@
 from abc import ABC
+import datetime
 import tensorflow as tf
 import os
 
@@ -14,7 +15,12 @@ class AbstractActorCritic(ABC):
         self.observation_space = observation_space
         self.action_space = action_space
         self.folder = "saved_folder"
+        # Get time as string
+        sub = str(datetime.datetime.now())
+        self.sub_folder = sub.replace(" ", "_")
         self._create_weights_folder(self.folder)
+        self._create_weights_folder(
+            os.path.join(self.folder, self.sub_folder))
         self.lr = lr
         self.tau = tau
         self.batch_size = batch_size
@@ -24,32 +30,35 @@ class AbstractActorCritic(ABC):
         if not os.path.exists(path):
             os.makedirs(path)
 
-    def save_model_weights(self, model, filepath):
+    def save_model_weights(self, sess, filepath):
         """Save the weights of thespecified model
         to the specified file in folder specified
         in __init__.
         """
-        pass
+        saver = tf.train.Saver()
+        saver.save(sess, os.path.join(self.folder, filepath))
 
-    def load_model_weights(self, model, filepath):
+    def load_model_weights(self, sess, filepath):
         """Load the weights of the specified model
         to the specified file in folder specified
         in __init__.
         """
-        pass
+        saver = tf.train.Saver()
+        saver.restore(sess, os.path.join(self.folder, filepath))
 
     def _soft_update_weights(self, from_weights, just_copy):
         #########################################
         # SOFT TARGET UPDATE
         #########################################
 
+        copy = lambda to_, from_: from_
         soft_update = lambda to_, from_: from_ * self.tau + (
             1 - self.tau) * to_
 
-        self.update_target = [
-            tf.assign(to_, soft_update(to_, from_)) for to_, from_
-            in zip(self.global_variables, from_weights) 
-        ]
+        fn = copy if just_copy else soft_update
+
+        for to_, from_ in zip(self.global_variables, from_weights):
+            tf.assign(to_, fn(to_, from_))
 
 
 class Actor(AbstractActorCritic):

@@ -17,6 +17,7 @@ def load_param_from_json():
     return json.load(open("params.json"))
 
 def load_param_from_cli():
+    parser = argparse.ArgumentParser()
     parser.add_argument("--reset", type=str2bool, default=False,
                         help="t to reset the environment when done, f if not. (default: f)")
     parser.add_argument("--render", type=str2bool, default=False,

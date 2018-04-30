@@ -1,9 +1,9 @@
 {
-    "reset": true,
-    "render": false,
-    "plot": true,
-    "train": true,
-    "load_weights": false,
+    "reset": false,
+    "render": true,
+    "plot": false,
+    "train": false,
+    "load_weights": true,
 
     "batch_size": 32,
     "epochs": 10000,

@@ -3,7 +3,8 @@ from abc import ABC, abstractmethod
 from ..utils.params import Params
 from ..utils.board import Board
 import numpy as np
-import roboschool, gym
+import roboschool
+import gym
 
 
 class AbstractHumanoidEnv(ABC):
@@ -33,15 +34,16 @@ class AbstractHumanoidEnv(ABC):
         labels = None
         if self.params.train:
             labels = ["Reward", "Average reward",
-                      "Number of epochs", "Epsilon"]
+                      "Distance gravity center from ground",
+                      "Epsilon", "Critic loss", "Actor loss"]
         else:
             labels = ["Average reward", "Angle to target",
                       "Distance to target", "Gravity center from ground"]
 
-        self.board.on_launch(row=2, column=2, labels=labels)
+        self.board.on_launch(row=2, column=3, labels=labels)
         self.env = gym.make("RoboschoolHumanoid-v1")
 
-    def plotting(self, state, epsilon, reward):
+    def plotting(self, **kwargs):
         """Send values to plot to render it.
         Actually plot the total reward, the distance to the target,
         the distance of the grivity center from the ground and the
@@ -51,6 +53,12 @@ class AbstractHumanoidEnv(ABC):
         :param reward: The reward to plot.
         """
         if self.params.plot:
+            # Unpack kwargs
+            state = kwargs.get('state')
+            reward = kwargs.get('reward')
+            epsilon = kwargs.get('epsilon')
+            c_loss = kwargs.get('c_loss')
+            a_loss = kwargs.get('a_loss')
 
             # Get metrics
             target_dist = self.env.unwrapped.walk_target_dist
@@ -66,7 +74,7 @@ class AbstractHumanoidEnv(ABC):
             if self.params.train:
                 ydatas = [reward, np.average(self.rewards),
                           dist_center_ground,
-                          epsilon]
+                          epsilon, c_loss, a_loss]
             else:
                 ydatas = [np.average(self.rewards), angle_to_target,
                           target_dist, dist_center_ground]
@@ -75,8 +83,10 @@ class AbstractHumanoidEnv(ABC):
             info = None
             if self.list_reset_t:
                 info = ' '.join(["RESET at t =", str(self.last_t),
-                                 ", Best t so far:", str(max(self.list_reset_t)),
-                                 ", Average t :", str(np.average(self.list_reset_t))])
+                                 ", Best t so far:",
+                                 str(max(self.list_reset_t)),
+                                 ", Average t :",
+                                 str(np.average(self.list_reset_t))])
 
             # Data to plot in the Y axis of the subplots
             self.board.on_running(ydatas, self.t, info=info)
