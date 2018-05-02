@@ -7,6 +7,7 @@ import tensorflow as tf
 
 # https://arxiv.org/pdf/1607.07086.pdf
 
+
 class AC_Policy(AbstractHumanoidEnv):
     """Actor critic agent. Implements DDPG algorithm from
     https://arxiv.org/pdf/1509.02971v5.pdf.

@@ -1,8 +1,8 @@
 {
-    "reset": false,
-    "render": true,
-    "plot": false,
-    "train": false,
+    "reset": true,
+    "render": false,
+    "plot": true,
+    "train": true,
     "load_weights": true,
 
     "batch_size": 32,

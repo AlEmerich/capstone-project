@@ -1,7 +1,8 @@
 from OpenGL import GLU # prevent running error
 from abc import ABC, abstractmethod
 from ..utils.params import Params
-from ..utils.board import Board
+from ..utils.matplotboard import MatplotBoard
+from ..utils.tensorboard import TensorBoard
 import numpy as np
 import roboschool
 import gym
@@ -11,7 +12,7 @@ class AbstractHumanoidEnv(ABC):
     """ Super class of all policy.
     """
 
-    def __init__(self, args, title):
+    def __init__(self, args):
         """Instantiate Roboschool humanoid environment and reset it.
 
         :param args: arguments of the program to send to the Params.
@@ -26,22 +27,26 @@ class AbstractHumanoidEnv(ABC):
         # list of t corresponding to the life time of the env
         self.list_reset_t = []
 
-        # Title has to be define in child class
-        self.board = Board(title)
-
         # When training, we are not interested at the same metrics
         # than when not training
-        labels = None
+        self.labels = None
         if self.params.train:
-            labels = ["Reward", "Average reward",
-                      "Distance gravity center from ground",
-                      "Epsilon", "Critic loss", "Actor loss"]
+            self.labels = ["Reward", "Average reward",
+                           "Distance gravity center from ground",
+                           "Epsilon", "Critic loss", "Actor loss"]
         else:
-            labels = ["Average reward", "Angle to target",
-                      "Distance to target", "Gravity center from ground"]
-
-        self.board.on_launch(row=2, column=3, labels=labels)
+            self.labels = ["Average reward", "Angle to target",
+                           "Distance to target", "Gravity center from ground"]
         self.env = gym.make("RoboschoolHumanoid-v1")
+
+    def use_matplotlib(self, title):
+        # Title has to be define in child class
+        self.board = MatplotBoard(title)
+        self.board.on_launch(row=2, column=3, labels=self.labels)
+
+    def use_tensorboard(self, tf_session):
+        self.board = TensorBoard(tf_session)
+        self.board.on_launch(labels=self.labels)
 
     def plotting(self, **kwargs):
         """Send values to plot to render it.
@@ -89,7 +94,9 @@ class AbstractHumanoidEnv(ABC):
                                  str(np.average(self.list_reset_t))])
 
             # Data to plot in the Y axis of the subplots
-            self.board.on_running(ydatas, self.t, info=info)
+            self.board.on_running(ydatas=ydatas,
+                                  xdata=self.t,
+                                  info=info)
 
     def reset(self, done):
         """Reset the time value and the total reward

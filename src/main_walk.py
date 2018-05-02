@@ -2,6 +2,7 @@ import argparse
 import json
 from walk.agents.ac_policy import AC_Policy
 
+
 def str2bool(v):
     """Function to convert string respresenting a boolean
     into a boolean.
@@ -13,8 +14,10 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
+
 def load_param_from_json():
     return json.load(open("params.json"))
+
 
 def load_param_from_cli():
     parser = argparse.ArgumentParser()
@@ -46,6 +49,7 @@ def load_param_from_cli():
     parser.add_argument("--gamma", type=float, default=0.1,
                         help="Discount factor. (default: 0.01)")
     return vars(parser.parse_args())
+
 
 def main(args):
     """Entry point of the program.

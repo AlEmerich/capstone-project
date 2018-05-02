@@ -3,6 +3,7 @@ import datetime
 import tensorflow as tf
 import os
 
+
 class AbstractActorCritic(ABC):
     """Model manager for actor critic agents. It build models
     and have function to save it.
