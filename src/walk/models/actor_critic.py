@@ -59,7 +59,7 @@ class AbstractActorCritic(ABC):
         fn = copy if just_copy else soft_update
 
         for to_, from_ in zip(self.global_variables, from_weights):
-            tf.assign(to_, fn(to_, from_))
+            tf.assign(to_, fn(to_, from_), name="soft_update")
 
 
 class Actor(AbstractActorCritic):
@@ -74,36 +74,46 @@ class Actor(AbstractActorCritic):
         super(Actor, self).__init__(observation_space,
                                     action_space, lr, tau,
                                     batch_size)
+        with tf.variable_scope("actor"):
+            self.input_ph = tf.placeholder(
+                tf.float32, [None, self.observation_space.shape[0]],
+                name='state_input')
 
-        self.input_ph = tf.placeholder(
-            tf.float32, [None, self.observation_space.shape[0]],
-            name='actor_state_input')
+            self.action_gradients = tf.placeholder(
+                tf.float32, [None, self.action_space.shape[0]],
+                name='action_gradients')
 
-        self.action_gradients = tf.placeholder(
-            tf.float32, [None, self.action_space.shape[0]],
-            name='actor_action_gradients')
+            with tf.variable_scope("state_input"):
+                h_out = None
+                for i, nb_node in enumerate([64, 128, 256, 128, 64, 32]):
+                    h_out = tf.layers.dense(
+                        h_out if h_out is not None
+                        else self.input_ph,
+                        units=nb_node,
+                        activation=tf.nn.relu,
+                        name="dense_"+str(nb_node)+"_"+str(i))
+                    h_out = tf.layers.batch_normalization(
+                        h_out,
+                        name="batch_norm_"+str(nb_node)+"_"+str(i))
 
-        h_out = None
-        for nb_node in [64, 128, 256, 128, 64, 32]:
-            h_out = tf.layers.dense(h_out if h_out is not None
-                                    else self.input_ph,
-                                    units=nb_node, activation=tf.nn.relu)
-            h_out = tf.layers.batch_normalization(h_out)
+            with tf.variable_scope("action_output"):
+                # Action space is from -1 to 1 and it is the range of
+                # hyperbolic tangent
+                self.output = tf.layers.dense(
+                    h_out, units=self.action_space.shape[0],
+                    activation=tf.nn.tanh,
+                    name="output")
 
-        # Action space is from -1 to 1 and it is the range of
-        # hyperbolic tangent
-        self.output = tf.layers.dense(h_out,
-                                      units=self.action_space.shape[0],
-                                      activation=tf.nn.tanh)
+            with tf.variable_scope("train"):
+                self.loss = tf.reduce_mean(
+                    tf.multiply(-self.action_gradients, self.output),
+                    name="loss")
 
-        self.loss = tf.reduce_mean(
-            tf.multiply(-self.action_gradients, self.output))
+                self.opt = tf.train.AdamOptimizer(
+                    self.lr).minimize(self.loss)
 
-        self.opt = tf.train.AdamOptimizer(
-            self.lr).minimize(self.loss)
-
-        self.global_variables = tf.get_collection(
-            tf.GraphKeys.GLOBAL_VARIABLES)
+            self.global_variables = tf.get_collection(
+                tf.GraphKeys.GLOBAL_VARIABLES)
 
 
 class Critic(AbstractActorCritic):
@@ -117,52 +127,75 @@ class Critic(AbstractActorCritic):
         super(Critic, self).__init__(observation_space,
                                      action_space, lr, tau,
                                      batch_size)
+        with tf.variable_scope("critic"):
+            self.true_target_ph = tf.placeholder(
+                tf.float32, name='true_target')
 
-        self.true_target_ph = tf.placeholder(tf.float32,
-                                             name='critic_true_target')
+            ################################################################
+            # STATE
+            ################################################################
+            with tf.variable_scope("state_input"):
+                self.input_state_ph = tf.placeholder(
+                    tf.float32, [None, self.observation_space.shape[0]],
+                    name='state_input')
 
-        ################################################################
-        # STATE
-        ################################################################
-        self.input_state_ph = tf.placeholder(
-            tf.float32, [None, self.observation_space.shape[0]],
-            name='critic_state_input')
+                state_out = None
+                for nb_node in [128, 64, 32]:
+                    state_out = tf.layers.dense(
+                        state_out if state_out is not None
+                        else self.input_state_ph,
+                        units=nb_node,
+                        activation=tf.nn.relu,
+                        name="dense_state_"+str(nb_node))
+                    state_out = tf.layers.batch_normalization(
+                        state_out,
+                        name="batch_norm_state_"+str(nb_node))
 
-        state_out = None
-        for nb_node in [128, 64, 32]:
-            state_out = tf.layers.dense(state_out if state_out is not None
-                                        else self.input_state_ph,
-                                        units=nb_node, activation=tf.nn.relu)
-            state_out = tf.layers.batch_normalization(state_out)
+            ################################################################
+            # ACTION
+            ################################################################
+            with tf.variable_scope("action_input"):
+                self.input_action_ph = tf.placeholder(
+                    tf.float32, [None, self.action_space.shape[0]],
+                    name='action_input')
 
-        ################################################################
-        # ACTION
-        ################################################################
-        self.input_action_ph = tf.placeholder(
-            tf.float32, [None, self.action_space.shape[0]],
-            name='critic_action_input')
+                action_out = None
+                for nb_node in [128, 64, 32]:
+                    action_out = tf.layers.dense(
+                        action_out if action_out is not None
+                        else self.input_action_ph,
+                        units=nb_node,
+                        activation=tf.nn.relu,
+                        name="dense_action_"+str(nb_node))
+                    action_out = tf.layers.batch_normalization(
+                        action_out,
+                        name="batch_norm_action_"+str(nb_node))
 
-        action_out = None
-        for nb_node in [128, 64, 32]:
-            action_out = tf.layers.dense(action_out if action_out is not None
-                                         else self.input_action_ph,
-                                         units=nb_node, activation=tf.nn.relu)
-            action_out = tf.layers.batch_normalization(action_out)
+            with tf.variable_scope("Q_output"):
+                merge = tf.concat([state_out, action_out],
+                                  axis=1,
+                                  name="concat")
 
-        merge = tf.concat([state_out, action_out], axis=1)
+                out_1 = tf.layers.dense(merge, 64, activation=tf.nn.relu,
+                                        name="out_64_1")
+                out_2 = tf.layers.dense(out_1, 128, activation=tf.nn.relu,
+                                        name="out_128")
+                out_3 = tf.layers.dense(out_2, 64, activation=tf.nn.relu,
+                                        name="out_64_2")
+                out_4 = tf.layers.dense(out_3, 32, activation=tf.nn.relu,
+                                        name="out_32")
+                self.Q = tf.layers.dense(out_4, 1, activation=tf.nn.relu,
+                                         name="out")
 
-        out_1 = tf.layers.dense(merge, 64, activation=tf.nn.relu)
-        out_2 = tf.layers.dense(out_1, 128, activation=tf.nn.relu)
-        out_3 = tf.layers.dense(out_2, 64, activation=tf.nn.relu)
-        out_4 = tf.layers.dense(out_3, 32, activation=tf.nn.relu)
-        self.Q = tf.layers.dense(out_3, 1, activation=tf.nn.relu)
+            with tf.variable_scope("gradients"):
+                self.action_gradients = tf.gradients(
+                    self.Q, self.input_action_ph)
 
-        self.action_gradients = tf.gradients(self.Q, self.input_action_ph)
+            with tf.variable_scope("train"):
+                self.loss = tf.losses.mean_squared_error(
+                    self.true_target_ph, self.Q)
+                self.opt = tf.train.AdamOptimizer(
+                    self.lr).minimize(self.loss)
 
-        self.loss = tf.losses.mean_squared_error(
-            self.true_target_ph, self.Q)
-        self.opt = tf.train.AdamOptimizer(
-            self.lr).minimize(self.loss)
-
-        self.global_variables = tf.get_collection(
-            tf.GraphKeys.GLOBAL_VARIABLES)
+            self.global_variables = tf.get_collection(
+                tf.GraphKeys.GLOBAL_VARIABLES)

@@ -1,9 +1,9 @@
 {
     "reset": true,
     "render": false,
-    "plot": true,
+    "plot": "tensorflow",
     "train": true,
-    "load_weights": true,
+    "load_weights": false,
 
     "batch_size": 32,
     "epochs": 10000,

@@ -26,6 +26,7 @@ class AbstractHumanoidEnv(ABC):
         self.last_t = 0
         # list of t corresponding to the life time of the env
         self.list_reset_t = []
+        self.board = None
 
         # When training, we are not interested at the same metrics
         # than when not training
@@ -40,11 +41,14 @@ class AbstractHumanoidEnv(ABC):
         self.env = gym.make("RoboschoolHumanoid-v1")
 
     def use_matplotlib(self, title):
-        # Title has to be define in child class
+        """Set the agent to use matplotboard to plot metrics.
+        """
         self.board = MatplotBoard(title)
         self.board.on_launch(row=2, column=3, labels=self.labels)
 
     def use_tensorboard(self, tf_session):
+        """Set the agent to use tensorboard to plot metrics.
+        """
         self.board = TensorBoard(tf_session)
         self.board.on_launch(labels=self.labels)
 
@@ -57,7 +61,7 @@ class AbstractHumanoidEnv(ABC):
         :param state: The current state of the environment.
         :param reward: The reward to plot.
         """
-        if self.params.plot:
+        if self.board:
             # Unpack kwargs
             state = kwargs.get('state')
             reward = kwargs.get('reward')

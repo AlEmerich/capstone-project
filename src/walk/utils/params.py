@@ -13,7 +13,7 @@ class Params():
         self.batch_size = args["batch_size"]
 
         self.epochs = args["epochs"]
-        
+
         self.base_epsilon = args["epsilon"]
         self.epsilon = self.base_epsilon
         self.epsilon_decay = args["epsilon_decay"]

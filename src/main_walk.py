@@ -25,8 +25,8 @@ def load_param_from_cli():
                         help="t to reset the environment when done, f if not. (default: f)")
     parser.add_argument("--render", type=str2bool, default=False,
                         help="t to render the environment, f if not. (default: f)")
-    parser.add_argument("--plot", type=str2bool, default=True,
-                        help="t to plot metrics, f if not (default: t)")
+    parser.add_argument("--plot", type=str, default=None,
+                        help="show library to plot metrics, matplotlib or tensorflow (default: None)")
 
     # Hyper parameters
     parser.add_argument("--train", type=str2bool, default=True,

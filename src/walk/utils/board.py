@@ -19,6 +19,8 @@ class Board(ABC):
         self._create_folder(self.path)
 
     def _create_folder(self, folder):
+        """Create folder if it doesn't exists.
+        """
         if not os.path.exists(folder):
             os.makedirs(folder)
 

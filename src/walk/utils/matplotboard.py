@@ -70,6 +70,8 @@ class MatplotBoard(Board):
         provided in on_launch()
 
         :param xdata: the xdata to add to every subplots.
+
+        :param info: random text to show in the middle of the figure.
         """
         ydatas = kwargs['ydatas']
         xdata = kwargs['xdata']
