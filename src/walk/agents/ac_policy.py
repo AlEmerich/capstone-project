@@ -51,13 +51,6 @@ class AC_Policy(AbstractHumanoidEnv):
         ################################################################
 
         with tf.variable_scope("target_network"):
-            # Get a second critic model to use it for target and copy their
-            # weight of the first critic model to it
-            self.target_critic_model = Critic(self.env.observation_space,
-                                              self.env.action_space,
-                                              self.params.learning_rate,
-                                              self.params.tau,
-                                              self.params.batch_size)
             # Get a second actor model to use it for target and copy the
             # weight of the first actor model to it
             self.target_actor_model = Actor(self.env.observation_space,
@@ -65,13 +58,26 @@ class AC_Policy(AbstractHumanoidEnv):
                                             self.params.learning_rate,
                                             self.params.tau,
                                             self.params.batch_size)
+# Get a second critic model to use it for target and copy their
+            # weight of the first critic model to it
+            self.target_critic_model = Critic(self.env.observation_space,
+                                              self.env.action_space,
+                                              self.params.learning_rate,
+                                              self.params.tau,
+                                              self.params.batch_size)
 
-            self._update_target_network(self.actor_model,
-                                        self.target_actor_model,
-                                        True)
-            self._update_target_network(self.critic_model,
-                                        self.target_critic_model,
-                                        True)
+        self.target_params = tf.trainable_variables(scope="target_network")
+        self.net_params = tf.trainable_variables(scope="network")
+
+        self.update_target_net_params = \
+            [self.target_params[i].assign(tf.multiply(self.net_params[i],
+                                                      self.params.tau) +
+                                          tf.multiply(self.target_params[i],
+                                                      1. - self.params.tau))
+             for i in range(len(self.target_params))]
+        self.just_copy_target_net_params = \
+            [self.target_params[i].assign(self.net_params[i])
+             for i in range(len(self.target_params))]
 
         # Defines the plotting library
         if self.params.plot == "tensorflow":
@@ -81,6 +87,7 @@ class AC_Policy(AbstractHumanoidEnv):
 
         # Initialize global variables of the session
         self.tf_session.run(tf.global_variables_initializer())
+        self._update_target_network(just_copy=True)
 
     def train(self):
         """Train both network if asked to when the memory
@@ -137,19 +144,21 @@ class AC_Policy(AbstractHumanoidEnv):
 
         with tf.variable_scope("soft_update"):
             # Update target network
-            self._update_target_network(self.actor_model,
-                                        self.target_actor_model)
-            self._update_target_network(self.critic_model,
-                                        self.target_critic_model)
+            self._update_target_network()
             # Save weights of the models
-            self.actor_model.save_model_weights(self.tf_session, "actor.ckpt")
-            self.critic_model.save_model_weights(self.tf_session, "critic.ckpt")
+        self.actor_model.save_model_weights(self.tf_session, "actor.ckpt")
+        self.critic_model.save_model_weights(self.tf_session, "critic.ckpt")
 
-    def _update_target_network(self, model, target, just_copy=False):
+    def _update_target_network(self, just_copy=False):
         """Update target network with soft update if just_copy is False
         and just copy weights from model to target if True.
         """
-        target._soft_update_weights(model.global_variables, just_copy)
+        if just_copy:
+            self.tf_session.run(self.just_copy_target_net_params)
+        else:
+            self.tf_session.run(self.update_target_net_params)
+        # target._soft_update_weights(self.tf_session,
+        #                             model.global_variables, just_copy)
 
     def act(self, state):
         """Return action given a state a add noise to it.

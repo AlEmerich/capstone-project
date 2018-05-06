@@ -11,7 +11,6 @@ class TensorBoard(Board):
         the super constructor.
         """
         self.tf_session = tf_session
-        self.scope = "Plotting"
         super(TensorBoard, self).__init__()
 
     def on_launch(self, **kwargs):
@@ -22,7 +21,8 @@ class TensorBoard(Board):
         self.labels = kwargs["labels"]
         # The dict we will have to feed
         self.d = {}
-        with tf.name_scope(self.scope):
+
+        with tf.variable_scope("plot"):
             # Set placeholders to dict and use it as scalar summary
             for label in self.labels:
                 self.d[label] = tf.Variable(0.0)
@@ -32,9 +32,9 @@ class TensorBoard(Board):
             self.d["info"] = tf.placeholder(tf.string, name="info")
             tf.summary.text("info", self.d["info"])
 
-            # Instantiate the writer
-            self.writer = tf.summary.FileWriter(self.path,
-                                                self.tf_session.graph)
+        # Instantiate the writer
+        self.writer = tf.summary.FileWriter(self.path,
+                                            self.tf_session.graph)
 
     def on_running(self, **kwargs):
         """Feed placeholder and variables with values provided.
@@ -50,17 +50,16 @@ class TensorBoard(Board):
         xdata = kwargs['xdata']
         info = kwargs['info']
 
-        with tf.name_scope(self.scope):
-            # Construct the dict we will feed with
-            feed = {}
-            for i, label in enumerate(self.labels):
-                feed[self.d[label]] = ydatas[i]
+        # Construct the dict we will feed with
+        feed = {}
+        for i, label in enumerate(self.labels):
+            feed[self.d[label]] = ydatas[i]
             feed[self.d["info"]] = "" if not info else info
-            self.merged = tf.summary.merge_all()
-            # Get the value to plot
-            summary = self.tf_session.run(self.merged, feed)
-            # Write to disk
-            self.writer.add_summary(summary, xdata)
+        self.merged = tf.summary.merge_all()
+        # Get the value to plot
+        summary = self.tf_session.run(self.merged, feed)
+        # Write to disk
+        self.writer.add_summary(summary, xdata)
 
     def on_reset(self, t):
         """No need to reset with tensorboard.
