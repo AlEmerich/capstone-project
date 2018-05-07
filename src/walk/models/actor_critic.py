@@ -9,7 +9,7 @@ class AbstractActorCritic(ABC):
     and have function to save it.
     """
     def __init__(self, observation_space, action_space,
-                 lr, tau, batch_size):
+                 lr, tau, batch_size, scope):
         """Save state space and action space and create
         the folder where to save the weights of the neural network.
         """
@@ -25,6 +25,7 @@ class AbstractActorCritic(ABC):
         self.lr = lr
         self.tau = tau
         self.batch_size = batch_size
+        self.scope = scope
 
     def _create_weights_folder(self, path):
         """Create the weights folder if not exists."""
@@ -56,30 +57,30 @@ class AbstractActorCritic(ABC):
         soft_update = lambda to_, from_: from_ * self.tau + (
             1 - self.tau) * to_
 
-        fn = copy if just_copy else soft_update
+        fn_ = copy if just_copy else soft_update
 
         for to_, from_ in zip(self.global_variables, from_weights):
-            op = tf.assign(to_, fn(to_, from_), name="soft_update")
-            sess.run(op)
+            op_ = tf.assign(to_, fn_(to_, from_), name="soft_update")
+            sess.run(op_)
 
-    def _summary_layer(self, tensor, name):
-        with tf.variable_scope(name):
-            weights = tf.get_variable("kernel")
-            tf.summary.histogram(values=weights, name="weights")
+    def _summary_layer(self, name):
+        scope = tf.get_variable_scope()
+        weights = tf.trainable_variables(scope=scope+name)
+        tf.summary.histogram(weights, name)
 
 
 class Actor(AbstractActorCritic):
     """Policy network.
     """
     def __init__(self, observation_space, action_space,
-                 lr, tau, batch_size):
+                 lr, tau, batch_size, scope):
         """Create the actor model and return it with
         input layer in order to train with the gradients
         of the critic network.
         """
         super(Actor, self).__init__(observation_space,
                                     action_space, lr, tau,
-                                    batch_size)
+                                    batch_size, scope)
         with tf.variable_scope("actor", reuse=tf.AUTO_REUSE):
             self.input_ph = tf.placeholder(
                 tf.float32, [None, self.observation_space.shape[0]],
@@ -92,18 +93,17 @@ class Actor(AbstractActorCritic):
             with tf.variable_scope("state_input"):
                 h_out = None
                 for i, nb_node in enumerate([64, 128, 256, 128, 64, 32]):
-                    dense_name = "dense_"+str(nb_node)+"_"+str(i)
+                    prefix = str(nb_node)+"_"+str(i)
                     h_out = tf.layers.dense(
                         h_out if h_out is not None
                         else self.input_ph,
                         units=nb_node,
                         activation=tf.nn.relu,
-                        name=dense_name)
-                    self._summary_layer(h_out, dense_name)
-                    bn_name = "batch_norm_"+str(nb_node)+"_"+str(i)
+                        name="dense_"+prefix)
+                    self._summary_layer("dense_"+prefix)
                     h_out = tf.layers.batch_normalization(
                         h_out,
-                        name=bn_name)
+                        name="batch_norm_"+prefix)
 
             with tf.variable_scope("action_output"):
                 # Action space is from -1 to 1 and it is the range of
@@ -112,10 +112,10 @@ class Actor(AbstractActorCritic):
                     h_out, units=self.action_space.shape[0],
                     activation=tf.nn.tanh,
                     name="output")
-                self._summary_layer(self.output, "output")
+                self._summary_layer("output")
 
             with tf.variable_scope("train"):
-                self.network_params = tf.trainable_variables()
+                self.network_params = tf.trainable_variable(scope=self.scope)
 
                 self.actor_gradients = tf.gradients(
                     self.output, self.network_params, -self.action_gradients)
@@ -127,21 +127,18 @@ class Actor(AbstractActorCritic):
                 self.opt = tf.train.AdamOptimizer(
                     self.lr).minimize(self.loss)
 
-            self.global_variables = tf.get_collection(
-                tf.GraphKeys.GLOBAL_VARIABLES)
-
 
 class Critic(AbstractActorCritic):
     """Q network.
     """
     def __init__(self, observation_space, action_space,
-                 lr, tau, batch_size):
+                 lr, tau, batch_size, scope):
         """Create the critic model and return the two input layers
         in order to compute gradients from critic network.
         """
         super(Critic, self).__init__(observation_space,
                                      action_space, lr, tau,
-                                     batch_size)
+                                     batch_size, scope)
         with tf.variable_scope("critic", reuse=tf.AUTO_REUSE):
             self.true_target_ph = tf.placeholder(
                 tf.float32, name='true_target')
@@ -163,7 +160,7 @@ class Critic(AbstractActorCritic):
                         units=nb_node,
                         activation=tf.nn.relu,
                         name=dense_name)
-                    self._summary_layer(state_out, dense_name)
+                    self._summary_layer(dense_name)
                     state_out = tf.layers.batch_normalization(
                         state_out,
                         name="batch_norm_"+str(nb_node))
@@ -185,7 +182,7 @@ class Critic(AbstractActorCritic):
                         units=nb_node,
                         activation=tf.nn.relu,
                         name=dense_name)
-                    self._summary_layer(action_out, dense_name)
+                    self._summary_layer(dense_name)
                     action_out = tf.layers.batch_normalization(
                         action_out,
                         name="batch_norm_action_"+str(nb_node))
@@ -196,19 +193,19 @@ class Critic(AbstractActorCritic):
                                   name="concat")
                 out_1 = tf.layers.dense(merge, 64, activation=tf.nn.relu,
                                         name="out_64_1")
-                self._summary_layer(out_1, "out_64_1")
+                self._summary_layer("out_64_1")
                 out_2 = tf.layers.dense(out_1, 128, activation=tf.nn.relu,
                                         name="out_128")
-                self._summary_layer(out_1, "out_128")
+                self._summary_layer("out_128")
                 out_3 = tf.layers.dense(out_2, 64, activation=tf.nn.relu,
                                         name="out_64_2")
-                self._summary_layer(out_1, "out_64_2")
+                self._summary_layer("out_64_2")
                 out_4 = tf.layers.dense(out_3, 32, activation=tf.nn.relu,
                                         name="out_32")
-                self._summary_layer(out_1, "out_32")
+                self._summary_layer("out_32")
                 self.Q = tf.layers.dense(out_4, 1, activation=tf.nn.relu,
                                          name="out")
-                self._summary_layer(out_1, "out")
+                self._summary_layer("out")
 
 
             with tf.variable_scope("gradients"):
@@ -220,6 +217,3 @@ class Critic(AbstractActorCritic):
                     self.true_target_ph, self.Q)
                 self.opt = tf.train.AdamOptimizer(
                     self.lr).minimize(self.loss)
-
-            self.global_variables = tf.get_collection(
-                tf.GraphKeys.GLOBAL_VARIABLES)

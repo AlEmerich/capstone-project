@@ -33,7 +33,8 @@ class AC_Policy(AbstractHumanoidEnv):
                                      self.env.action_space,
                                      self.params.learning_rate,
                                      self.params.tau,
-                                     self.params.batch_size)
+                                     self.params.batch_size,
+                                     "network/actor")
             self.actor_loss = 0
 
             ################################################################
@@ -43,7 +44,8 @@ class AC_Policy(AbstractHumanoidEnv):
                                        self.env.action_space,
                                        self.params.learning_rate,
                                        self.params.tau,
-                                       self.params.batch_size)
+                                       self.params.batch_size,
+                                       "network/critic")
             self.critic_loss = 0
 
         ################################################################
@@ -57,14 +59,16 @@ class AC_Policy(AbstractHumanoidEnv):
                                             self.env.action_space,
                                             self.params.learning_rate,
                                             self.params.tau,
-                                            self.params.batch_size)
-# Get a second critic model to use it for target and copy their
+                                            self.params.batch_size,
+                                            "target_network/actor")
+            # Get a second critic model to use it for target and copy their
             # weight of the first critic model to it
             self.target_critic_model = Critic(self.env.observation_space,
                                               self.env.action_space,
                                               self.params.learning_rate,
                                               self.params.tau,
-                                              self.params.batch_size)
+                                              self.params.batch_size,
+                                              "target_network/critic")
 
         self.target_params = tf.trainable_variables(scope="target_network")
         self.net_params = tf.trainable_variables(scope="network")
