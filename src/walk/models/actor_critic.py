@@ -64,9 +64,12 @@ class AbstractActorCritic(ABC):
             sess.run(op_)
 
     def _summary_layer(self, name):
-        scope = tf.get_variable_scope()
-        weights = tf.trainable_variables(scope=scope+name)
-        tf.summary.histogram(weights, name)
+        scope = tf.get_variable_scope().name
+        var = tf.trainable_variables(scope=scope+"/"+name)
+        weights = var[0]
+        biases = var[1]
+        tf.summary.histogram("weights", weights)
+        tf.summary.histogram("biases", biases)
 
 
 class Actor(AbstractActorCritic):
@@ -115,13 +118,13 @@ class Actor(AbstractActorCritic):
                 self._summary_layer("output")
 
             with tf.variable_scope("train"):
-                self.network_params = tf.trainable_variable(scope=self.scope)
+                self.network_params = tf.trainable_variables(scope=self.scope)
 
                 self.actor_gradients = tf.gradients(
                     self.output, self.network_params, -self.action_gradients)
 
                 self.loss = tf.reduce_mean(
-                    tf.multiply(-self.action_gradients, self.output),
+                    tf.multiply(self.action_gradients, self.output),
                     name="loss")
 
                 self.opt = tf.train.AdamOptimizer(

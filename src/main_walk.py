@@ -1,7 +1,16 @@
 import argparse
 import json
+import threading
 from walk.agents.ac_policy import AC_Policy
 
+def launch_tensorboard(log_dir):
+    import tensorflow as tf    
+    from tensorboard import main as tb
+    tf.flags.FLAGS.logdir = log_dir
+    tb.main()
+
+t = threading.Thread(target=launch_tensorboard, args=(["plots/"]))
+t.start()
 
 def str2bool(v):
     """Function to convert string respresenting a boolean

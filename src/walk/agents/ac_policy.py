@@ -135,6 +135,8 @@ class AC_Policy(AbstractHumanoidEnv):
                 [self.critic_model.loss, self.critic_model.opt,
                  self.critic_model.action_gradients],
                 feed_dict=feed_critic)
+            for grad in critic_action_gradient:
+                print(grad)
 
         with tf.variable_scope("train_actor"):
             # Train the actor network with the critic gradients
