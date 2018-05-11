@@ -214,7 +214,9 @@ class AC_Policy(AbstractHumanoidEnv):
             new_state, reward, done, info = self.env.step(action)
 
             # Put the current environment in the memory
-            self.memory.remember(state, action, reward, new_state, done)
+            # State interval is [-5;5] and action range is [-1;1]
+            self.memory.remember(state, action, reward, new_state, done,
+                                 state_range=10, action_range=2)
 
             # Reset the environment if done
             self.reset(done)

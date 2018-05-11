@@ -206,7 +206,7 @@ class Critic(AbstractActorCritic):
                 out_4 = tf.layers.dense(out_3, 32, activation=tf.nn.relu,
                                         name="out_32")
                 self._summary_layer("out_32")
-                self.Q = tf.layers.dense(out_4, 1, activation=tf.nn.relu,
+                self.Q = tf.layers.dense(out_4, 1, activation=tf.nn.sigmoid,
                                          name="out")
                 self._summary_layer("out")
 

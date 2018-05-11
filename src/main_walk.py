@@ -9,8 +9,8 @@ def launch_tensorboard(log_dir):
     tf.flags.FLAGS.logdir = log_dir
     tb.main()
 
-t = threading.Thread(target=launch_tensorboard, args=(["plots/"]))
-t.start()
+# t = threading.Thread(target=launch_tensorboard, args=(["plots/"]))
+# t.start()
 
 def str2bool(v):
     """Function to convert string respresenting a boolean
