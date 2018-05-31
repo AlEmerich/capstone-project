@@ -12,13 +12,17 @@ class Memory():
         """
         self.mem = deque(maxlen=length)
 
-    def remember(self, state, action, reward, next_action, done,
+    def remember(self, state, action, reward, next_state, done,
                  state_range=None, action_range=None):
         """Put a new SARS in the memory
         """
-        norm_state = (state + (state_range/2)) / state_range
-        norm_action = (action +(action_range/2)) / action_range
-        self.mem.append([norm_state, norm_action, reward, next_action, done])
+        if state_range:
+            state = (state + state_range/2) / state_range
+            next_state = (next_state + state_range/2) / state_range
+
+        if action_range:
+            action = (action + action_range/2) / action_range
+        self.mem.append([state, action, reward, next_state, done])
 
     def samples(self, batch_size):
         """Retrieve random batch_size of elements from the

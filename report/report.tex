@@ -1,0 +1,189 @@
+\documentclass{article}
+\usepackage[english]{babel}
+\usepackage[square,comma,sort,numbers]{natbib}
+\usepackage{glossaries}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{multicol}
+\usepackage[T1]{fontenc}
+\renewcommand{\familydefault}{\sfdefault}
+\setlength{\columnsep}{1cm}
+\graphicspath{ {images/} }
+
+% \makeglossaries
+% \input{glossary}
+
+\title{\textbf{Capstone Report}\\Arise and walk, by Deep Deterministic Policy Gradient algorithm}
+\date{\today}
+\author{Guitard Alan}
+
+
+\begin{document}
+\raggedright
+\maketitle
+
+\section{Definition of the problem}
+
+\subsection{Project Overview}
+
+With this project, I want to tackle an important task of robotics: the ability
+of a humanoïd to walk. This is a really interesting problem since we, humans, learn
+to walk without any feedback from another agent, just by a training process. The
+parents doesn't teach anything to the kids, the kids just learns. I think this
+is very interesting to build such model of artificial intelligence in order to
+to understand our brain a little bit more. \\
+The anthropologic reason is not the only reason that task is important, it is
+also important to build autonomous walking robots able to progress on every
+fields. There are several areas of actions: In war, such a robot will be able to
+reach wounded soldier to give medical treatment or bring the soldier back to a
+safe place. It will avoid a medic human to risk his life in order to do that. In
+hospital, we will gain time by giving task to the walking robot so doctors and
+nurses will have more time to give to the patient. In every day life, we will be
+able to get near from the future described by movies like ``I-Robot''. Even if
+it questions the place of the robot in human society, I think making this kind of
+robot is still a goal to reach in order to send the robot in places human cannot
+or with difficulty go, like to another planet.\\
+I am talking about walking but a neural network able to make a robot walk sure
+will be able to tackle another difficult task. The difficulty in those task is
+their continuous observation spaces. Indeed, in order to make a robot walk, we
+have two possibilities. The first one is to learn over pixels of the
+environment. I didn't choose this one because I don't think a human learn to
+walk from its sight but rather from its body. That why I chose to watch the
+position of its joints. With pixels, we will able to train the humanoïd to watch
+its steps but only after it is able to walk.
+
+\subsection{Problem Statement}
+
+The goal of this project, precisely, is to train a 3D avatar to walk forward on
+a plane fields. I will use \cite{1606.01540} as interface to the environment
+because it gives a simple and general way to use all kind of environment. For
+3-dimensional avatar, it provides a binding for Mujoco library but since
+this library is paid, I will use a free similar one called
+Roboschool\footnote{\href{https://github.com/openai/roboschool}} which propose
+few environments among the one I will use, RoboschoolHumanoid-v1.\\
+I am planning to use Reinforcement Learning to tackle this task with the
+Deep Deterministic Policy Gradient algorithm
+(\citeauthor{journals/corr/LillicrapHPHETS15}), an actor-critic algorithm.
+
+\paragraph{Actor-critic} In Reinforcement Learning, many algorithms uses an
+action-value function. It is function which returns the expected rewards after
+taken an action from a state following a policy. It is defined like this:
+\begin{equation}
+  R = \sum_{}
+\end{equation}
+
+\subsection{Metrics}
+
+\section{Analysis}
+
+\subsection{Data Exploration}
+
+\subsubsection{Observation space}
+
+This environment has an observation space of 44 float values in the range [-5,
+5] which is a concatenation a three vectors described as follows:
+\begin{itemize}
+\item{\textbf{more}: It is a vector of 8 values defined as follows:
+    \begin{itemize}
+    \item{The distance between the last position of the body and the current one.}
+    \item{The sinus of the angle to the target.}
+    \item{The cosinus of the angle to the target.}
+    \item{The three next values is the X, Y and Z values of the matrix multiplication between
+        \begin{itemize}
+        \item{\[\left(
+                \begin{matrix}
+                  \cos(-yaw) & -\sin(-yaw) & 0 \\
+                  \sin(-yaw) & \cos(yaw) & 0 \\
+                  0 & 0 & 1
+                \end{matrix}\right)
+            \]}
+        \item{The speed vector of the body.}
+        \end{itemize}}
+    \item{The roll value of the body}
+    \item{The pitch value of the body}
+    \end{itemize}}
+\item{\textbf{j}: This is the current relative position of the joint described earlier and their current speed. The position is in the even position, and the speed in the odds (34 values).}
+\item{\textbf{feet\_contact}: Boolean values, 0 or 1, for left and right feet, indicating if the respective feet is touching the ground or not.}
+\end{itemize}
+
+\subsubsection{Action space}
+The action space is a vector of 17 float values in the range [-1, 1]. Each
+value corresponds to the joints of the avatar by this order
+\href{https://github.com/openai/roboschool/blob/master/roboschool/mujoco_assets/humanoid_symmetric.xml}{XML}:
+\begin{multicols}{2}
+  \begin{itemize}
+  \item{abdomen\_y}
+  \item{abdomen\_z}
+  \item{abdomen\_x}
+  \item{right\_hip\_x}
+  \item{right\_hip\_z}
+  \item{right\_hip\_y}
+  \item{right\_knee}
+  \item{left\_hip\_x}
+  \item{left\_hip\_z}
+  \item{left\_hip\_y}
+  \item{left\_knee}
+  \item{right\_shoulder1}
+  \item{right\_shoulder2}
+  \item{right\_elbow}
+  \item{left\_shoulder1}
+  \item{left\_shoulder2}
+  \item{left\_elbow}
+  \end{itemize}
+\end{multicols}
+  At each step, these values are applied to all the joints of the body by the code
+\begin{verbatim}
+for n,j in enumerate(self.ordered_joints):
+    j.set_motor_torque( self.power*j.power_coef \
+                         *float(np.clip(a[n], -1, +1)) )
+\end{verbatim}
+
+in the \verb?apply_action? function in the class which extends the
+\verb?gym.Env? class (\verb?RoboschoolMujocoXmlEnv?) to set the torque value
+into the respective motor.
+
+\subsection{Exploratory Visualization}
+
+\subsection{Algorithm and Techniques}
+
+\paragraph{Reward}
+The reward is a sum of 5 computed values: \begin{itemize}
+  \item{\textbf{alive}: -1 or +1 wether is on the ground or not}
+  \item{\textbf{progress}: potential minus the old potential. The potential is defined by
+    the speed multiplied by the distance to target point, to the negative.}
+  \item{\textbf{electricity\_cost}: The amount of energy needed for the last action}
+  \item{\textbf{joints\_at\_limit\_cost}: The amount of collision between joints of body
+      during the last action}
+  \item{\textbf{feet\_collsion\_cost}: The amount of feet collision taken during the last action}
+  \end{itemize}
+
+\subsection{Benchmark}
+
+\section{Methodology}
+
+\subsection{Data Preprocessing}
+
+\subsection{Implementation}
+
+\subsection{Refinement}
+
+\section{Results}
+
+\subsection{Model Evaluation and Validation}
+
+\subsection{Justification}
+
+\section{Conclusion}
+
+\subsection{Free-Form Visualization}
+
+\subsection{Reflection}
+
+\subsection{Improvement}
+
+\bibliography{biblio}
+\bibliographystyle{plainnat}
+
+\end{document}

@@ -24,6 +24,7 @@ class AC_Policy(AbstractHumanoidEnv):
         self.actor_file = "actor.ckpt"
         self.critic_file = "critic.ckpt"
         self.ratio_random_action = [0, 0]
+        self.current_epsilon = self.params.epsilon
 
         with tf.variable_scope("network"):
             ################################################################
@@ -31,10 +32,13 @@ class AC_Policy(AbstractHumanoidEnv):
             ################################################################
             self.actor_model = Actor(self.env.observation_space,
                                      self.env.action_space,
-                                     self.params.learning_rate,
+                                     self.params.actor_layers,
+                                     self.params.actor_learning_rate,
                                      self.params.tau,
                                      self.params.batch_size,
-                                     "network/actor")
+                                     "network/actor",
+                                     self.params.dropout,
+                                     self.params.actor_batch_norm)
             self.actor_loss = 0
 
             ################################################################
@@ -42,10 +46,13 @@ class AC_Policy(AbstractHumanoidEnv):
             ################################################################
             self.critic_model = Critic(self.env.observation_space,
                                        self.env.action_space,
-                                       self.params.learning_rate,
+                                       self.params.critic_layers,
+                                       self.params.critic_learning_rate,
                                        self.params.tau,
                                        self.params.batch_size,
-                                       "network/critic")
+                                       "network/critic",
+                                       self.params.dropout,
+                                       self.params.critic_batch_norm)
             self.critic_loss = 0
 
         ################################################################
@@ -57,21 +64,29 @@ class AC_Policy(AbstractHumanoidEnv):
             # weight of the first actor model to it
             self.target_actor_model = Actor(self.env.observation_space,
                                             self.env.action_space,
-                                            self.params.learning_rate,
+                                            self.params.actor_layers,
+                                            self.params.actor_learning_rate,
                                             self.params.tau,
                                             self.params.batch_size,
-                                            "target_network/actor")
+                                            "target_network/actor",
+                                            self.params.dropout,
+                                            self.params.actor_batch_norm)
             # Get a second critic model to use it for target and copy their
             # weight of the first critic model to it
             self.target_critic_model = Critic(self.env.observation_space,
                                               self.env.action_space,
-                                              self.params.learning_rate,
+                                              self.params.critic_layers,
+                                              self.params.critic_learning_rate,
                                               self.params.tau,
                                               self.params.batch_size,
-                                              "target_network/critic")
+                                              "target_network/critic",
+                                              self.params.dropout,
+                                              self.params.critic_batch_norm)
 
         self.target_params = tf.trainable_variables(scope="target_network")
         self.net_params = tf.trainable_variables(scope="network")
+        print("target params:", len(self.target_params))
+        print("network params:", len(self.net_params))
 
         self.update_target_net_params = \
             [self.target_params[i].assign(tf.multiply(self.net_params[i],
@@ -105,38 +120,50 @@ class AC_Policy(AbstractHumanoidEnv):
         if len(self.memory) < self.params.batch_size:
             return
 
+        decay = self.params.epsilon_decay
+
+        # Decaying function
+        self.current_epsilon = self.current_epsilon * (
+            (1 - decay) ** (self.t % self.params.epochs))
+
         # Get samples of memory
         states, actions, rewards, next_states, dones = \
             self.memory.samples(self.params.batch_size)
 
         with tf.variable_scope("train_critic"):
+
             # Predicted actions
             next_actions = self.tf_session.run(
-                self.actor_model.output,
+                self.target_actor_model.output,
                 feed_dict={
-                    self.actor_model.input_ph: states
+                    self.target_actor_model.input_ph: next_states
                 })
+
+            if self.params.action_range:
+                next_actions = (next_actions +
+                                self.params.action_range/2
+                ) / self.params.action_range
+
             # Compute the Q+1 value with next s+1 and a+1
-            Q_next = self.tf_session.run(self.critic_model.Q, feed_dict={
-                self.critic_model.input_state_ph: next_states,
-                self.critic_model.input_action_ph: next_actions
+            Q_next = self.tf_session.run(self.target_critic_model.Q, feed_dict={
+                self.target_critic_model.input_state_ph: next_states,
+                self.target_critic_model.input_action_ph: next_actions
             })
 
             # gamma is the discounted factor
-            Q = rewards + self.params.gamma * Q_next * (1 - dones)
+            Q_next = self.params.gamma * Q_next * (1 - dones)
+            Q_next = Q_next + rewards
 
             # Train the critic network and get gradients
             feed_critic = {
                 self.critic_model.input_state_ph: states,
                 self.critic_model.input_action_ph: actions,
-                self.critic_model.true_target_ph: Q
+                self.critic_model.true_target_ph: Q_next
             }
             self.critic_loss, _, critic_action_gradient = self.tf_session.run(
                 [self.critic_model.loss, self.critic_model.opt,
                  self.critic_model.action_gradients],
                 feed_dict=feed_critic)
-            for grad in critic_action_gradient:
-                print(grad)
 
         with tf.variable_scope("train_actor"):
             # Train the actor network with the critic gradients
@@ -151,7 +178,7 @@ class AC_Policy(AbstractHumanoidEnv):
         with tf.variable_scope("soft_update"):
             # Update target network
             self._update_target_network()
-            # Save weights of the models
+        # Save weights of the models
         self.actor_model.save_model_weights(self.tf_session, "actor.ckpt")
         self.critic_model.save_model_weights(self.tf_session, "critic.ckpt")
 
@@ -163,20 +190,12 @@ class AC_Policy(AbstractHumanoidEnv):
             self.tf_session.run(self.just_copy_target_net_params)
         else:
             self.tf_session.run(self.update_target_net_params)
-        # target._soft_update_weights(self.tf_session,
-        #                             model.global_variables, just_copy)
 
     def act(self, state):
-        """Return action given a state a add noise to it.
+        """Return action given a state.
         Implements epsilon-greedy exploration.
         """
         if self.params.train:
-            epsilon = self.params.epsilon
-            decay = self.params.epsilon_decay
-            # Decaying function
-            self.params.epsilon = epsilon * ((1 - decay) ** (
-                self.t % self.params.epochs))
-
             # Return a random action epsilon percent of the time
             if np.random.random() < self.params.epsilon:
                 # +1 to random actions taken
@@ -187,14 +206,16 @@ class AC_Policy(AbstractHumanoidEnv):
         self.ratio_random_action[1] = self.ratio_random_action[1] + 1
 
         # Predict action from state
-        reshaped_state = state.reshape(1, self.env.observation_space.shape[0])
+        reshaped_state = (state.reshape(1,
+                                        self.env.observation_space.shape[0])
+                          + self.params.state_range/2) / self.params.state_range
         feed = {self.actor_model.input_ph: reshaped_state}
-        return (self.tf_session.run(self.actor_model.output,
-                                    feed) + self.noise())[0]
+        return self.tf_session.run(self.actor_model.output, feed)[0]
 
     def run(self):
         """Run the simulation.
         """
+        print(self.params)
         state = self.env.reset()
 
         # True to initialize actor and critic with saved weights
@@ -206,6 +227,9 @@ class AC_Policy(AbstractHumanoidEnv):
 
         for j in range(self.params.epochs):
             action = self.act(state)
+            if self.params.noisy:
+                action += self.noise()
+
             print("Number of random taken actions",
                   self.ratio_random_action[0],
                   "against", self.ratio_random_action[1],
@@ -215,8 +239,11 @@ class AC_Policy(AbstractHumanoidEnv):
 
             # Put the current environment in the memory
             # State interval is [-5;5] and action range is [-1;1]
-            self.memory.remember(state, action, reward, new_state, done,
-                                 state_range=10, action_range=2)
+            self.memory.remember(state, action, reward * self.params.reward_multiply,
+                                 new_state, done, state_range=10, action_range=2)
+
+            # Train the network
+            self.train()
 
             # Reset the environment if done
             self.reset(done)
@@ -226,15 +253,12 @@ class AC_Policy(AbstractHumanoidEnv):
 
             # Plot needed values
             self.plotting(state=state, reward=reward,
-                          epsilon=self.params.epsilon,
+                          epsilon=self.current_epsilon,
                           c_loss=self.critic_loss,
                           a_loss=self.actor_loss)
 
             # Change current state
             state = new_state
-
-            # Train the network
-            self.train()
 
         # Save the plot
         self.board.save()

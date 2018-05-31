@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from ..utils.params import Params
 from ..utils.matplotboard import MatplotBoard
 from ..utils.tensorboard import TensorBoard
+from collections import namedtuple
 import numpy as np
 import roboschool
 import gym
@@ -17,7 +18,9 @@ class AbstractHumanoidEnv(ABC):
 
         :param args: arguments of the program to send to the Params.
         """
-        self.params = Params(args)
+        # self.params = Params(args)
+        self.params = namedtuple("Params", args.keys())(*args.values())
+        print()
         # list of rewards updating at each step
         self.rewards = []
 

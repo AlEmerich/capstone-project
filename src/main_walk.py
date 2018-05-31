@@ -4,7 +4,7 @@ import threading
 from walk.agents.ac_policy import AC_Policy
 
 def launch_tensorboard(log_dir):
-    import tensorflow as tf    
+    import tensorflow as tf
     from tensorboard import main as tb
     tf.flags.FLAGS.logdir = log_dir
     tb.main()
