@@ -1,16 +1,21 @@
 \documentclass{article}
 \usepackage[english]{babel}
+
 \usepackage[square,comma,sort,numbers]{natbib}
 \usepackage{glossaries}
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{multicol}
 \usepackage[T1]{fontenc}
+
+
 \renewcommand{\familydefault}{\sfdefault}
 \setlength{\columnsep}{1cm}
 \graphicspath{ {images/} }
+
 
 % \makeglossaries
 % \input{glossary}
@@ -24,12 +29,13 @@
 \raggedright
 \maketitle
 
+
 \section{Definition of the problem}
 
 \subsection{Project Overview}
 
 With this project, I want to tackle an important task of robotics: the ability
-of a humanoïd to walk. This is a really interesting problem since we, humans, learn
+of a humanoid to walk. This is a really interesting problem since we, humans, learn
 to walk without any feedback from another agent, just by a training process. The
 parents doesn't teach anything to the kids, the kids just learns. I think this
 is very interesting to build such model of artificial intelligence in order to
@@ -51,28 +57,38 @@ their continuous observation spaces. Indeed, in order to make a robot walk, we
 have two possibilities. The first one is to learn over pixels of the
 environment. I didn't choose this one because I don't think a human learn to
 walk from its sight but rather from its body. That why I chose to watch the
-position of its joints. With pixels, we will able to train the humanoïd to watch
+position of its joints. With pixels, we will able to train the humanoid to watch
 its steps but only after it is able to walk.
 
 \subsection{Problem Statement}
 
 The goal of this project, precisely, is to train a 3D avatar to walk forward on
-a plane fields. I will use \cite{1606.01540} as interface to the environment
+a plane fields. I will use OpenAI Gym (\cite{1606.01540}) as interface to the environment
 because it gives a simple and general way to use all kind of environment. For
 3-dimensional avatar, it provides a binding for Mujoco library but since
 this library is paid, I will use a free similar one called
-Roboschool\footnote{\href{https://github.com/openai/roboschool}} which propose
+Roboschool\footnote{\href{https://github.com/openai/roboschool}
+  {https://github.com/openai/roboschool}} which propose
 few environments among the one I will use, RoboschoolHumanoid-v1.\\
-I am planning to use Reinforcement Learning to tackle this task with the
+I am planning to use Reinforcemen
+t Learning to tackle this task with the
 Deep Deterministic Policy Gradient algorithm
 (\citeauthor{journals/corr/LillicrapHPHETS15}), an actor-critic algorithm.
 
 \paragraph{Actor-critic} In Reinforcement Learning, many algorithms uses an
-action-value function. It is function which returns the expected rewards after
-taken an action from a state following a policy. It is defined like this:
+action-value function. It is a function which returns the value of an action
+$a$ from a state $s$ following a
+policy $\mu$. It is defined like this:
+  
 \begin{equation}
-  R = \sum_{}
+  Q^\mu(s_t,a_t) = \mathbb{E}_{r_t,s_{t+1}\sim{E}}[r(s_t,a_t) + \gamma
+  Q^\mu(s_{t+1}, \mu(s_{t+1}))]
 \end{equation}
+
+\begin{equation}
+  R = \sum_{i=t}^T\gamma^{(i-t)}r(s_i,a_i)
+\end{equation}
+
 
 \subsection{Metrics}
 
@@ -183,7 +199,7 @@ The reward is a sum of 5 computed values: \begin{itemize}
 
 \subsection{Improvement}
 
-\bibliography{biblio}
+\bibliography{report}
 \bibliographystyle{plainnat}
 
 \end{document}
