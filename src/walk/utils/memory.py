@@ -7,7 +7,7 @@ class Memory():
     on the current state. Hold the queue of
     <state, action, reward, next_state, done>.
     """
-    def __init__(self, length=1000):
+    def __init__(self, length=10000):
         """Instantiate the queue
         """
         self.mem = deque(maxlen=length)
@@ -54,9 +54,9 @@ class Memory():
             dones.append(done)
         states = np.array(states)
         actions = np.array(actions)
-        rewards = np.array(rewards)
+        rewards = np.array(rewards).reshape(len(rewards), 1)
         new_states = np.array(new_states)
-        dones = np.array(done)
+        dones = np.array(dones).reshape(len(dones), 1)
         return states, actions, rewards, new_states, dones
 
     def __len__(self):

@@ -1,11 +1,12 @@
-This is BibTeX, Version 0.99d (TeX Live 2017)
-Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+This is BibTeX, Version 0.99d (TeX Live 2015/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: report.aux
 The style file: plainnat.bst
 Database file #1: report.bib
+Warning--I didn't find a database entry for "GuLilGhaTurLev17"
 You've used 2 entries,
             2773 wiz_defined-function locations,
-            603 strings with 5334 characters,
+            605 strings with 5366 characters,
 and the built_in function-call counts, 1312 in all, are:
 = -- 96
 > -- 141
@@ -44,3 +45,4 @@ warning$ -- 0
 while$ -- 6
 width$ -- 0
 write$ -- 32
+(There was 1 warning)

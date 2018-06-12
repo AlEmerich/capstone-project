@@ -7,11 +7,39 @@
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{amsmath}
+\usepackage[document]{ragged2e}
 \usepackage{amssymb}
+\usepackage{listings}
 \usepackage{multicol}
 \usepackage[T1]{fontenc}
+\usepackage[font=scriptsize]{caption}
 
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+ 
+\lstset{style=mystyle}
+ 
 \renewcommand{\familydefault}{\sfdefault}
 \setlength{\columnsep}{1cm}
 \graphicspath{ {images/} }
@@ -26,20 +54,23 @@
 
 
 \begin{document}
-\raggedright
+
 \maketitle
 
+\includegraphics[width=\textwidth]{roboschoolhumanoid}
+\justify
 
 \section{Definition of the problem}
 
 \subsection{Project Overview}
-
+\paragraph{}
 With this project, I want to tackle an important task of robotics: the ability
 of a humanoid to walk. This is a really interesting problem since we, humans, learn
 to walk without any feedback from another agent, just by a training process. The
 parents doesn't teach anything to the kids, the kids just learns. I think this
 is very interesting to build such model of artificial intelligence in order to
-to understand our brain a little bit more. \\
+to understand our brain a little bit more.
+\paragraph{}
 The anthropologic reason is not the only reason that task is important, it is
 also important to build autonomous walking robots able to progress on every
 fields. There are several areas of actions: In war, such a robot will be able to
@@ -50,7 +81,8 @@ nurses will have more time to give to the patient. In every day life, we will be
 able to get near from the future described by movies like ``I-Robot''. Even if
 it questions the place of the robot in human society, I think making this kind of
 robot is still a goal to reach in order to send the robot in places human cannot
-or with difficulty go, like to another planet.\\
+or with difficulty go, like to another planet.
+\paragraph{}
 I am talking about walking but a neural network able to make a robot walk sure
 will be able to tackle another difficult task. The difficulty in those task is
 their continuous observation spaces. Indeed, in order to make a robot walk, we
@@ -61,44 +93,86 @@ position of its joints. With pixels, we will able to train the humanoid to watch
 its steps but only after it is able to walk.
 
 \subsection{Problem Statement}
-
+\paragraph{}
 The goal of this project, precisely, is to train a 3D avatar to walk forward on
-a plane fields. I will use OpenAI Gym (\cite{1606.01540}) as interface to the environment
+a plane fields. I will use OpenAI Gym \cite{1606.01540} as an interface to the environment
 because it gives a simple and general way to use all kind of environment. For
 3-dimensional avatar, it provides a binding for Mujoco library but since
 this library is paid, I will use a free similar one called
 Roboschool\footnote{\href{https://github.com/openai/roboschool}
-  {https://github.com/openai/roboschool}} which propose
-few environments among the one I will use, RoboschoolHumanoid-v1.\\
-I am planning to use Reinforcemen
-t Learning to tackle this task with the
-Deep Deterministic Policy Gradient algorithm
-(\citeauthor{journals/corr/LillicrapHPHETS15}), an actor-critic algorithm.
+  {https://github.com/openai/roboschool}} which proposes
+few environments among the one I will use, RoboschoolHumanoid-v1. I am planning
+to use Reinforcement Learning to tackle this task with the Deep Deterministic
+Policy Gradient algorithm (\citeauthor{journals/corr/LillicrapHPHETS15}), an
+actor-critic algorithm. It is ``Deep'' because the actor and the critic is
+designed with deep neural networks. This algorithm is mostly used when the
+environment is a continuous space and since this environment never changes in
+our case (it is a plane field without changes), we can use a deterministic policy. 
 
-\paragraph{Actor-critic} In Reinforcement Learning, many algorithms uses an
-action-value function. It is a function which returns the value of an action
-$a$ from a state $s$ following a
-policy $\mu$. It is defined like this:
+\paragraph{Actor Critic algorithm}
+
+In Reinforcement Learning, many algorithms uses an action-value function.
+It is a function which returns the value of an action $a$ from a state $s$
+following a policy $\mu$. It is defined like this: 
   
 \begin{equation}
   Q^\mu(s_t,a_t) = \mathbb{E}_{r_t,s_{t+1}\sim{E}}[r(s_t,a_t) + \gamma
   Q^\mu(s_{t+1}, \mu(s_{t+1}))]
 \end{equation}
 
+Besides that, the policy is the map of probabilities for an agent to go
+to state $s_{t+1}$ from state $s$ by the action $a$:
+
 \begin{equation}
-  R = \sum_{i=t}^T\gamma^{(i-t)}r(s_i,a_i)
+  \mu(s,a) = P(a_t=a|s_t=s)
 \end{equation}
 
+The idea of actor-critic algorithms is to use the action-value function as a
+critic which will give the $Q$ value of the action taken by the agent at each time
+step. The higher the $Q$ is, the more the reward the agent will get by taking
+that action in that state. The agent, here called the actor, will follow a
+policy $\mu$ in order to chose the action and that policy will be updated by the
+output of the critic. In Layman's terms, the actor is a child playing in the
+sandbox and the critic is the parent watching him. When the child make an action
+that may lead to a bad state, the parent gives him a bad reward in order to
+change his behaviour (policy).
 
 \subsection{Metrics}
 
+\paragraph{}
+I will need two set of metrics because I have two kind of session for the body:
+it can walk and fail to stand or it can walk without falling. When the avatar
+will fall, I will restart the session, because to teach it to stand up is
+another kind of problem.
+\paragraph{}
+At the beggining of the training, the body will fall and fall again very quickly.
+So my metrics during that period will be the amount of time step it took before
+failing, the distance of the gravity center from the floor, the reward per
+action and the global average reward. Since the actor and critic are neural
+networks, I will also plot the loss of the critic network and their weights and
+biases, to check if it is changing over times. With these informations, I will
+be able to tell if my models is training well or if I have to adjust my parameters.
+When the body will start to have less fall, some of these metrics will not be
+informative anymore. I have to find metrics to evaluate the gait of the walk.
+For that, I will plot the angle of the current body position from the start
+position in respect to the axe the avatar will try to follow. 
+
 \section{Analysis}
 
-\subsection{Data Exploration}
+\subsection{Data Exploration: RoboschoolHumanoid-v1}
 
 \subsubsection{Observation space}
+\label{subsub:obs_space}
 
-This environment has an observation space of 44 float values in the range [-5,
+\paragraph{Definition} An observation space, or state space, is the shape and
+the possible values an environment state could have. If the state is not
+continuous, we can calculate the state space by counting all possible values.
+For example, in a tic-tac-toe game, every square have 3 states so the state
+space is $3^9 = 19,683$. Here, our state is continuous, meaning that our possible
+values stands in a range. We can then just describe values and specify the range.
+
+\paragraph{}
+Our environment has an observation space of 44 float values in the range [-5,
 5] which is a concatenation a three vectors described as follows:
 \begin{itemize}
 \item{\textbf{more}: It is a vector of 8 values defined as follows:
@@ -125,6 +199,11 @@ This environment has an observation space of 44 float values in the range [-5,
 \end{itemize}
 
 \subsubsection{Action space}
+
+\paragraph{Definition} An action space is like observation space but for action
+an actor can take. In the tic-tac-toe example, the actor has 9 possible actions,
+which is playing in one of the square. 
+\paragraph{}
 The action space is a vector of 17 float values in the range [-1, 1]. Each
 value corresponds to the joints of the avatar by this order
 \href{https://github.com/openai/roboschool/blob/master/roboschool/mujoco_assets/humanoid_symmetric.xml}{XML}:
@@ -150,21 +229,23 @@ value corresponds to the joints of the avatar by this order
   \end{itemize}
 \end{multicols}
   At each step, these values are applied to all the joints of the body by the code
-\begin{verbatim}
+\begin{lstlisting}[language=Python]
 for n,j in enumerate(self.ordered_joints):
     j.set_motor_torque( self.power*j.power_coef \
                          *float(np.clip(a[n], -1, +1)) )
-\end{verbatim}
+\end{lstlisting}
 
 in the \verb?apply_action? function in the class which extends the
 \verb?gym.Env? class (\verb?RoboschoolMujocoXmlEnv?) to set the torque value
 into the respective motor.
 
-\subsection{Exploratory Visualization}
+\subsubsection{Reward}
 
-\subsection{Algorithm and Techniques}
-
-\paragraph{Reward}
+\paragraph{Definition} A reward is a value given the information if the action
+was good or not given the state. The definition of the reward function is a
+critical aspect of reinforcement learning since it is the one who gives the most
+valuable information during the training.
+\paragraph{}
 The reward is a sum of 5 computed values: \begin{itemize}
   \item{\textbf{alive}: -1 or +1 wether is on the ground or not}
   \item{\textbf{progress}: potential minus the old potential. The potential is defined by
@@ -175,13 +256,166 @@ The reward is a sum of 5 computed values: \begin{itemize}
   \item{\textbf{feet\_collsion\_cost}: The amount of feet collision taken during the last action}
   \end{itemize}
 
+\subsection{Exploratory Visualization}
+
+To visualize the exploration, we can simply use the render function of the gym
+environment which uses \verb?Roboschool? library to create the 3D plane and
+humanoid such as show in the figure \ref{fig:roboschoolhumanoid}.  
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{roboschoolhumanoid}
+  \caption{Roboschool environment}
+  \label{fig:roboschoolhumanoid}
+\end{figure}
+
+\subsection{Algorithm and Techniques}
+
+\paragraph{Deep Deterministic Policy Gradient}
+
+In DDPG, instead of compute manually the $Q$ value and the $\mu$, we
+use neural networks, one for the actor and one for the critic. The figure
+\ref{fig:actor-critic} shows how such a model can train.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=.5\textwidth]{actor-critic}
+  \caption{First, the environment gives the first state to the actor and it chose the
+action following the policy. The action is given back to the environment and a
+reward is computed, meaning how good the action was for that state, and sent to
+the critic network. The critic computes the $Q$ value of that action by
+minimizing the loss and gives the error to the actor in order to let him train
+on it.}
+  \label{fig:actor-critic}
+\end{figure}
+
+The Temporal Difference learning (TD Error in the figure) is a machine learning
+technique to, basically, let a network able to train with a little guess of the
+future. In our case of walking, the critic should not only see the next state
+but also estimate the chance the actor has to fall because of the action it
+took. To do that, we will use target actor and target critic network. It is, at
+the beggining, a copy of the actor and the critic but we will use these networks
+to compute the target action for a state and $Q_{t+1}$ and, at each time steps,
+we will update their weights $\theta^{Q'}$ with the actual network weights
+$\theta^Q$ by the following formula called ``soft update'':  
+
+\begin{equation}
+\theta^{Q'} \leftarrow \tau\theta^Q + (1 - \tau)\theta^Q
+\end{equation}
+
+Not using target networks will cause divergence and none of the model will learn
+a good policy or a good $Q$-value function.
+\paragraph{}
+We need to also design a Replay buffer to store transition $(s_t, a, r,
+s_{t+1})$ and train over minibatch of random transition. In that way, we break
+temporal correlations between transition and minimize variance between our
+possible bad predictions.
+\paragraph{}
+A last thing we need to introduce is exploration noise. We want to add some noise to the
+action the actor take during training in order to let it explore its world with
+some randomness. A good way to compute noise is the Ornstein–Uhlenbeck process,
+which is also known as Brownian motion. 
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{algoDDPG}
+  \caption{Algorithm from \citeauthor{journals/corr/LillicrapHPHETS15} paper}
+  \label{fig:algoDDPG}
+\end{figure}
+
+The figure \ref{fig:algoDDPG} describes the algorithm in a pseudo-code. The
+reader can see that the actor doesn't learn the classical way, i.e. by
+minimizing its loss. Instead of that, its weights is updated with the gradient
+of the critic network after it trained. 
+
 \subsection{Benchmark}
+
+The most basic benchmark we have to test is the random benchmark. What will
+happen in a worse case scenario ? 
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{randompolicy}
+  \caption{Random Policy}
+  \label{fig:randompolicy}
+\end{figure}
+
+The figure \ref{fig:randompolicy} shows that the agent fall and fall again,
+without any chance to stand. The relevant information here is the average
+reward. The average reward of the random policy over 500 epochs is around 20 and
+the agent never lives more than 30 epochs.
+\paragraph{}
+Now we have a low benchmark, we have to dig into previous work of the community
+in order to find the state-of-the-art paper for that task. The work of
+\citeauthor{journals/corr/LillicrapHPHETS15} in their paper called
+'Continuous control with deep reinforcement Learning' does not show results with
+a humanoid environment but they did reach a good policy for 2d walker. Another
+more recent studies\cite{GuLilGhaTurLev17} shows results of different algorithm
+including DDPG. 
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{benchmark}
+  \caption{Average return over episodes in HalfCheetah-v1 and Humanoid-v1 during
+    learning, comparing Q-Prop against other model-free algorithms. Q-Prop with
+    vanilla policy gradient outperforms TRPO on HalfCheetah. Q-Prop
+    significantly outperforms TRPO in convergence time on Humanoid.}
+  \label{fig:benchmark}
+\end{figure}
+
+The figure \ref{fig:benchmark} emphases that maybe DDPG is not a good choice to
+such a complex environment like Humanoid because DDPG is really sensitive about
+hyper-parameters changes. I still want to try to teach a robot to walk with that
+algorithm by increasing the depth of the networks for example and see what
+happened.  
 
 \section{Methodology}
 
 \subsection{Data Preprocessing}
 
+The Roboschool environment is made for educational and research purpose. In that
+matter, a lot of useful data preprocessing is already made. For the observation
+vector, after building it as explained in section \ref{subsub:obs_space}, the
+value is clipped between -5 and 5, meaning that if the environment provides a
+value outside of these bounds, the value is set to the nearest bounds. This is
+the same for action space but the value is clipped between -1 and 1. 
+
 \subsection{Implementation}
+
+\subsubsection{Replay buffer}
+
+To implement that task, I started by writing the replay buffer. I created a
+class \verb?Memory? which holds a queue as a member in order to store tuple of
+$(s_t, a, r, s_{t+1})$. I defined the first method as follow:
+
+\begin{lstlisting}[language=Python]
+def remember(self, state, action, reward, next_state, done, state_range=None, action_range=None)
+\end{lstlisting}
+
+The \verb?done? value is a boolean telling if the state is terminal or not. The
+state and the action range is a value to normalize the respective vector between
+0 and 1. I think by this way neural networks will have better performance
+because input is less sparsed. If not \verb?None?, these values must be equal to
+the range between low and high value (2 for action and 10 for state in our
+case).\\
+The second needed method to define is the one to get samples from the queue randomly:
+
+\begin{lstlisting}[language=Python]
+def samples(self, batch_size)
+\end{lstlisting}
+
+We need to get random sample, not last one or older one, but random, in order to
+break their correlations which would lead to decrease the performance of the model.
+
+\subsubsection{Neural networks: Actor and Critic}
+
+\subsubsection{Training Operations}
+
+\subsubsection{Noise}
+
+\subsubsection{Visualization}
+
+\subsubsection{Hyper Parameters}
 
 \subsection{Refinement}
 

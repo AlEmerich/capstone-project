@@ -125,7 +125,7 @@ class MatplotBoard(Board):
     def save(self):
         """Save the plot at (datetime.now).png.
         """
-        plt.savefig(self.path)
+        plt.savefig(self.path+"/plot.png")
 
     def _index2dto1d(self, row, column):
         """Convert X-Y coordinates in one index to

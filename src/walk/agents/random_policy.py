@@ -10,14 +10,15 @@ class RandomPolicy(AbstractHumanoidEnv):
         """Create the title before calling the super class
         and create the labels of the plot before initializing it.
         """
-        super(RandomPolicy, self).__init__(args, "Random policy")
+        super(RandomPolicy, self).__init__(args)
+        self.use_matplotlib("Random Policy")
 
     def act(self, state):
         """ Return a random action.
         """
         return self.env.action_space.sample()
 
-    def run(self, train_pass=10000, epochs=100):
+    def run(self, train_pass=10000, epochs=500):
         """Training loop.
 
         :param train_pass: Number of allowing reset, inf if reset is false.
@@ -32,12 +33,11 @@ class RandomPolicy(AbstractHumanoidEnv):
             self.render()
 
             # Plot the different metrics if asked to
-            self.plotting(state, reward)
+            self.plotting(state=state, reward=reward)
 
             # Reset the environment when done if asked to
-            if done and self.params.reset:
-                observation = self.reset()
-                break
+            self.reset(done)
+        self.board.save()
 
 
 if __name__ == "__main__":

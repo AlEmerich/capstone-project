@@ -55,6 +55,7 @@ class TensorBoard(Board):
         for i, label in enumerate(self.labels):
             feed[self.d[label]] = ydatas[i]
             feed[self.d["info"]] = "" if not info else info
+
         self.merged = tf.summary.merge_all()
         # Get the value to plot
         summary = self.tf_session.run(self.merged, feed)

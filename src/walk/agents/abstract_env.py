@@ -37,7 +37,7 @@ class AbstractHumanoidEnv(ABC):
         if self.params.train:
             self.labels = ["Reward", "Average reward",
                            "Distance gravity center from ground",
-                           "Epsilon", "Critic loss", "Actor loss"]
+                           "Critic loss", "Actor loss"]
         else:
             self.labels = ["Average reward", "Angle to target",
                            "Distance to target", "Gravity center from ground"]
@@ -60,15 +60,12 @@ class AbstractHumanoidEnv(ABC):
         Actually plot the total reward, the distance to the target,
         the distance of the grivity center from the ground and the
         angle to the target.
-
-        :param state: The current state of the environment.
-        :param reward: The reward to plot.
         """
         if self.board:
+
             # Unpack kwargs
             state = kwargs.get('state')
             reward = kwargs.get('reward')
-            epsilon = kwargs.get('epsilon')
             c_loss = kwargs.get('c_loss')
             a_loss = kwargs.get('a_loss')
 
@@ -85,8 +82,7 @@ class AbstractHumanoidEnv(ABC):
             ydatas = None
             if self.params.train:
                 ydatas = [reward, np.average(self.rewards),
-                          dist_center_ground,
-                          epsilon, c_loss, a_loss]
+                          dist_center_ground, c_loss, a_loss]
             else:
                 ydatas = [np.average(self.rewards), angle_to_target,
                           target_dist, dist_center_ground]

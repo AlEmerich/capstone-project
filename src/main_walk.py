@@ -2,6 +2,7 @@ import argparse
 import json
 import threading
 from walk.agents.ac_policy import AC_Policy
+from walk.agents.random_policy import RandomPolicy
 
 def launch_tensorboard(log_dir):
     import tensorflow as tf
