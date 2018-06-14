@@ -11,6 +11,7 @@
 \usepackage{amssymb}
 \usepackage{listings}
 \usepackage{multicol}
+\usepackage{dirtree}
 \usepackage[T1]{fontenc}
 \usepackage[font=scriptsize]{caption}
 
@@ -51,7 +52,6 @@
 \title{\textbf{Capstone Report}\\Arise and walk, by Deep Deterministic Policy Gradient algorithm}
 \date{\today}
 \author{Guitard Alan}
-
 
 \begin{document}
 
@@ -157,12 +157,13 @@ informative anymore. I have to find metrics to evaluate the gait of the walk.
 For that, I will plot the angle of the current body position from the start
 position in respect to the axe the avatar will try to follow. 
 
+\newpage
 \section{Analysis}
 
 \subsection{Data Exploration: RoboschoolHumanoid-v1}
 
 \subsubsection{Observation space}
-\label{subsub:obs_space}
+\label{subsubsec:obs_space}
 
 \paragraph{Definition} An observation space, or state space, is the shape and
 the possible values an environment state could have. If the state is not
@@ -205,8 +206,9 @@ an actor can take. In the tic-tac-toe example, the actor has 9 possible actions,
 which is playing in one of the square. 
 \paragraph{}
 The action space is a vector of 17 float values in the range [-1, 1]. Each
-value corresponds to the joints of the avatar by this order
-\href{https://github.com/openai/roboschool/blob/master/roboschool/mujoco_assets/humanoid_symmetric.xml}{XML}:
+value corresponds to the joints of the avatar by this order in the 
+\href{https://github.com/openai/roboschool/blob/master/roboschool/mujoco_assets/humanoid_symmetric.xml}{XML}
+file:
 \begin{multicols}{2}
   \begin{itemize}
   \item{abdomen\_y}
@@ -235,7 +237,7 @@ for n,j in enumerate(self.ordered_joints):
                          *float(np.clip(a[n], -1, +1)) )
 \end{lstlisting}
 
-in the \verb?apply_action? function in the class which extends the
+in the \verb?apply\_action? function in the class which extends the
 \verb?gym.Env? class (\verb?RoboschoolMujocoXmlEnv?) to set the torque value
 into the respective motor.
 
@@ -264,7 +266,7 @@ humanoid such as show in the figure \ref{fig:roboschoolhumanoid}.
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=\textwidth]{roboschoolhumanoid}
+  \includegraphics[width=.5\textwidth]{roboschoolhumanoid}
   \caption{Roboschool environment}
   \label{fig:roboschoolhumanoid}
 \end{figure}
@@ -348,10 +350,10 @@ the agent never lives more than 30 epochs.
 Now we have a low benchmark, we have to dig into previous work of the community
 in order to find the state-of-the-art paper for that task. The work of
 \citeauthor{journals/corr/LillicrapHPHETS15} in their paper called
-'Continuous control with deep reinforcement Learning' does not show results with
-a humanoid environment but they did reach a good policy for 2d walker. Another
-more recent studies\cite{GuLilGhaTurLev17} shows results of different algorithm
-including DDPG. 
+\textit{Continuous control with deep reinforcement Learning} does not show
+results with a humanoid environment but they did reach a good policy for 2d
+walker. Another more recent studies\cite{GuLilGhaTurLev17} shows results of
+different algorithm including DDPG. 
 
 \begin{figure}[ht]
   \centering
@@ -375,12 +377,48 @@ happened.
 
 The Roboschool environment is made for educational and research purpose. In that
 matter, a lot of useful data preprocessing is already made. For the observation
-vector, after building it as explained in section \ref{subsub:obs_space}, the
+vector, after building it as explained in section \ref{subsubsec:obs_space}, the
 value is clipped between -5 and 5, meaning that if the environment provides a
 value outside of these bounds, the value is set to the nearest bounds. This is
 the same for action space but the value is clipped between -1 and 1. 
 
 \subsection{Implementation}
+
+\subsubsection{Project Structure}
+
+I present you below the structure of my project:
+
+\dirtree{%
+.1 /.
+.2 params.json.
+.2 main\_walk.py.
+.2 walk.
+.3 agents.
+.4 abstract\_env.py.
+.4 ac\_policy.py.
+.4 random\_policy.py.
+.3 models.
+.4 actor\_critic.py.
+.3 utils.
+.4 board.py.
+.4 matplotboard.py.
+.4 memory.py.
+.4 noise.py.
+.4 params.py.
+.4 tensorboard.py.
+}
+
+In the \verb?agents? folder, the \verb?abstract_env.py? file is meant to be the
+super class of every policy I could implement, managing operation that every
+environment has to manage like instancing the plotting library or resetting the
+environment and its variables. In the \verb?models? folder, we have our actor
+and critic networks definitions. In the \verb?utils? folder, we have all classes
+used by our algorithm to make it work properly like visualization class, data
+structure and noise definition. The last thing I need to precise is that a lot
+of parameters in my program is written in \verb?params.json? and read at
+runtime. By this way, I can search for the good set of parameters without
+entering into the code. I will explain in section \ref{subsubsec:hp_params} this
+file precisely after my implementation description.
 
 \subsubsection{Replay buffer}
 
@@ -409,13 +447,244 @@ break their correlations which would lead to decrease the performance of the mod
 
 \subsubsection{Neural networks: Actor and Critic}
 
-\subsubsection{Training Operations}
+\paragraph{Keras vs Tensorflow}
+
+In the beginning, to design my networks, I used Keras but this library is
+high-level API over Theano, Tensorflow and CNTK. It means that when we use it,
+we lose some control over the low-level API in order to be more readable and
+easy to implement. Since I will need to compute gradients and applying it to
+another networks, I understand that it will be more easy to do that in
+Tensorflow and it will be a good occasion to start to learn it.
+
+\paragraph{The Actor}
+
+The actor model is composed by fully-connected layers followed by Rectified
+Linear Unit activation function and then by batch normalization, because it
+gives better training speed and efficiency. The input is a shape of 44 float
+values for the state and the output is a shape of 17 float values activated by
+hyperbolic tangent because the range of the action values is equal to defintion
+range of the hyperbolic tangent, [-1, 1].
+
+\paragraph{The Critic}
+
+The critic model is composed by two inputs, one for the state and one for the
+action. The state input is followed by several dense layers activated by ReLU
+and batch normalization. The action input is followed by one layer with the same
+number of node than the last layer of the state network in order to be able to
+merge them. That layer is also followed by activation ReLU activation and
+batch normalization. These two layers is then added and followed by the output
+layer, a single-node one representing the Q-value of the state-action pair.
+
+\paragraph{Target networks}
+
+In our training process, when we have to do inferences from next actions or next
+states, we have to use actor target network and critic target network. These
+identical network has been recently shown to increase stability during the
+training and decrease variance of outputs.
+
+\subsubsection{Training}
+
+\paragraph{The Actor}
+
+TODO
+
+\paragraph{The Critic}
+
+I defined training operations for the critic with a mean squared error loss
+function and the ADAM optimizer, with learning rate defined in parameters and
+minimizing the loss.
+
+\paragraph{Process}
+Here comes the salt and pepper of Deep Deterministic Policy Gradients. I need
+here to train the critic network first, computing the gradients and apply it to
+the actor network. Here the complete code:
+
+\begin{lstlisting}[language=Python]
+# Get samples of memory
+states, actions, rewards, next_states, dones = \
+    self.memory.samples(self.params.batch_size)
+
+with tf.variable_scope("train_critic"):
+    # Predicted actions
+    next_actions = self.tf_session.run(
+        self.target_actor_model.output,
+        feed_dict={
+            self.target_actor_model.input_ph: next_states
+        })
+
+    if self.params.action_range:
+        next_actions = (next_actions +
+                        self.params.action_range/2
+        ) / self.params.action_range
+
+    # Compute the Q+1 value with next s+1 and a+1
+    Q_next = self.tf_session.run(
+          self.target_critic_model.Q, 
+          feed_dict={
+              self.target_critic_model.input_state_ph: next_states,
+              self.target_critic_model.input_action_ph: next_actions
+          })
+
+    # gamma is the discounted factor
+    Q_next = self.params.gamma * Q_next * (1 - dones)
+    Q_next = np.add(Q_next, rewards)
+
+    # Train the critic network and get gradients
+    feed_critic = {
+        self.critic_model.input_state_ph: states,
+        self.critic_model.input_action_ph: actions,
+        self.critic_model.true_target_ph: Q_next
+    }
+    self.critic_loss, _, critic_action_gradient = \
+        self.tf_session.run(
+            [self.critic_model.loss, self.critic_model.opt,
+             self.critic_model.action_gradients],
+        feed_dict=feed_critic)
+
+    with tf.variable_scope("train_actor"):
+        # Train the actor network with the critic gradients
+        feed_actor = {
+            self.actor_model.input_ph: states,
+            self.actor_model.action_gradients: \
+                 critic_action_gradient[0]
+        }
+        self.actor_loss, _ = self.tf_session.run(
+            [self.actor_model.loss,
+             self.actor_model.opt],
+             feed_dict=feed_actor)
+
+    with tf.variable_scope("soft_update"):
+        # Update target network
+        self._update_target_network()
+\end{lstlisting}
+
+Here is the step by step explanation:
+\begin{itemize}
+\item We get temporally not-correlated batch from memory.
+\item We compute next actions with next states.
+\item We compute the expected reward $Q_{next}$ with next states and next actions.
+\item We ponderate (or ignoring if the state is final) by the gamma parameters,
+  i.e the discounted factor.
+\item We use it as a label to train the critic network and get gradients.
+\item We can then apply these gradients the actor to train it.
+\item Finally, we update target networks with soft update function.
+  \begin{lstlisting}[language=Python]
+self.update_critic_target =
+   [self.ct_params[i].assign(
+                tf.multiply(self.c_params[i], 
+                            self.params.tau) + 
+                tf.multiply(self.ct_params[i],
+                            1. - self.params.tau))
+       for i in range(len(self.ct_params))]
+  
+self.update_actor_target =
+   [self.at_params[i].assign(
+                tf.multiply(self.a_params[i], 
+                            self.params.tau) +
+                tf.multiply(self.at_params[i], 
+                            1. - self.params.tau))
+       for i in range(len(self.at_params))]
+  \end{lstlisting}
+\end{itemize}
 
 \subsubsection{Noise}
 
-\subsubsection{Visualization}
+In my first implementation, I used a $\epsilon$-greedy algorithm to explore the
+environment. It was a decaying asymptotic-to-0 function used to generate less
+and less random actions over time. But then I discovered noise function to
+reduce variance and increase stability over taken actions, like
+Ornstein-Uhlenbeck noise. It computes a vector of float equal to the shape
+passed in parameters and we can add it to the action given by the actor.
+
+\subsubsection{The Agent}
+
+Here is the main loop of the program:
+
+\begin{lstlisting}[language=Python]
+for j in range(self.params.epochs):
+    action = self.act(state)
+    if self.params.noisy and j < self.params.noise_threshold:
+        action += self.noise()
+
+    new_state, reward, done, info = self.env.step(action)
+
+    # Put the current environment in the memory
+    # State interval is [-5;5] and action range is [-1;1]
+    self.memory.remember(state, action, \ 
+                         reward * self.params.reward_multiply, \
+                         new_state, done, \
+                         state_range=self.params.state_range, \
+                         action_range=self.params.action_range)
+
+    # Train the network
+    self.train()
+
+    # Reset the environment if done
+    self.reset(done)
+
+    # Render the environment
+    self.render()
+
+    # Plot needed values
+    self.plotting(state=state, reward=reward, \ 
+                  c_loss=self.critic_loss, \
+                  a_loss=self.actor_loss)
+
+    # Change current state
+    state = new_state
+\end{lstlisting}
 
 \subsubsection{Hyper Parameters}
+\label{subsubsec:hp_params}
+
+I present in this section every arguments of my programs. It was really usefull
+to quickly test many hyper parameters in order to see how does it affects the
+training.
+
+\begin{itemize}
+\item \textbf{reset}: \verb?true? to reset the environment at final states,
+  \verb?false? otherwise.
+\item \textbf{render}: \verb?true? to render the environment, \verb?false?
+  otherwise. Roboschool has a bug which lead to give vector of \verb?inf? after
+  the second reset when render, so when I train the networkds, I don't render
+  it.
+\item \textbf{plot}: \verb?tensorflow? to visualize plot with tensorboard,
+  \verb?matplotlib? to render plot with matplotlib.
+\item \textbf{train}: \verb?true? to train network, \verb?false? otherwise.
+\item \textbf{noisy}: \verb?true? to add noise to action output, \verb?false?
+  otherwise.
+\item \textbf{load\_weights}: \verb?true? to load previously saved weight from
+  previous training session, \verb?false? otherwise.
+\item \textbf{batch\_size}: \verb?integer?, number of samples to get from memory.
+\item \textbf{epochs}: \verb?integer?, number of epochs to act.
+\item \textbf{noise\_threshold}; \verb?integer?, when epochs is hight than this
+  number, the program stops adding noise to the action output.
+\item \textbf{actor\_learning\_rate}: \verb?float?, learning rate for the actor
+  network.
+\item \textbf{critic\_learning\_rate}: \verb?float?, learning rate for the critic
+  network.
+\item \textbf{actor\_batch\_norm}: \verb?true? to add batch normamization after
+  dense layers of the actor network, \verb?false? otherwise.
+\item \textbf{critic\_batch\_norm}: \verb?true? to add batch normamization after
+  dense layers of the critic network, \verb?false? otherwise.
+\item \textbf{tau}: \verb?float?, used in the soft target update function.
+\item \textbf{gamma}: \verb?float?, discounted factor.
+\item \textbf{actor\_layers}: \verb?list of integer?, define the structure of the
+  actor network, the depth and the number of unit in each layer.
+\item \textbf{critic\_layers}: \verb?list of integer?, define the structure of the
+  critic network, the depth and the number of unit in each layer.
+\item \textbf{action\_range}: \verb?integer?, size of the action range to normalize
+  it between 0 and 1.
+\item \textbf{state\_range}: \verb?integer?, size of the state range to normalize
+  it between 0 and 1.
+\item \textbf{reward\_multiply}: \verb?integer?, multiply every reward with to
+  reward more when good action is taken and less when a bad one is taken.
+\item \textbf{dropout}: \verb?float?, percent of dropout to use after dense
+  layers. 0 to not add dropout.
+\end{itemize}
+
+\subsubsection{Visualization}
+
 
 \subsection{Refinement}
 

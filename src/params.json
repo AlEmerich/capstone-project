@@ -1,12 +1,12 @@
 {
-    "reset": true,
+    "reset": true, 
     "render": false,
     "plot": "tensorflow",
     "train": true,
     "noisy": true,
     "load_weights": false,
 
-    "batch_size": 64,
+    "batch_size": 128,
     "epochs": 10000,
     "noise_threshold": 200,
 
@@ -16,8 +16,8 @@
     "critic_batch_norm": true,
     "tau": 0.001,
     "gamma": 0.99,
-    "actor_layers": [600, 400],
-    "critic_layers": [600, 400],
+    "actor_layers": [400, 300],
+    "critic_layers": [400, 300],
     "action_range": 2,
     "state_range": 10,
     "reward_multiply": 1,

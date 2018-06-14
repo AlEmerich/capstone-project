@@ -8,19 +8,11 @@ import numpy as np
 import roboschool
 import gym
 
-
-class AbstractHumanoidEnv(ABC):
-    """ Super class of all policy.
-    """
+class AbstractEnv(ABC):
 
     def __init__(self, args):
-        """Instantiate Roboschool humanoid environment and reset it.
-
-        :param args: arguments of the program to send to the Params.
-        """
-        # self.params = Params(args)
         self.params = namedtuple("Params", args.keys())(*args.values())
-        print()
+
         # list of rewards updating at each step
         self.rewards = []
 
@@ -30,6 +22,37 @@ class AbstractHumanoidEnv(ABC):
         # list of t corresponding to the life time of the env
         self.list_reset_t = []
         self.board = None
+
+    @abstractmethod
+    def plotting(self, **kwargs):
+        pass
+
+    @abstractmethod
+    def reset(self, done):
+        pass
+
+    @abstractmethod
+    def render(self):
+        pass
+
+    @abstractmethod
+    def act(self, state):
+        pass
+
+    @abstractmethod
+    def run(self, train_pass, epochs):
+        pass
+
+class AbstractHumanoidEnv(AbstractEnv, ABC):
+    """ Super class of all policy.
+    """
+
+    def __init__(self, args):
+        """Instantiate Roboschool humanoid environment and reset it.
+
+        :param args: arguments of the program to send to the Params.
+        """
+        super(AbstractHumanoidEnv, self).__init__(args)
 
         # When training, we are not interested at the same metrics
         # than when not training

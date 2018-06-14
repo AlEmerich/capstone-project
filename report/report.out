@@ -13,13 +13,19 @@
 \BOOKMARK [1][-]{section.3}{Methodology}{}% 13
 \BOOKMARK [2][-]{subsection.3.1}{Data Preprocessing}{section.3}% 14
 \BOOKMARK [2][-]{subsection.3.2}{Implementation}{section.3}% 15
-\BOOKMARK [3][-]{subsubsection.3.2.1}{Replay buffer}{subsection.3.2}% 16
-\BOOKMARK [3][-]{subsubsection.3.2.2}{Neural networks: Actor and Critic}{subsection.3.2}% 17
-\BOOKMARK [2][-]{subsection.3.3}{Refinement}{section.3}% 18
-\BOOKMARK [1][-]{section.4}{Results}{}% 19
-\BOOKMARK [2][-]{subsection.4.1}{Model Evaluation and Validation}{section.4}% 20
-\BOOKMARK [2][-]{subsection.4.2}{Justification}{section.4}% 21
-\BOOKMARK [1][-]{section.5}{Conclusion}{}% 22
-\BOOKMARK [2][-]{subsection.5.1}{Free-Form Visualization}{section.5}% 23
-\BOOKMARK [2][-]{subsection.5.2}{Reflection}{section.5}% 24
-\BOOKMARK [2][-]{subsection.5.3}{Improvement}{section.5}% 25
+\BOOKMARK [3][-]{subsubsection.3.2.1}{Project Structure}{subsection.3.2}% 16
+\BOOKMARK [3][-]{subsubsection.3.2.2}{Replay buffer}{subsection.3.2}% 17
+\BOOKMARK [3][-]{subsubsection.3.2.3}{Neural networks: Actor and Critic}{subsection.3.2}% 18
+\BOOKMARK [3][-]{subsubsection.3.2.4}{Training}{subsection.3.2}% 19
+\BOOKMARK [3][-]{subsubsection.3.2.5}{Noise}{subsection.3.2}% 20
+\BOOKMARK [3][-]{subsubsection.3.2.6}{The Agent}{subsection.3.2}% 21
+\BOOKMARK [3][-]{subsubsection.3.2.7}{Hyper Parameters}{subsection.3.2}% 22
+\BOOKMARK [3][-]{subsubsection.3.2.8}{Visualization}{subsection.3.2}% 23
+\BOOKMARK [2][-]{subsection.3.3}{Refinement}{section.3}% 24
+\BOOKMARK [1][-]{section.4}{Results}{}% 25
+\BOOKMARK [2][-]{subsection.4.1}{Model Evaluation and Validation}{section.4}% 26
+\BOOKMARK [2][-]{subsection.4.2}{Justification}{section.4}% 27
+\BOOKMARK [1][-]{section.5}{Conclusion}{}% 28
+\BOOKMARK [2][-]{subsection.5.1}{Free-Form Visualization}{section.5}% 29
+\BOOKMARK [2][-]{subsection.5.2}{Reflection}{section.5}% 30
+\BOOKMARK [2][-]{subsection.5.3}{Improvement}{section.5}% 31

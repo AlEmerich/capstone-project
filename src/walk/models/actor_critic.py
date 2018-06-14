@@ -228,11 +228,12 @@ class Critic(AbstractActorCritic):
 
                 with tf.variable_scope("Q_output"):
                     merge = h_state + h_action
-#                    l2_reg = tf.contrib.layers.l2_regularizer(scale=0.001)
+                    merge = tf.layers.dense(merge, 32, activation=act)
+                    l2_reg = tf.contrib.layers.l2_regularizer(scale=0.001)
                     self.Q = tf.layers.dense(merge, 1, activation=None,
                                              kernel_initializer=self.init_w,
                                              bias_initializer=self.init_b,
-#                                             kernel_regularizer=l2_reg,
+                                             kernel_regularizer=l2_reg,
                                              name="out")
                     self._summary_layer("out")
 

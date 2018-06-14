@@ -3,46 +3,44 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: report.aux
 The style file: plainnat.bst
 Database file #1: report.bib
-Warning--I didn't find a database entry for "GuLilGhaTurLev17"
-You've used 2 entries,
+You've used 3 entries,
             2773 wiz_defined-function locations,
-            605 strings with 5366 characters,
-and the built_in function-call counts, 1312 in all, are:
-= -- 96
-> -- 141
+            611 strings with 5659 characters,
+and the built_in function-call counts, 1885 in all, are:
+= -- 144
+> -- 189
 < -- 0
-+ -- 47
-- -- 45
-* -- 125
-:= -- 222
-add.period$ -- 6
-call.type$ -- 2
-change.case$ -- 21
-chr.to.int$ -- 2
-cite$ -- 4
-duplicate$ -- 36
-empty$ -- 65
-format.name$ -- 47
-if$ -- 253
++ -- 63
+- -- 60
+* -- 177
+:= -- 313
+add.period$ -- 11
+call.type$ -- 3
+change.case$ -- 29
+chr.to.int$ -- 3
+cite$ -- 6
+duplicate$ -- 60
+empty$ -- 106
+format.name$ -- 63
+if$ -- 373
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 1
-newline$ -- 18
-num.names$ -- 8
-pop$ -- 43
+missing$ -- 2
+newline$ -- 24
+num.names$ -- 12
+pop$ -- 61
 preamble$ -- 1
-purify$ -- 19
+purify$ -- 26
 quote$ -- 0
-skip$ -- 42
+skip$ -- 57
 stack$ -- 0
-substring$ -- 4
-swap$ -- 2
+substring$ -- 6
+swap$ -- 5
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 22
+type$ -- 33
 warning$ -- 0
-while$ -- 6
+while$ -- 9
 width$ -- 0
-write$ -- 32
-(There was 1 warning)
+write$ -- 47

@@ -35,11 +35,11 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Metrics}{3}{subsection.1.3}}
 \@writefile{toc}{\contentsline {paragraph}{}{3}{section*.6}}
 \@writefile{toc}{\contentsline {paragraph}{}{3}{section*.7}}
-\@writefile{toc}{\contentsline {section}{\numberline {2}Analysis}{3}{section.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Data Exploration: RoboschoolHumanoid-v1}{3}{subsection.2.1}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.1}Observation space}{3}{subsubsection.2.1.1}}
-\newlabel{subsub:obs_space}{{2.1.1}{3}{Observation space}{subsubsection.2.1.1}{}}
-\@writefile{toc}{\contentsline {paragraph}{Definition}{3}{section*.8}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Analysis}{4}{section.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Data Exploration: RoboschoolHumanoid-v1}{4}{subsection.2.1}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.1}Observation space}{4}{subsubsection.2.1.1}}
+\newlabel{subsubsec:obs_space}{{2.1.1}{4}{Observation space}{subsubsection.2.1.1}{}}
+\@writefile{toc}{\contentsline {paragraph}{Definition}{4}{section*.8}}
 \@writefile{toc}{\contentsline {paragraph}{}{4}{section*.9}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.2}Action space}{4}{subsubsection.2.1.2}}
 \@writefile{toc}{\contentsline {paragraph}{Definition}{4}{section*.10}}
@@ -48,41 +48,56 @@
 \@writefile{toc}{\contentsline {paragraph}{Definition}{5}{section*.12}}
 \@writefile{toc}{\contentsline {paragraph}{}{5}{section*.13}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Exploratory Visualization}{5}{subsection.2.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Algorithm and Techniques}{5}{subsection.2.3}}
-\@writefile{toc}{\contentsline {paragraph}{Deep Deterministic Policy Gradient}{5}{section*.15}}
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Roboschool environment\relax }}{6}{figure.caption.14}}
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
 \newlabel{fig:roboschoolhumanoid}{{1}{6}{Roboschool environment\relax }{figure.caption.14}{}}
-\@writefile{toc}{\contentsline {paragraph}{}{6}{section*.17}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Algorithm and Techniques}{6}{subsection.2.3}}
+\@writefile{toc}{\contentsline {paragraph}{Deep Deterministic Policy Gradient}{6}{section*.15}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces First, the environment gives the first state to the actor and it chose the action following the policy. The action is given back to the environment and a reward is computed, meaning how good the action was for that state, and sent to the critic network. The critic computes the $Q$ value of that action by minimizing the loss and gives the error to the actor in order to let him train on it.\relax }}{6}{figure.caption.16}}
+\newlabel{fig:actor-critic}{{2}{6}{First, the environment gives the first state to the actor and it chose the action following the policy. The action is given back to the environment and a reward is computed, meaning how good the action was for that state, and sent to the critic network. The critic computes the $Q$ value of that action by minimizing the loss and gives the error to the actor in order to let him train on it.\relax }{figure.caption.16}{}}
 \citation{journals/corr/LillicrapHPHETS15}
 \citation{journals/corr/LillicrapHPHETS15}
+\@writefile{toc}{\contentsline {paragraph}{}{7}{section*.17}}
+\@writefile{toc}{\contentsline {paragraph}{}{7}{section*.18}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Algorithm from \citeauthor  {journals/corr/LillicrapHPHETS15} paper\relax }}{7}{figure.caption.19}}
+\newlabel{fig:algoDDPG}{{3}{7}{Algorithm from \citeauthor {journals/corr/LillicrapHPHETS15} paper\relax }{figure.caption.19}{}}
 \citation{journals/corr/LillicrapHPHETS15}
 \citation{GuLilGhaTurLev17}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces First, the environment gives the first state to the actor and it chose the action following the policy. The action is given back to the environment and a reward is computed, meaning how good the action was for that state, and sent to the critic network. The critic computes the $Q$ value of that action by minimizing the loss and gives the error to the actor in order to let him train on it.\relax }}{7}{figure.caption.16}}
-\newlabel{fig:actor-critic}{{2}{7}{First, the environment gives the first state to the actor and it chose the action following the policy. The action is given back to the environment and a reward is computed, meaning how good the action was for that state, and sent to the critic network. The critic computes the $Q$ value of that action by minimizing the loss and gives the error to the actor in order to let him train on it.\relax }{figure.caption.16}{}}
-\@writefile{toc}{\contentsline {paragraph}{}{7}{section*.18}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Benchmark}{7}{subsection.2.4}}
-\@writefile{toc}{\contentsline {paragraph}{}{7}{section*.21}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Algorithm from \citeauthor  {journals/corr/LillicrapHPHETS15} paper\relax }}{8}{figure.caption.19}}
-\newlabel{fig:algoDDPG}{{3}{8}{Algorithm from \citeauthor {journals/corr/LillicrapHPHETS15} paper\relax }{figure.caption.19}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Methodology}{8}{section.3}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Data Preprocessing}{8}{subsection.3.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Benchmark}{8}{subsection.2.4}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Random Policy\relax }}{8}{figure.caption.20}}
+\newlabel{fig:randompolicy}{{4}{8}{Random Policy\relax }{figure.caption.20}{}}
+\@writefile{toc}{\contentsline {paragraph}{}{8}{section*.21}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Average return over episodes in HalfCheetah-v1 and Humanoid-v1 during learning, comparing Q-Prop against other model-free algorithms. Q-Prop with vanilla policy gradient outperforms TRPO on HalfCheetah. Q-Prop significantly outperforms TRPO in convergence time on Humanoid.\relax }}{8}{figure.caption.22}}
+\newlabel{fig:benchmark}{{5}{8}{Average return over episodes in HalfCheetah-v1 and Humanoid-v1 during learning, comparing Q-Prop against other model-free algorithms. Q-Prop with vanilla policy gradient outperforms TRPO on HalfCheetah. Q-Prop significantly outperforms TRPO in convergence time on Humanoid.\relax }{figure.caption.22}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Methodology}{9}{section.3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Data Preprocessing}{9}{subsection.3.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Implementation}{9}{subsection.3.2}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.1}Project Structure}{9}{subsubsection.3.2.1}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.2}Replay buffer}{10}{subsubsection.3.2.2}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.3}Neural networks: Actor and Critic}{10}{subsubsection.3.2.3}}
+\@writefile{toc}{\contentsline {paragraph}{Keras vs Tensorflow}{10}{section*.23}}
+\@writefile{toc}{\contentsline {paragraph}{The Actor}{10}{section*.24}}
+\@writefile{toc}{\contentsline {paragraph}{The Critic}{10}{section*.25}}
+\@writefile{toc}{\contentsline {paragraph}{Target networks}{10}{section*.26}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.4}Training}{11}{subsubsection.3.2.4}}
+\@writefile{toc}{\contentsline {paragraph}{The Actor}{11}{section*.27}}
+\@writefile{toc}{\contentsline {paragraph}{The Critic}{11}{section*.28}}
+\@writefile{toc}{\contentsline {paragraph}{Process}{11}{section*.29}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.5}Noise}{13}{subsubsection.3.2.5}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.6}The Agent}{13}{subsubsection.3.2.6}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.7}Hyper Parameters}{13}{subsubsection.3.2.7}}
+\newlabel{subsubsec:hp_params}{{3.2.7}{13}{Hyper Parameters}{subsubsection.3.2.7}{}}
 \bibdata{report}
 \bibcite{1606.01540}{{1}{2016}{{Brockman et~al.}}{{Brockman, Cheung, Pettersson, Schneider, Schulman, Tang, and Zaremba}}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Random Policy\relax }}{9}{figure.caption.20}}
-\newlabel{fig:randompolicy}{{4}{9}{Random Policy\relax }{figure.caption.20}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Average return over episodes in HalfCheetah-v1 and Humanoid-v1 during learning, comparing Q-Prop against other model-free algorithms. Q-Prop with vanilla policy gradient outperforms TRPO on HalfCheetah. Q-Prop significantly outperforms TRPO in convergence time on Humanoid.\relax }}{9}{figure.caption.22}}
-\newlabel{fig:benchmark}{{5}{9}{Average return over episodes in HalfCheetah-v1 and Humanoid-v1 during learning, comparing Q-Prop against other model-free algorithms. Q-Prop with vanilla policy gradient outperforms TRPO on HalfCheetah. Q-Prop significantly outperforms TRPO in convergence time on Humanoid.\relax }{figure.caption.22}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Implementation}{9}{subsection.3.2}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.1}Replay buffer}{9}{subsubsection.3.2.1}}
-\bibcite{journals/corr/LillicrapHPHETS15}{{2}{2015}{{Lillicrap et~al.}}{{Lillicrap, Hunt, Pritzel, Heess, Erez, Tassa, Silver, and Wierstra}}}
+\bibcite{GuLilGhaTurLev17}{{2}{2017}{{Gu et~al.}}{{Gu, Lillicrap, Ghahramani, Turner, and Levine}}}
+\bibcite{journals/corr/LillicrapHPHETS15}{{3}{2015}{{Lillicrap et~al.}}{{Lillicrap, Hunt, Pritzel, Heess, Erez, Tassa, Silver, and Wierstra}}}
 \bibstyle{plainnat}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.2}Neural networks: Actor and Critic}{10}{subsubsection.3.2.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Refinement}{10}{subsection.3.3}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Results}{10}{section.4}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Model Evaluation and Validation}{10}{subsection.4.1}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Justification}{10}{subsection.4.2}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Conclusion}{10}{section.5}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Free-Form Visualization}{10}{subsection.5.1}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Reflection}{10}{subsection.5.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Improvement}{10}{subsection.5.3}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.8}Visualization}{15}{subsubsection.3.2.8}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Refinement}{15}{subsection.3.3}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Results}{15}{section.4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Model Evaluation and Validation}{15}{subsection.4.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Justification}{15}{subsection.4.2}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Conclusion}{15}{section.5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Free-Form Visualization}{15}{subsection.5.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Reflection}{15}{subsection.5.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Improvement}{15}{subsection.5.3}}

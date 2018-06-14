@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.3.21)  12 JUN 2018 23:49
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.3.21)  15 JUN 2018 00:17
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -560,6 +560,28 @@ Package: multicol 2015/08/19 v1.8n multicolumn formatting (FMi)
 \colbreak@box=\box60
 \mc@col@check@num=\count157
 )
+(/usr/share/texlive/texmf-dist/tex/generic/dirtree/dirtree.sty
+Package: dirtree 2012/12/11 v0.32 package wrapper for dirtree
+
+(/usr/share/texlive/texmf-dist/tex/generic/dirtree/dirtree.tex
+`dirtree' v0.32, 2012/12/11 (jcc)
+\DT@offset=\dimen145
+\DT@width=\dimen146
+\DT@sep=\dimen147
+\DT@all=\dimen148
+\DT@rulewidth=\dimen149
+\DT@dotwidth=\dimen150
+\DTbaselineskip=\dimen151
+\DT@counti=\count158
+\DT@countii=\count159
+\DT@countiii=\count160
+\DT@countiv=\count161
+\DT@indent=\dimen152
+\DT@parskip=\dimen153
+\DT@baselineskip=\dimen154
+)
+File: dirtree.tex 2012/12/11 v0.32 `dirtree' (jcc)
+)
 (/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty
 Package: fontenc 2005/09/27 v1.99g Standard LaTeX package
 
@@ -573,15 +595,15 @@ Package: caption 2016/02/21 v3.3-144 Customizing captions (AR)
 (/usr/share/texlive/texmf-dist/tex/latex/caption/caption3.sty
 Package: caption3 2016/02/04 v1.7-139 caption3 kernel (AR)
 Package caption3 Info: TeX engine: e-TeX on input line 67.
-\captionmargin=\dimen145
-\captionmargin@=\dimen146
-\captionwidth=\dimen147
-\caption@tempdima=\dimen148
-\caption@indent=\dimen149
-\caption@parindent=\dimen150
-\caption@hangindent=\dimen151
+\captionmargin=\dimen155
+\captionmargin@=\dimen156
+\captionwidth=\dimen157
+\caption@tempdima=\dimen158
+\caption@indent=\dimen159
+\caption@parindent=\dimen160
+\caption@hangindent=\dimen161
 )
-\c@ContinuedFloat=\count158
+\c@ContinuedFloat=\count162
 Package caption Info: hyperref package is loaded.
 Package caption Info: listings package is loaded.
 Package caption Info: longtable package is loaded.
@@ -620,7 +642,7 @@ Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
 Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
-\c@section@level=\count159
+\c@section@level=\count163
 )
 LaTeX Info: Redefining \ref on input line 56.
 LaTeX Info: Redefining \pageref on input line 56.
@@ -633,16 +655,16 @@ LaTeX Info: Redefining \nameref on input line 56.
 
 (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count160
-\scratchdimen=\dimen152
+\scratchcounter=\count164
+\scratchdimen=\dimen162
 \scratchbox=\box62
-\nofMPsegments=\count161
-\nofMParguments=\count162
+\nofMPsegments=\count165
+\nofMParguments=\count166
 \everyMPshowfont=\toks32
-\MPscratchCnt=\count163
-\MPscratchDim=\dimen153
-\MPnumerator=\count164
-\makeMPintoPDFobject=\count165
+\MPscratchCnt=\count167
+\MPscratchDim=\dimen163
+\MPnumerator=\count168
+\makeMPintoPDFobject=\count169
 \everyMPtoPDFconversion=\toks33
 ) (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
 Package: epstopdf-base 2010/02/09 v2.5 Base part for package epstopdf
@@ -663,7 +685,7 @@ Package ragged2e Info: ABD: executing \RaggedRight on input line 56.
 
 ABD: EverySelectfont initializing macros
 LaTeX Info: Redefining \selectfont on input line 56.
-\c@lstlisting=\count166
+\c@lstlisting=\count170
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: End \AtBeginDocument code.
 LaTeX Font Info:    Try loading font information for U+msa on input line 59.
@@ -676,7 +698,7 @@ LaTeX Font Info:    Try loading font information for U+msb on input line 59.
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<images/roboschoolhumanoid.png, id=104, 584.1825pt x 557.08125pt>
+<images/roboschoolhumanoid.png, id=128, 584.1825pt x 557.08125pt>
 File: images/roboschoolhumanoid.png Graphic file (type png)
 
 <use images/roboschoolhumanoid.png>
@@ -686,19 +708,19 @@ Package pdftex.def Info: images/roboschoolhumanoid.png used on input line 60.
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./images/roboschoolhumanoi
 d.png>] [2] [3]
-LaTeX Font Info:    Try loading font information for OMS+cmss on input line 178
+LaTeX Font Info:    Try loading font information for OMS+cmss on input line 179
 .
-LaTeX Font Info:    No file OMScmss.fd. on input line 178.
+LaTeX Font Info:    No file OMScmss.fd. on input line 179.
 
 
 LaTeX Font Warning: Font shape `OMS/cmss/m/n' undefined
 (Font)              using `OMS/cmsy/m/n' instead
-(Font)              for symbol `textbullet' on input line 178.
+(Font)              for symbol `textbullet' on input line 179.
 
 [4] (/usr/share/texlive/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2015/06/04 1.6 listings language file
 )
-LaTeX Font Info:    Try loading font information for T1+cmtt on input line 238.
+LaTeX Font Info:    Try loading font information for T1+cmtt on input line 240.
 
 
 (/usr/share/texlive/texmf-dist/tex/latex/base/t1cmtt.fd
@@ -707,66 +729,58 @@ File: t1cmtt.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 File: images/roboschoolhumanoid.png Graphic file (type png)
 
 <use images/roboschoolhumanoid.png>
-Package pdftex.def Info: images/roboschoolhumanoid.png used on input line 267.
-(pdftex.def)             Requested size: 345.0pt x 329.0066pt.
-
-<images/actor-critic.png, id=166, 354.32375pt x 351.3125pt>
+Package pdftex.def Info: images/roboschoolhumanoid.png used on input line 269.
+(pdftex.def)             Requested size: 172.5pt x 164.49905pt.
+ [5]
+<images/actor-critic.png, id=205, 354.32375pt x 351.3125pt>
 File: images/actor-critic.png Graphic file (type png)
 
 <use images/actor-critic.png>
-Package pdftex.def Info: images/actor-critic.png used on input line 282.
+Package pdftex.def Info: images/actor-critic.png used on input line 284.
 (pdftex.def)             Requested size: 172.5pt x 171.03497pt.
- [5] [6]
-<images/algoDDPG.png, id=191, 524.96124pt x 391.4625pt>
+ [6 <./images/actor-critic.png>]
+<images/algoDDPG.png, id=213, 524.96124pt x 391.4625pt>
 File: images/algoDDPG.png Graphic file (type png)
 
 <use images/algoDDPG.png>
-Package pdftex.def Info: images/algoDDPG.png used on input line 321.
+Package pdftex.def Info: images/algoDDPG.png used on input line 323.
 (pdftex.def)             Requested size: 345.0pt x 257.27293pt.
 
-<images/randompolicy.png, id=196, 937.3419pt x 258.7266pt>
+<images/randompolicy.png, id=218, 937.3419pt x 258.7266pt>
 File: images/randompolicy.png Graphic file (type png)
 
 <use images/randompolicy.png>
-Package pdftex.def Info: images/randompolicy.png used on input line 338.
+Package pdftex.def Info: images/randompolicy.png used on input line 340.
 (pdftex.def)             Requested size: 345.0pt x 95.2299pt.
-
-
-Package natbib Warning: Citation `GuLilGhaTurLev17' on page 7 undefined on inpu
-t line 353.
-
-<images/benchmark.png, id=199, 637.67647pt x 223.18677pt>
+ [7 <./images/algoDDPG.png>]
+<images/benchmark.png, id=233, 637.67647pt x 223.18677pt>
 File: images/benchmark.png Graphic file (type png)
 
 <use images/benchmark.png>
-Package pdftex.def Info: images/benchmark.png used on input line 358.
+Package pdftex.def Info: images/benchmark.png used on input line 360.
 (pdftex.def)             Requested size: 345.0pt x 120.75063pt.
- [7 <./images/actor-critic.png>] [8 <./images/algoDDPG.png>] (./report.bbl [9 <
-./images/randompolicy.png> <./images/benchmark.png (PNG copy)>])
-
-Package natbib Warning: There were undefined citations.
-
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 431.
-[10]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 431.
+ [8 <./images/randompolicy.png> <./images/benchmark.png (PNG copy)>] [9] [10] [
+11] [12] [13] (./report.bbl [14])
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 708.
+ [15]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 708.
  (./report.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 431.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 431.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 708.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 708.
 Package rerunfilecheck Info: File `report.out' has not changed.
-(rerunfilecheck)             Checksum: 342D7821AEC851FF220F0F4B796F13D4;1630.
-
+(rerunfilecheck)             Checksum: 2E414D2D970435260BC2EA0F31B09FF3;2058.
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 14498 strings out of 493029
- 215381 string characters out of 6136234
- 405085 words of memory out of 5000000
- 17695 multiletter control sequences out of 15000+600000
+ 14784 strings out of 493029
+ 219458 string characters out of 6136234
+ 537302 words of memory out of 5000000
+ 17850 multiletter control sequences out of 15000+600000
  21089 words of font info for 55 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 53i,8n,92p,1936b,1213s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 53i,8n,92p,1936b,1819s stack positions out of 5000i,500n,10000p,200000b,80000s
 pdfTeX warning (dest): name{Hfootnote.1} has been referenced but does not exi
 st, replaced by a fixed one
 
@@ -792,10 +806,10 @@ nts/type1/public/cm-super/sfsx1000.pfb></usr/share/texmf/fonts/type1/public/cm-
 super/sfsx1200.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfsx1440.pfb><
 /usr/share/texmf/fonts/type1/public/cm-super/sfsx1728.pfb></usr/share/texmf/fon
 ts/type1/public/cm-super/sftt1000.pfb>
-Output written on report.pdf (10 pages, 668319 bytes).
+Output written on report.pdf (15 pages, 707772 bytes).
 PDF statistics:
- 335 PDF objects out of 1000 (max. 8388607)
- 285 compressed objects within 3 object streams
- 73 named destinations out of 1000 (max. 500000)
- 226 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 523 PDF objects out of 1000 (max. 8388607)
+ 466 compressed objects within 5 object streams
+ 198 named destinations out of 1000 (max. 500000)
+ 274 words of extra memory for PDF output out of 10000 (max. 10000000)
 
