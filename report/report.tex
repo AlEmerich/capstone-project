@@ -10,6 +10,7 @@
 \usepackage[document]{ragged2e}
 \usepackage{amssymb}
 \usepackage{listings}
+\usepackage{adjustbox}
 \usepackage{multicol}
 \usepackage{dirtree}
 \usepackage[T1]{fontenc}
@@ -486,7 +487,33 @@ training and decrease variance of outputs.
 
 \paragraph{The Actor}
 
-TODO
+To train the actor network, we must define operations capable of applying action
+gradients computed by critic network. I have three steps:
+\begin{enumerate}
+\item Compute the gradients:
+\begin{lstlisting}[language=Python]
+self.unnormalized_actor_gradients = tf.gradients(
+    self.output, self.network_params, -self.action_gradients)
+\end{lstlisting}
+  I called these gradients unnormalized because since we compute gradients over
+  mini-batches, we need to ponderate gradients with the size of these batches.
+\item Ponderate gradients:
+\begin{lstlisting}[language=Python]
+self.actor_gradients = list(
+    map(
+        lambda x: tf.div(x, self.batch_size),
+        self.unnormalized_actor_gradients))
+\end{lstlisting}
+  Now that we have actor gradients, we can apply it to the actor variables:
+\item Applying gradients:
+\begin{lstlisting}[language=Python]
+self.network_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.scope+"/model")
+# ...
+self.opt = tf.train.AdamOptimizer(
+    self.lr).apply_gradients(
+        zip(self.actor_gradients, self.network_params))
+\end{lstlisting}
+\end{enumerate}
 
 \paragraph{The Critic}
 
@@ -497,7 +524,8 @@ minimizing the loss.
 \paragraph{Process}
 Here comes the salt and pepper of Deep Deterministic Policy Gradients. I need
 here to train the critic network first, computing the gradients and apply it to
-the actor network. Here the complete code:
+the actor network. Here the complete code which is basically the implementation
+of the figure \ref{fig:algoDDPG}:
 
 \begin{lstlisting}[language=Python]
 # Get samples of memory
@@ -590,7 +618,7 @@ self.update_actor_target =
 \subsubsection{Noise}
 
 In my first implementation, I used a $\epsilon$-greedy algorithm to explore the
-environment. It was a decaying asymptotic-to-0 function used to generate less
+environment. It was a decaying asymptotic-to-zero function used to generate less
 and less random actions over time. But then I discovered noise function to
 reduce variance and increase stability over taken actions, like
 Ornstein-Uhlenbeck noise. It computes a vector of float equal to the shape
@@ -641,52 +669,46 @@ I present in this section every arguments of my programs. It was really usefull
 to quickly test many hyper parameters in order to see how does it affects the
 training.
 
-\begin{itemize}
-\item \textbf{reset}: \verb?true? to reset the environment at final states,
-  \verb?false? otherwise.
-\item \textbf{render}: \verb?true? to render the environment, \verb?false?
-  otherwise. Roboschool has a bug which lead to give vector of \verb?inf? after
-  the second reset when render, so when I train the networkds, I don't render
-  it.
-\item \textbf{plot}: \verb?tensorflow? to visualize plot with tensorboard,
-  \verb?matplotlib? to render plot with matplotlib.
-\item \textbf{train}: \verb?true? to train network, \verb?false? otherwise.
-\item \textbf{noisy}: \verb?true? to add noise to action output, \verb?false?
-  otherwise.
-\item \textbf{load\_weights}: \verb?true? to load previously saved weight from
-  previous training session, \verb?false? otherwise.
-\item \textbf{batch\_size}: \verb?integer?, number of samples to get from memory.
-\item \textbf{epochs}: \verb?integer?, number of epochs to act.
-\item \textbf{noise\_threshold}; \verb?integer?, when epochs is hight than this
-  number, the program stops adding noise to the action output.
-\item \textbf{actor\_learning\_rate}: \verb?float?, learning rate for the actor
-  network.
-\item \textbf{critic\_learning\_rate}: \verb?float?, learning rate for the critic
-  network.
-\item \textbf{actor\_batch\_norm}: \verb?true? to add batch normamization after
-  dense layers of the actor network, \verb?false? otherwise.
-\item \textbf{critic\_batch\_norm}: \verb?true? to add batch normamization after
-  dense layers of the critic network, \verb?false? otherwise.
-\item \textbf{tau}: \verb?float?, used in the soft target update function.
-\item \textbf{gamma}: \verb?float?, discounted factor.
-\item \textbf{actor\_layers}: \verb?list of integer?, define the structure of the
-  actor network, the depth and the number of unit in each layer.
-\item \textbf{critic\_layers}: \verb?list of integer?, define the structure of the
-  critic network, the depth and the number of unit in each layer.
-\item \textbf{action\_range}: \verb?integer?, size of the action range to normalize
-  it between 0 and 1.
-\item \textbf{state\_range}: \verb?integer?, size of the state range to normalize
-  it between 0 and 1.
-\item \textbf{reward\_multiply}: \verb?integer?, multiply every reward with to
-  reward more when good action is taken and less when a bad one is taken.
-\item \textbf{dropout}: \verb?float?, percent of dropout to use after dense
-  layers. 0 to not add dropout.
-\end{itemize}
+\begin{table}[ht]
+  \centering
+  \begin{adjustbox}{width=1\textwidth}
+    \begin{tabular}{ |c|c|c| }
+      \hline
+      \textbf{Name} & \textbf{Description} & \textbf{Value to train} \\
+      \hline
+      reset & Reset the environment at final states & \verb?true? \\ 
+      render & Render the environment\footnotemark & false \\
+      plot & Choose the plotting library & \verb?tensorflow? \\
+      train & Train network & \verb?true? \\
+      noisy & Add noise to action outputs & \verb?true? \\
+      load\_weights & Load previously saved weights & \verb?false? \\
+      batch\_size & Number of samples to train from the momery & 128 \\
+      epochs & Number of epochs to act & 10,000 \\
+      noise\_threshold & At which epochs the program stops adding noise to actions & 500 \\
+      actor\_learning\_rate & Learning rate for the actor & 0.0001 \\
+      critic\_learning\_rate & Learning rate for the critic & 0.001 \\
+      actor\_batch\_norm & Add batch normalization after dense layers of the actor network & \verb?true? \\
+      critic\_batch\_norm & Add batch normalization after dense layers of the critic network & \verb?true? \\
+      tau & Used in soft target update function & 0.001 \\
+      gamma & Discounted factor & 0.99 \\
+      actor\_layers & Structure of actor network, depth and number of units in each layer & \verb?[400, 300]? \\
+      critic\_layers & Structure of critic network, depth and number of units in each layer & \verb?[400, 300]? \\
+      action\_range & Size of the action range to normalize it between 0 and 1 & 2 \\
+      state\_range & Size of the state range to normalize it between 0 and 1 & 10 \\
+      reward\_multiply & Multiply every reward with to reward more when good action is taken and less when a bad one is taken. & 1 \\
+      dropout & percent of dropout to use after dense layers & 0 \\
+      \hline
+    \end{tabular}
+  \end{adjustbox}
+  \caption{Hyper parameters description and definition for training purpose}
+  \label{tab:hyperparams}
+\end{table}
 
-\subsubsection{Visualization}
-
+\footnotetext{Roboschool has a bug which lead to give vector of \textit{inf} after the second reset when rendering, so when I train the networks, I don't render it.}
 
 \subsection{Refinement}
+
+
 
 \section{Results}
 
