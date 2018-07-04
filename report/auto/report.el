@@ -40,7 +40,8 @@
     "fig:randompolicy"
     "fig:benchmark"
     "subsubsec:hp_params"
-    "tab:hyperparams")
+    "tab:hyperparams"
+    "fig:noise_600")
    (LaTeX-add-bibliographies)
    (LaTeX-add-xcolor-definecolors
     "codegreen"

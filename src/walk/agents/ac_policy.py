@@ -1,4 +1,4 @@
-from .abstract_env import AbstractHumanoidEnv
+from .abstract_env import AbstractHumanoidEnv, AbstractCartpoleEnv
 from ..models.actor_critic import Actor, Critic
 from ..utils.memory import Memory
 from ..utils.noise import Noise
@@ -8,7 +8,7 @@ import tensorflow as tf
 # https://arxiv.org/pdf/1607.07086.pdf
 
 
-class AC_Policy(AbstractHumanoidEnv):
+class AC_Policy(AbstractCartpoleEnv):
     """Actor critic agent. Implements DDPG algorithm from
     https://arxiv.org/pdf/1509.02971v5.pdf.
     """
@@ -20,6 +20,7 @@ class AC_Policy(AbstractHumanoidEnv):
         super(AC_Policy, self).__init__(args)
         self.memory = Memory()
         self.tf_session = tf.Session()
+        print(self.env.action_space.shape)
         self.noise = Noise(mu=np.zeros(self.env.action_space.shape[0]))
         self.actor_file = "actor.ckpt"
         self.critic_file = "critic.ckpt"
@@ -90,13 +91,21 @@ class AC_Policy(AbstractHumanoidEnv):
             self.ct_params = tf.trainable_variables()[
                 len(self.at_params) + len(self.c_params) + len(self.a_params):]
 
-        print("************** ACTOR PARAMS", len(self.a_params), "**********************")
+        print("************** ACTOR PARAMS",
+              len(self.a_params),
+              "**********************")
         print(self.a_params)
-        print("************** CRITIC PARAMS", len(self.c_params), "*********************")
+        print("************** CRITIC PARAMS",
+              len(self.c_params),
+              "*********************")
         print(self.c_params)
-        print("********** TARGET ACTOR PARAMS", len(self.at_params), "******************")
+        print("********** TARGET ACTOR PARAMS",
+              len(self.at_params),
+              "******************")
         print(self.at_params)
-        print("********** TARGET CRITIC PARAMS", len(self.ct_params), "*****************")
+        print("********** TARGET CRITIC PARAMS",
+              len(self.ct_params),
+              "*****************")
         print(self.ct_params)
 
         self.update_critic_target = \
@@ -155,15 +164,18 @@ class AC_Policy(AbstractHumanoidEnv):
                 })
 
             if self.params.action_range:
-                next_actions = (next_actions +
-                                self.params.action_range/2
+                next_actions = (
+                    next_actions +
+                    self.params.action_range/2
                 ) / self.params.action_range
 
             # Compute the Q+1 value with next s+1 and a+1
-            Q_next = self.tf_session.run(self.target_critic_model.Q, feed_dict={
-                self.target_critic_model.input_state_ph: next_states,
-                self.target_critic_model.input_action_ph: next_actions
-            })
+            Q_next = self.tf_session.run(
+                self.target_critic_model.Q,
+                feed_dict={
+                    self.target_critic_model.input_state_ph: next_states,
+                    self.target_critic_model.input_action_ph: next_actions
+                })
 
             # gamma is the discounted factor
             Q_next = self.params.gamma * Q_next * (1 - dones)
@@ -192,6 +204,9 @@ class AC_Policy(AbstractHumanoidEnv):
             }
             _ = self.tf_session.run([self.actor_model.opt],
                                     feed_dict=feed_actor)
+            # self.actor_loss, _ = self.tf_session.run([self.actor_model.loss,
+            #                                           self.actor_model.opt],
+            #                                          feed_dict=feed_actor)
 
         with tf.variable_scope("soft_update"):
             # Update target network
@@ -218,22 +233,19 @@ class AC_Policy(AbstractHumanoidEnv):
         # Predict action from state
         reshaped_state = state.reshape(1, self.env.observation_space.shape[0])
         if self.params.state_range:
-            reshaped_state = (reshaped_state +
-                              self.params.state_range/2
+            reshaped_state = (
+                reshaped_state + self.params.state_range/2
             ) / self.params.state_range
         feed = {self.actor_model.input_ph: reshaped_state}
         return self.tf_session.run(self.actor_model.output, feed)[0]
 
-    def reset(self, done):
-        if done and self.params.reset:
-            self.noise.reset()
-        super(AC_Policy, self).reset(done)
+    def reset(self):
+        super(AC_Policy, self).reset()
 
     def run(self):
         """Run the simulation.
         """
-        print(self.params)
-        state = self.env.reset()
+        print(self.params) 
 
         # True to initialize actor and critic with saved weights
         if self.params.load_weights:
@@ -242,35 +254,46 @@ class AC_Policy(AbstractHumanoidEnv):
             self.critic_model.load_model_weights(
                 self.tf_session, self.critic_file)
 
+        seed = 42
+        np.random.seed(seed)
+        tf.set_random_seed(seed)
+
         for j in range(self.params.epochs):
-            action = self.act(state)
-            if self.params.noisy and j < self.params.noise_threshold:
-                action += self.noise()
-
-            new_state, reward, done, info = self.env.step(action)
-
-            # Put the current environment in the memory
-            # State interval is [-5;5] and action range is [-1;1]
-            self.memory.remember(state, action, reward * self.params.reward_multiply,
-                                 new_state, done, state_range=self.params.state_range,
-                                 action_range=self.params.action_range)
-
-            # Train the network
-            self.train()
-
             # Reset the environment if done
-            self.reset(done)
+            state = self.env.reset()
 
-            # Render the environment
-            self.render()
+            while True:
+                action = self.act(state)
+                if self.params.noisy:
+                    action += self.noise()
 
-            # Plot needed values
-            self.plotting(state=state, reward=reward,
-                          c_loss=self.critic_loss,
-                          a_loss=self.actor_loss)
+                new_state, reward, done, info = self.env.step(action)
 
-            # Change current state
-            state = new_state
+                # Put the current environment in the memory
+                # State interval is [-5;5] and action range is [-1;1]
+                self.memory.remember(state, action,
+                                     reward * self.params.reward_multiply,
+                                     new_state, done,
+                                     state_range=self.params.state_range,
+                                     action_range=self.params.action_range)
+
+                # Train the network
+                self.train()
+
+                # Render the environment
+                self.render()
+
+                # Plot needed values
+                self.plotting(state=state, reward=reward,
+                              c_loss=self.critic_loss,
+                              a_loss=self.actor_loss)
+
+                if done:
+                    self.reset()
+                    break;
+
+                # Change current state
+                state = new_state
 
         # Save the plot
         self.board.save()
