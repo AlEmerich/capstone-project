@@ -674,7 +674,7 @@ training.
   \begin{adjustbox}{width=1\textwidth}
     \begin{tabular}{ |c|c|c| }
       \hline
-      \textbf{Name} & \textbf{Description} & \textbf{Value to train} \\
+      \textbf{Name} & \textbf{Description} & \textbf{Value for training} \\
       \hline
       reset & Reset the environment at final states & \verb?true? \\ 
       render & Render the environment\footnotemark & false \\
@@ -683,7 +683,8 @@ training.
       noisy & Add noise to action outputs & \verb?true? \\
       load\_weights & Load previously saved weights & \verb?false? \\
       batch\_size & Number of samples to train from the momery & 128 \\
-      epochs & Number of epochs to act & 10,000 \\
+      epochs & Number of epochs & 1000 \\
+      pass_pereoch & Number of action during one epoch & 100 \\ 
       noise\_threshold & At which epochs the program stops adding noise to actions & 500 \\
       actor\_learning\_rate & Learning rate for the actor & 0.0001 \\
       critic\_learning\_rate & Learning rate for the critic & 0.001 \\

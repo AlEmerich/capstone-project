@@ -23,6 +23,7 @@ class AbstractActorCritic(ABC):
         self._create_weights_folder(
             os.path.join(self.folder, self.sub_folder))
         self.lr = lr
+
         self.tau = tau
         self.batch_size = batch_size
         self.scope = scope
@@ -155,7 +156,6 @@ class Actor(AbstractActorCritic):
                     self.opt = tf.train.AdamOptimizer(
                         self.lr).apply_gradients(
                             zip(self.actor_gradients, self.network_params))
-
 
 class Critic(AbstractActorCritic):
     """Q network.
