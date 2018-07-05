@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.11.13)  19 JUN 2018 12:23
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.11.13)  5 JUL 2018 16:51
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -423,6 +423,35 @@ File: pdftex.def 2017/01/12 v0.06k Graphics/color for pdfTeX
 \Gin@req@height=\dimen129
 \Gin@req@width=\dimen130
 )
+(/usr/local/texlive/2017/texmf-dist/tex/latex/caption/subcaption.sty
+Package: subcaption 2016/05/22 v1.1-161 Sub-captions (AR)
+
+(/usr/local/texlive/2017/texmf-dist/tex/latex/caption/caption.sty
+Package: caption 2016/02/21 v3.3-144 Customizing captions (AR)
+
+(/usr/local/texlive/2017/texmf-dist/tex/latex/caption/caption3.sty
+Package: caption3 2016/05/22 v1.7-166 caption3 kernel (AR)
+Package caption3 Info: TeX engine: e-TeX on input line 67.
+\captionmargin=\dimen131
+\captionmargin@=\dimen132
+\captionwidth=\dimen133
+\caption@tempdima=\dimen134
+\caption@indent=\dimen135
+\caption@parindent=\dimen136
+\caption@hangindent=\dimen137
+)
+\c@ContinuedFloat=\count140
+Package caption Info: hyperref package is loaded.
+Package caption Info: longtable package is loaded.
+
+(/usr/local/texlive/2017/texmf-dist/tex/latex/caption/ltcaption.sty
+Package: ltcaption 2013/06/09 v1.4-94 longtable captions (AR)
+)
+Package caption Info: supertabular package is loaded.
+)
+\c@subfigure=\count141
+\c@subtable=\count142
+)
 (/usr/local/texlive/2017/texmf-dist/tex/latex/xcolor/xcolor.sty
 Package: xcolor 2016/05/11 v2.12 LaTeX color extensions (UK)
 
@@ -453,8 +482,8 @@ Package: everysel 2011/10/28 v1.2 EverySelectfont Package (MS)
 (/usr/local/texlive/2017/texmf-dist/tex/latex/footmisc/footmisc.sty
 Package: footmisc 2011/06/06 v5.5b a miscellany of footnote facilities
 \FN@temptoken=\toks30
-\footnotemargin=\dimen131
-\c@pp@next@reset=\count140
+\footnotemargin=\dimen138
+\c@pp@next@reset=\count143
 Package footmisc Info: Declaring symbol style bringhurst on input line 855.
 Package footmisc Info: Declaring symbol style chicago on input line 863.
 Package footmisc Info: Declaring symbol style wiley on input line 872.
@@ -490,23 +519,23 @@ LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
 ))
 (/usr/local/texlive/2017/texmf-dist/tex/latex/listings/listings.sty
-\lst@mode=\count141
+\lst@mode=\count144
 \lst@gtempboxa=\box33
 \lst@token=\toks31
-\lst@length=\count142
-\lst@currlwidth=\dimen132
-\lst@column=\count143
-\lst@pos=\count144
-\lst@lostspace=\dimen133
-\lst@width=\dimen134
-\lst@newlines=\count145
-\lst@lineno=\count146
-\lst@maxwidth=\dimen135
+\lst@length=\count145
+\lst@currlwidth=\dimen139
+\lst@column=\count146
+\lst@pos=\count147
+\lst@lostspace=\dimen140
+\lst@width=\dimen141
+\lst@newlines=\count148
+\lst@lineno=\count149
+\lst@maxwidth=\dimen142
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/listings/lstmisc.sty
 File: lstmisc.sty 2015/06/04 1.6 (Carsten Heinz)
-\c@lstnumber=\count147
-\lst@skipnumbers=\count148
+\c@lstnumber=\count150
+\lst@skipnumbers=\count151
 \lst@framebox=\box34
 )
 (/usr/local/texlive/2017/texmf-dist/tex/latex/listings/listings.cfg
@@ -528,50 +557,50 @@ Package: trimclip 2012/05/16 v1.0 Trim and clip general TeX material
 Package: collectbox 2012/05/17 v0.4b Collect macro arguments as boxes
 \collectedbox=\box35
 )
-\tc@llx=\dimen136
-\tc@lly=\dimen137
-\tc@urx=\dimen138
-\tc@ury=\dimen139
+\tc@llx=\dimen143
+\tc@lly=\dimen144
+\tc@urx=\dimen145
+\tc@ury=\dimen146
 Package trimclip Info: Using driver 'tc-pdftex.def'.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/adjustbox/tc-pdftex.def
 File: tc-pdftex.def 2012/05/13 v1.0 Clipping driver for pdftex
 ))
-\adjbox@Width=\dimen140
-\adjbox@Height=\dimen141
-\adjbox@Depth=\dimen142
-\adjbox@Totalheight=\dimen143
+\adjbox@Width=\dimen147
+\adjbox@Height=\dimen148
+\adjbox@Depth=\dimen149
+\adjbox@Totalheight=\dimen150
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/ifoddpage/ifoddpage.sty
 Package: ifoddpage 2016/04/23 v1.1 Conditionals for odd/even page detection
-\c@checkoddpage=\count149
+\c@checkoddpage=\count152
 )
 (/usr/local/texlive/2017/texmf-dist/tex/latex/varwidth/varwidth.sty
 Package: varwidth 2009/03/30 ver 0.92;  Variable-width minipages
 \@vwid@box=\box36
-\sift@deathcycles=\count150
-\@vwid@loff=\dimen144
-\@vwid@roff=\dimen145
+\sift@deathcycles=\count153
+\@vwid@loff=\dimen151
+\@vwid@roff=\dimen152
 ))
 (/usr/local/texlive/2017/texmf-dist/tex/latex/tools/multicol.sty
 Package: multicol 2017/04/11 v1.8q multicolumn formatting (FMi)
-\c@tracingmulticols=\count151
+\c@tracingmulticols=\count154
 \mult@box=\box37
-\multicol@leftmargin=\dimen146
-\c@unbalance=\count152
-\c@collectmore=\count153
-\doublecol@number=\count154
-\multicoltolerance=\count155
-\multicolpretolerance=\count156
-\full@width=\dimen147
-\page@free=\dimen148
-\premulticols=\dimen149
-\postmulticols=\dimen150
+\multicol@leftmargin=\dimen153
+\c@unbalance=\count155
+\c@collectmore=\count156
+\doublecol@number=\count157
+\multicoltolerance=\count158
+\multicolpretolerance=\count159
+\full@width=\dimen154
+\page@free=\dimen155
+\premulticols=\dimen156
+\postmulticols=\dimen157
 \multicolsep=\skip76
 \multicolbaselineskip=\skip77
 \partial@page=\box38
 \last@line=\box39
-\maxbalancingoverflow=\dimen151
+\maxbalancingoverflow=\dimen158
 \mult@rightbox=\box40
 \mult@grightbox=\box41
 \mult@gfirstbox=\box42
@@ -593,34 +622,34 @@ Package: multicol 2017/04/11 v1.8q multicolumn formatting (FMi)
 \@tempa=\box58
 \@tempa=\box59
 \@tempa=\box60
-\c@columnbadness=\count157
-\c@finalcolumnbadness=\count158
-\last@try=\dimen152
-\multicolovershoot=\dimen153
-\multicolundershoot=\dimen154
+\c@columnbadness=\count160
+\c@finalcolumnbadness=\count161
+\last@try=\dimen159
+\multicolovershoot=\dimen160
+\multicolundershoot=\dimen161
 \mult@nat@firstbox=\box61
 \colbreak@box=\box62
-\mc@col@check@num=\count159
+\mc@col@check@num=\count162
 )
 (/usr/local/texlive/2017/texmf-dist/tex/generic/dirtree/dirtree.sty
 Package: dirtree 2012/12/11 v0.32 package wrapper for dirtree
 
 (/usr/local/texlive/2017/texmf-dist/tex/generic/dirtree/dirtree.tex
 `dirtree' v0.32, 2012/12/11 (jcc)
-\DT@offset=\dimen155
-\DT@width=\dimen156
-\DT@sep=\dimen157
-\DT@all=\dimen158
-\DT@rulewidth=\dimen159
-\DT@dotwidth=\dimen160
-\DTbaselineskip=\dimen161
-\DT@counti=\count160
-\DT@countii=\count161
-\DT@countiii=\count162
-\DT@countiv=\count163
-\DT@indent=\dimen162
-\DT@parskip=\dimen163
-\DT@baselineskip=\dimen164
+\DT@offset=\dimen162
+\DT@width=\dimen163
+\DT@sep=\dimen164
+\DT@all=\dimen165
+\DT@rulewidth=\dimen166
+\DT@dotwidth=\dimen167
+\DTbaselineskip=\dimen168
+\DT@counti=\count163
+\DT@countii=\count164
+\DT@countiii=\count165
+\DT@countiv=\count166
+\DT@indent=\dimen169
+\DT@parskip=\dimen170
+\DT@baselineskip=\dimen171
 )
 File: dirtree.tex 2012/12/11 v0.32 `dirtree' (jcc)
 )
@@ -630,54 +659,30 @@ Package: fontenc 2017/04/05 v2.0i Standard LaTeX package
 (/usr/local/texlive/2017/texmf-dist/tex/latex/base/t1enc.def
 File: t1enc.def 2017/04/05 v2.0i Standard LaTeX file
 LaTeX Font Info:    Redeclaring font encoding T1 on input line 48.
-))
-(/usr/local/texlive/2017/texmf-dist/tex/latex/caption/caption.sty
-Package: caption 2016/02/21 v3.3-144 Customizing captions (AR)
-
-(/usr/local/texlive/2017/texmf-dist/tex/latex/caption/caption3.sty
-Package: caption3 2016/05/22 v1.7-166 caption3 kernel (AR)
-Package caption3 Info: TeX engine: e-TeX on input line 67.
-\captionmargin=\dimen165
-\captionmargin@=\dimen166
-\captionwidth=\dimen167
-\caption@tempdima=\dimen168
-\caption@indent=\dimen169
-\caption@parindent=\dimen170
-\caption@hangindent=\dimen171
-)
-\c@ContinuedFloat=\count164
-Package caption Info: hyperref package is loaded.
-Package caption Info: listings package is loaded.
-Package caption Info: longtable package is loaded.
-
-(/usr/local/texlive/2017/texmf-dist/tex/latex/caption/ltcaption.sty
-Package: ltcaption 2013/06/09 v1.4-94 longtable captions (AR)
-)
-Package caption Info: supertabular package is loaded.
-)
-(./report.aux)
+)) (./report.aux)
 \openout1 = `report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 57.
-LaTeX Font Info:    ... okay on input line 57.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 57.
-LaTeX Font Info:    ... okay on input line 57.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 57.
-LaTeX Font Info:    ... okay on input line 57.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 57.
-LaTeX Font Info:    ... okay on input line 57.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 57.
-LaTeX Font Info:    ... okay on input line 57.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 57.
-LaTeX Font Info:    ... okay on input line 57.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 57.
-LaTeX Font Info:    ... okay on input line 57.
-LaTeX Font Info:    Try loading font information for T1+cmss on input line 57.
- (/usr/local/texlive/2017/texmf-dist/tex/latex/base/t1cmss.fd
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 58.
+LaTeX Font Info:    ... okay on input line 58.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 58.
+LaTeX Font Info:    ... okay on input line 58.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 58.
+LaTeX Font Info:    ... okay on input line 58.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 58.
+LaTeX Font Info:    ... okay on input line 58.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 58.
+LaTeX Font Info:    ... okay on input line 58.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 58.
+LaTeX Font Info:    ... okay on input line 58.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 58.
+LaTeX Font Info:    ... okay on input line 58.
+LaTeX Font Info:    Try loading font information for T1+cmss on input line 58.
+
+(/usr/local/texlive/2017/texmf-dist/tex/latex/base/t1cmss.fd
 File: t1cmss.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 \AtBeginShipoutBox=\box63
-Package hyperref Info: Link coloring OFF on input line 57.
+Package hyperref Info: Link coloring OFF on input line 58.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
@@ -685,11 +690,11 @@ Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
 (/usr/local/texlive/2017/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
 Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
-\c@section@level=\count165
+\c@section@level=\count167
 )
-LaTeX Info: Redefining \ref on input line 57.
-LaTeX Info: Redefining \pageref on input line 57.
-LaTeX Info: Redefining \nameref on input line 57.
+LaTeX Info: Redefining \ref on input line 58.
+LaTeX Info: Redefining \pageref on input line 58.
+LaTeX Info: Redefining \nameref on input line 58.
 
 (./report.out) (./report.out)
 \@outlinefile=\write3
@@ -698,16 +703,16 @@ LaTeX Info: Redefining \nameref on input line 57.
 
 (/usr/local/texlive/2017/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count166
+\scratchcounter=\count168
 \scratchdimen=\dimen172
 \scratchbox=\box64
-\nofMPsegments=\count167
-\nofMParguments=\count168
+\nofMPsegments=\count169
+\nofMParguments=\count170
 \everyMPshowfont=\toks32
-\MPscratchCnt=\count169
+\MPscratchCnt=\count171
 \MPscratchDim=\dimen173
-\MPnumerator=\count170
-\makeMPintoPDFobject=\count171
+\MPnumerator=\count172
+\makeMPintoPDFobject=\count173
 \everyMPtoPDFconversion=\toks33
 ) (/usr/local/texlive/2017/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
 Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
@@ -726,46 +731,47 @@ G,.JBIG2,.JB2,.eps]
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-Package ragged2e Info: ABD: executing \RaggedRight on input line 57.
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: listings package is loaded.
+Package caption Info: End \AtBeginDocument code.
+Package ragged2e Info: ABD: executing \RaggedRight on input line 58.
 
 ABD: EverySelectfont initializing macros
-LaTeX Info: Redefining \selectfont on input line 57.
-\c@lstlisting=\count172
-Package caption Info: Begin \AtBeginDocument code.
-Package caption Info: End \AtBeginDocument code.
-LaTeX Font Info:    Try loading font information for U+msa on input line 60.
+LaTeX Info: Redefining \selectfont on input line 58.
+\c@lstlisting=\count174
+LaTeX Font Info:    Try loading font information for U+msa on input line 61.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 60.
+LaTeX Font Info:    Try loading font information for U+msb on input line 61.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<images/roboschoolhumanoid.png, id=124, 584.1825pt x 557.08125pt>
+<images/roboschoolhumanoid.png, id=132, 584.1825pt x 557.08125pt>
 File: images/roboschoolhumanoid.png Graphic file (type png)
 
 <use images/roboschoolhumanoid.png>
-Package pdftex.def Info: images/roboschoolhumanoid.png used on input line 61.
+Package pdftex.def Info: images/roboschoolhumanoid.png used on input line 62.
 (pdftex.def)             Requested size: 345.0pt x 329.0066pt.
  [1
 
 {/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./image
 s/roboschoolhumanoid.png>] [2] [3]
-LaTeX Font Info:    Try loading font information for OMS+cmss on input line 180
+LaTeX Font Info:    Try loading font information for OMS+cmss on input line 181
 .
-LaTeX Font Info:    No file OMScmss.fd. on input line 180.
+LaTeX Font Info:    No file OMScmss.fd. on input line 181.
 
 
 LaTeX Font Warning: Font shape `OMS/cmss/m/n' undefined
 (Font)              using `OMS/cmsy/m/n' instead
-(Font)              for symbol `textbullet' on input line 180.
+(Font)              for symbol `textbullet' on input line 181.
 
 [4] (/usr/local/texlive/2017/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2015/06/04 1.6 listings language file
 )
-LaTeX Font Info:    Try loading font information for T1+cmtt on input line 241.
+LaTeX Font Info:    Try loading font information for T1+cmtt on input line 242.
 
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/base/t1cmtt.fd
@@ -774,58 +780,87 @@ File: t1cmtt.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 File: images/roboschoolhumanoid.png Graphic file (type png)
 
 <use images/roboschoolhumanoid.png>
-Package pdftex.def Info: images/roboschoolhumanoid.png used on input line 270.
+Package pdftex.def Info: images/roboschoolhumanoid.png used on input line 271.
 (pdftex.def)             Requested size: 172.5pt x 164.49905pt.
  [5]
-<images/actor-critic.png, id=201, 354.32375pt x 351.3125pt>
+<images/actor-critic.png, id=209, 354.32375pt x 351.3125pt>
 File: images/actor-critic.png Graphic file (type png)
 
 <use images/actor-critic.png>
-Package pdftex.def Info: images/actor-critic.png used on input line 285.
+Package pdftex.def Info: images/actor-critic.png used on input line 286.
 (pdftex.def)             Requested size: 172.5pt x 171.03497pt.
  [6 <./images/actor-critic.png>]
-<images/algoDDPG.png, id=209, 524.96124pt x 391.4625pt>
+<images/algoDDPG.png, id=217, 524.96124pt x 391.4625pt>
 File: images/algoDDPG.png Graphic file (type png)
 
 <use images/algoDDPG.png>
-Package pdftex.def Info: images/algoDDPG.png used on input line 324.
+Package pdftex.def Info: images/algoDDPG.png used on input line 325.
 (pdftex.def)             Requested size: 345.0pt x 257.27293pt.
 
-<images/randompolicy.png, id=214, 937.3419pt x 258.7266pt>
+<images/randompolicy.png, id=222, 937.3419pt x 258.7266pt>
 File: images/randompolicy.png Graphic file (type png)
 
 <use images/randompolicy.png>
-Package pdftex.def Info: images/randompolicy.png used on input line 341.
+Package pdftex.def Info: images/randompolicy.png used on input line 342.
 (pdftex.def)             Requested size: 345.0pt x 95.2299pt.
  [7 <./images/algoDDPG.png>]
-<images/benchmark.png, id=229, 637.67647pt x 223.18677pt>
+<images/benchmark.png, id=237, 637.67647pt x 223.18677pt>
 File: images/benchmark.png Graphic file (type png)
 
 <use images/benchmark.png>
-Package pdftex.def Info: images/benchmark.png used on input line 361.
+Package pdftex.def Info: images/benchmark.png used on input line 362.
 (pdftex.def)             Requested size: 345.0pt x 120.75063pt.
  [8 <./images/randompolicy.png> <./images/benchmark.png (PNG copy)>] [9] [10] [
-11] [12] [13] (./report.bbl [14])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 728.
- [15]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 728.
+11] [12] [13]
+<images/plot_noise_600.png, id=399, 241.60854pt x 167.21294pt>
+File: images/plot_noise_600.png Graphic file (type png)
+
+<use images/plot_noise_600.png>
+Package pdftex.def Info: images/plot_noise_600.png used on input line 725.
+(pdftex.def)             Requested size: 172.5pt x 119.39047pt.
+
+<images/plot_noise_350.png, id=400, 243.73412pt x 170.04706pt>
+File: images/plot_noise_350.png Graphic file (type png)
+
+<use images/plot_noise_350.png>
+Package pdftex.def Info: images/plot_noise_350.png used on input line 732.
+(pdftex.def)             Requested size: 172.5pt x 120.35541pt.
+
+Overfull \hbox (6.66504pt too wide) in paragraph at lines 723--736
+[][]  []  
+ []
+
+[14]
+
+Package natbib Warning: Citation `DBLP:journals/corr/abs-1801-10425' on page 15
+ undefined on input line 748.
+
+[15 <./images/plot_noise_600.png (PNG copy)> <./images/plot_noise_350.png (PNG 
+copy)>] (./report.bbl [16])
+
+Package natbib Warning: There were undefined citations.
+
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 803.
+[17]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 803.
  (./report.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 728.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 728.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 803.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 803.
 Package rerunfilecheck Info: File `report.out' has not changed.
-(rerunfilecheck)             Checksum: 2A3FC4F3968856C1B3D8E5510F0236B8;1985.
+(rerunfilecheck)             Checksum: 04CBA2CC3768FC48513D8B664D558177;2128.
+
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 16991 strings out of 492995
- 273221 string characters out of 6132703
- 588382 words of memory out of 5000000
- 20029 multiletter control sequences out of 15000+600000
- 21903 words of font info for 56 fonts, out of 8000000 for 9000
+ 17073 strings out of 492995
+ 274690 string characters out of 6132703
+ 589564 words of memory out of 5000000
+ 20098 multiletter control sequences out of 15000+600000
+ 22672 words of font info for 57 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 53i,13n,92p,1936b,1819s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 59i,13n,94p,1936b,1819s stack positions out of 5000i,500n,10000p,200000b,80000s
 pdfTeX warning (dest): name{Hfootnote.2} has been referenced but does not exi
 st, replaced by a fixed one
 
@@ -851,18 +886,19 @@ ve/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive
 texmf-dist/fonts/type1/public/cm-super/sfss0600.pfb></usr/local/texlive/2017/te
 xmf-dist/fonts/type1/public/cm-super/sfss0700.pfb></usr/local/texlive/2017/texm
 f-dist/fonts/type1/public/cm-super/sfss0800.pfb></usr/local/texlive/2017/texmf-
-dist/fonts/type1/public/cm-super/sfss1000.pfb></usr/local/texlive/2017/texmf-di
-st/fonts/type1/public/cm-super/sfss1200.pfb></usr/local/texlive/2017/texmf-dist
-/fonts/type1/public/cm-super/sfss1728.pfb></usr/local/texlive/2017/texmf-dist/f
-onts/type1/public/cm-super/sfsx1000.pfb></usr/local/texlive/2017/texmf-dist/fon
-ts/type1/public/cm-super/sfsx1200.pfb></usr/local/texlive/2017/texmf-dist/fonts
-/type1/public/cm-super/sfsx1440.pfb></usr/local/texlive/2017/texmf-dist/fonts/t
-ype1/public/cm-super/sfsx1728.pfb></usr/local/texlive/2017/texmf-dist/fonts/typ
-e1/public/cm-super/sftt1000.pfb>
-Output written on report.pdf (15 pages, 713238 bytes).
+dist/fonts/type1/public/cm-super/sfss0900.pfb></usr/local/texlive/2017/texmf-di
+st/fonts/type1/public/cm-super/sfss1000.pfb></usr/local/texlive/2017/texmf-dist
+/fonts/type1/public/cm-super/sfss1200.pfb></usr/local/texlive/2017/texmf-dist/f
+onts/type1/public/cm-super/sfss1728.pfb></usr/local/texlive/2017/texmf-dist/fon
+ts/type1/public/cm-super/sfsx1000.pfb></usr/local/texlive/2017/texmf-dist/fonts
+/type1/public/cm-super/sfsx1200.pfb></usr/local/texlive/2017/texmf-dist/fonts/t
+ype1/public/cm-super/sfsx1440.pfb></usr/local/texlive/2017/texmf-dist/fonts/typ
+e1/public/cm-super/sfsx1728.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1
+/public/cm-super/sftt1000.pfb>
+Output written on report.pdf (17 pages, 755868 bytes).
 PDF statistics:
- 547 PDF objects out of 1000 (max. 8388607)
- 489 compressed objects within 5 object streams
- 216 named destinations out of 1000 (max. 500000)
- 266 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 583 PDF objects out of 1000 (max. 8388607)
+ 519 compressed objects within 6 object streams
+ 223 named destinations out of 1000 (max. 500000)
+ 292 words of extra memory for PDF output out of 10000 (max. 10000000)
 
