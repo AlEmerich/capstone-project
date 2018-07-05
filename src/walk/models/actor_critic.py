@@ -98,6 +98,7 @@ class Actor(AbstractActorCritic):
                                     batch_size, scope)
 
         act = tf.nn.relu
+        output_act = None
 
         with tf.variable_scope("actor", reuse=tf.AUTO_REUSE):
             with tf.variable_scope("model"):
@@ -134,7 +135,7 @@ class Actor(AbstractActorCritic):
                     # hyperbolic tangent
                     self.output = tf.layers.dense(
                         h_out, units=self.action_space.shape[0],
-                        activation=tf.nn.tanh,
+                        activation=output_act,
                         name="output")
                     self._summary_layer("output")
 
@@ -149,13 +150,16 @@ class Actor(AbstractActorCritic):
                         map(
                             lambda x: tf.div(x, self.batch_size),
                             self.unnormalized_actor_gradients))
-                    self.loss = tf.reduce_mean(
-                        tf.multiply(-self.action_gradients, self.output),
-                        name="loss")
-
                     self.opt = tf.train.AdamOptimizer(
                         self.lr).apply_gradients(
-                            zip(self.actor_gradients, self.network_params))
+                            zip(self.actor_gradients,
+                                self.network_params))
+
+                    # self.loss = tf.reduce_mean(
+                    #     tf.multiply(-self.action_gradients, self.output),
+                    #     name="loss")
+                    # self.opt = tf.train.AdamOptimizer(
+                    #     self.lr).minimize(self.loss)
 
 class Critic(AbstractActorCritic):
     """Q network.

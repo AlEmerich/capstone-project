@@ -709,7 +709,22 @@ training.
 
 \subsection{Refinement}
 
+To find the best tuning for my training, I changed the way I added the noise
+into the action, the learning operation of my actor network and its layer
+defintion. For the noise, I added it every steps. It then produces a bad
+training making the loss of the critic network going up at around 350 steps
+(Fig. \ref{fig:noise_600}).
 
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=1.\textwidth]{noise_600}*
+  \caption{Training with noise every steps}
+  \label{fig:noise_600}
+\end{figure}
+
+
+
+\subsubsection{Network definition} 
 
 \section{Results}
 
