@@ -35,7 +35,6 @@
     "caption")
    (LaTeX-add-labels
     "subsubsec:obs_space"
-    "fig:roboschoolhumanoid"
     "fig:actor-critic"
     "fig:algoDDPG"
     "fig:randompolicy"
