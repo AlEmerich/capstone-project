@@ -22,6 +22,7 @@
     "glossaries"
     "hyperref"
     "graphicx"
+    "subcaption"
     "xcolor"
     "amsmath"
     "ragged2e"
@@ -34,14 +35,14 @@
     "caption")
    (LaTeX-add-labels
     "subsubsec:obs_space"
-    "fig:roboschoolhumanoid"
     "fig:actor-critic"
     "fig:algoDDPG"
     "fig:randompolicy"
     "fig:benchmark"
     "subsubsec:hp_params"
     "tab:hyperparams"
-    "fig:noise_600")
+    "fig:noise_600"
+    "fig:noise_350")
    (LaTeX-add-bibliographies)
    (LaTeX-add-xcolor-definecolors
     "codegreen"
