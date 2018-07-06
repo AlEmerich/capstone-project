@@ -143,12 +143,12 @@ class Actor(AbstractActorCritic):
             print("ACTOR NETWORK PARAMS IN MEMBER:\n", self.network_params)
             if trainable:
                 with tf.variable_scope("train"):
-                    self.unnormalized_actor_gradients = tf.gradients(
+                    self.actor_gradients = tf.gradients(
                         self.output, self.network_params, -self.action_gradients)
-                    self.actor_gradients = list(
-                        map(
-                            lambda x: tf.div(x, self.batch_size),
-                            self.unnormalized_actor_gradients))
+                    # self.actor_gradients = list(
+                    #     map(
+                    #         lambda x: tf.div(x, self.batch_size),
+                    #         self.unnormalized_actor_gradients))
                     self.opt = tf.train.AdamOptimizer(
                         self.lr).apply_gradients(
                             zip(self.actor_gradients,

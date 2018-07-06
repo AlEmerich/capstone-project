@@ -26,7 +26,11 @@ def str2bool(v):
 
 
 def load_param_from_json():
-    return json.load(open("params.json"))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--params", type=str, default="params.json",
+                        help="File holding the paramet of the program.")
+    args = vars(parser.parse_args())
+    return json.load(open(args['params']))
 
 
 def load_param_from_cli():

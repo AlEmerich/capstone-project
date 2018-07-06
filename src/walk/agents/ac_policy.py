@@ -4,6 +4,7 @@ from ..utils.memory import Memory
 from ..utils.noise import Noise
 import numpy as np
 import tensorflow as tf
+import os
 
 # https://arxiv.org/pdf/1607.07086.pdf
 
@@ -19,6 +20,8 @@ class AC_Policy(AbstractCartpoleEnv):
         """
         super(AC_Policy, self).__init__(args)
         self.memory = Memory()
+        if self.params.device == "cpu":
+            os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
         self.tf_session = tf.Session()
         print(self.env.action_space.shape)
         self.noise = Noise(mu=np.zeros(self.env.action_space.shape[0]))
@@ -262,7 +265,7 @@ class AC_Policy(AbstractCartpoleEnv):
             # Reset the environment if done
             state = self.env.reset()
 
-            while True:
+            for i in range(self.params.pass_per_epoch):
                 action = self.act(state)
                 if self.params.noisy:
                     action += self.noise()

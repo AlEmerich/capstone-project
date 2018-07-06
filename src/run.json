@@ -1,14 +1,14 @@
 {
-    "device": "gpu",
-    "reset": true,
-    "render": false,
+    "device": "cpu",
+    "reset": false,
+    "render": true,
     "plot": "tensorflow",
-    "train": true,
-    "noisy": true,
+    "train": false,
+    "noisy": false,
     "load_weights": true,
 
     "batch_size": 128,
-    "epochs": 5,
+    "epochs": 100,
     "pass_per_epoch": 1000,
     "noise_threshold": 350,
 

@@ -53,8 +53,7 @@ class AbstractCartpoleEnv(AbstractEnv, ABC):
             self.labels = ["Reward", "Average reward",
                            "Critic loss", "Actor loss"]
         else:
-            self.labels = ["Average reward", "Angle to target",
-                           "Distance to target", "Gravity center from ground"]
+            self.labels = ["Average reward"]
         self.env = gym.make("MountainCarContinuous-v0")
 
     def use_matplotlib(self, title):
@@ -92,8 +91,7 @@ class AbstractCartpoleEnv(AbstractEnv, ABC):
                 ydatas = [reward, np.average(self.rewards),
                           c_loss, a_loss]
             else:
-                ydatas = [np.average(self.rewards), angle_to_target,
-                          target_dist, dist_center_ground]
+                ydatas = [np.average(self.rewards)]
 
             # Define text to display at the center of the figure
             info = None
