@@ -12,16 +12,9 @@ class Memory():
         """
         self.mem = deque(maxlen=length)
 
-    def remember(self, state, action, reward, next_state, done,
-                 state_range=None, action_range=None):
+    def remember(self, state, action, reward, next_state, done):
         """Put a new SARS in the memory
         """
-        if state_range:
-            state = (state + state_range/2) / state_range
-            next_state = (next_state + state_range/2) / state_range
-
-        if action_range:
-            action = (action + action_range/2) / action_range
         self.mem.append([state, action, reward, next_state, done])
 
     def samples(self, batch_size):

@@ -98,7 +98,7 @@ class Actor(AbstractActorCritic):
                                     batch_size, scope)
 
         act = tf.nn.relu
-        output_act = None
+        output_act = tf.nn.tanh
 
         with tf.variable_scope("actor", reuse=tf.AUTO_REUSE):
             with tf.variable_scope("model"):
@@ -138,18 +138,19 @@ class Actor(AbstractActorCritic):
                         activation=output_act,
                         name="output")
                     self._summary_layer("output")
+                    
 
             self.network_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES,
                                                     scope=self.scope+"/model")
             print("ACTOR NETWORK PARAMS IN MEMBER:\n", self.network_params)
             if trainable:
                 with tf.variable_scope("train"):
-                    self.actor_gradients = tf.gradients(
+                    self.unnormalized_actor_gradients = tf.gradients(
                         self.output, self.network_params, -self.action_gradients)
-                    # self.actor_gradients = list(
-                    #     map(
-                    #         lambda x: tf.div(x, self.batch_size),
-                    #         self.unnormalized_actor_gradients))
+                    self.actor_gradients = list(
+                        map(
+                            lambda x: tf.div(x, self.batch_size),
+                            self.unnormalized_actor_gradients))
                     self.opt = tf.train.AdamOptimizer(
                         self.lr).apply_gradients(
                             zip(self.actor_gradients,
@@ -232,7 +233,7 @@ class Critic(AbstractActorCritic):
 
                 with tf.variable_scope("Q_output"):
                     merge = h_state + h_action
-                    merge = tf.layers.dense(merge, 32, activation=act)
+                    # merge = tf.layers.dense(merge, 32, activation=act)
                     l2_reg = tf.contrib.layers.l2_regularizer(scale=0.001)
                     self.Q = tf.layers.dense(merge, 1, activation=None,
                                              kernel_initializer=self.init_w,

@@ -1,7 +1,8 @@
-from .abstract_env import AbstractHumanoidEnv, AbstractCartpoleEnv
+from .abstract_env import AbstractHumanoidEnv, AbstractMountainCarEnv
 from ..models.actor_critic import Actor, Critic
 from ..utils.memory import Memory
 from ..utils.noise import Noise
+from ..utils.array_utils import fit_normalize
 import numpy as np
 import tensorflow as tf
 import os
@@ -9,7 +10,7 @@ import os
 # https://arxiv.org/pdf/1607.07086.pdf
 
 
-class AC_Policy(AbstractCartpoleEnv):
+class AC_Policy(AbstractMountainCarEnv):
     """Actor critic agent. Implements DDPG algorithm from
     https://arxiv.org/pdf/1509.02971v5.pdf.
     """
@@ -23,12 +24,13 @@ class AC_Policy(AbstractCartpoleEnv):
         if self.params.device == "cpu":
             os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
         self.tf_session = tf.Session()
-        print(self.env.action_space.shape)
+        
         self.noise = Noise(mu=np.zeros(self.env.action_space.shape[0]))
         self.actor_file = "actor.ckpt"
         self.critic_file = "critic.ckpt"
         self.ratio_random_action = [0, 0]
-
+        self.scale = np.vectorize(fit_normalize)
+        
         with tf.variable_scope("network"):
             ################################################################
             # ACTOR
@@ -111,6 +113,7 @@ class AC_Policy(AbstractCartpoleEnv):
               "*****************")
         print(self.ct_params)
 
+        # Defines the soft target update operations
         self.update_critic_target = \
             [self.ct_params[i].assign(tf.multiply(self.c_params[i],
                                                   self.params.tau) +
@@ -124,6 +127,7 @@ class AC_Policy(AbstractCartpoleEnv):
                                                   1. - self.params.tau))
              for i in range(len(self.at_params))]
 
+        # Defines the initialization of the target parameter operations
         self.init_critic_target = \
             [self.ct_params[i].assign(self.c_params[i])
              for i in range(len(self.ct_params))]
@@ -165,13 +169,8 @@ class AC_Policy(AbstractCartpoleEnv):
                 feed_dict={
                     self.target_actor_model.input_ph: next_states
                 })
-
-            if self.params.action_range:
-                next_actions = (
-                    next_actions +
-                    self.params.action_range/2
-                ) / self.params.action_range
-
+            next_actions = self.scale(next_actions, self.act_low, self.act_high)
+            
             # Compute the Q+1 value with next s+1 and a+1
             Q_next = self.tf_session.run(
                 self.target_critic_model.Q,
@@ -195,9 +194,6 @@ class AC_Policy(AbstractCartpoleEnv):
                     [self.critic_model.loss, self.critic_model.opt,
                      self.critic_model.action_gradients],
                     feed_dict=feed_critic)
-
-        for grad in critic_action_gradient:
-            print(grad)
 
         with tf.variable_scope("train_actor"):
             # Train the actor network with the critic gradients
@@ -235,16 +231,13 @@ class AC_Policy(AbstractCartpoleEnv):
         """
         # Predict action from state
         reshaped_state = state.reshape(1, self.env.observation_space.shape[0])
-        if self.params.state_range:
-            reshaped_state = (
-                reshaped_state + self.params.state_range/2
-            ) / self.params.state_range
         feed = {self.actor_model.input_ph: reshaped_state}
-        return self.tf_session.run(self.actor_model.output, feed)[0]
+        actions = self.tf_session.run(self.actor_model.output, feed)[0]
+        return self.scale(actions, self.act_low, self.act_high)
 
     def reset(self):
         super(AC_Policy, self).reset()
-
+        
     def run(self):
         """Run the simulation.
         """
@@ -264,10 +257,11 @@ class AC_Policy(AbstractCartpoleEnv):
         for j in range(self.params.epochs):
             # Reset the environment if done
             state = self.env.reset()
-
+            
             for i in range(self.params.pass_per_epoch):
+                print("EPOCHS:", j, "PASS:", i)
                 action = self.act(state)
-                if self.params.noisy:
+                if self.params.noisy and j < self.params.noise_threshold:
                     action += self.noise()
 
                 new_state, reward, done, info = self.env.step(action)
@@ -276,9 +270,7 @@ class AC_Policy(AbstractCartpoleEnv):
                 # State interval is [-5;5] and action range is [-1;1]
                 self.memory.remember(state, action,
                                      reward * self.params.reward_multiply,
-                                     new_state, done,
-                                     state_range=self.params.state_range,
-                                     action_range=self.params.action_range)
+                                     new_state, done)
 
                 # Train the network
                 self.train()

@@ -43,9 +43,9 @@ class AbstractEnv(ABC):
     def run(self, train_pass, epochs):
         pass
 
-class AbstractCartpoleEnv(AbstractEnv, ABC):
+class AbstractMountainCarEnv(AbstractEnv, ABC):
     def __init__(self, args):
-        super(AbstractCartpoleEnv, self).__init__(args)
+        super(AbstractMountainCarEnv, self).__init__(args)
         # When training, we are not interested at the same metrics
         # than when not training
         self.labels = None
@@ -55,6 +55,12 @@ class AbstractCartpoleEnv(AbstractEnv, ABC):
         else:
             self.labels = ["Average reward"]
         self.env = gym.make("MountainCarContinuous-v0")
+
+        # Definition of the observation and action space
+        self.obs_low = self.env.observation_space.low
+        self.obs_high = self.env.observation_space.high
+        self.act_low = self.env.action_space.low
+        self.act_high = self.env.action_space.high
 
     def use_matplotlib(self, title):
         """Set the agent to use matplotboard to plot metrics.
@@ -159,6 +165,14 @@ class AbstractHumanoidEnv(AbstractEnv, ABC):
             self.labels = ["Average reward", "Angle to target",
                            "Distance to target", "Gravity center from ground"]
         self.env = gym.make("RoboschoolHumanoid-v1")
+
+        # Defintion of observation and action space
+        self.obs_low = np.empty(len(self.env.observation_space.low))
+        self.obs_low.fill(-5)        # Define in robotschool environment
+        self.obs_high = np.empty(len(self.env.observation_space.high))
+        self.obs_high.fill(5)
+        self.act_low = self.env.action_space.low
+        self.act_high = self.env.action_space.high
 
     def use_matplotlib(self, title):
         """Set the agent to use matplotboard to plot metrics.
