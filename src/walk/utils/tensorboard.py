@@ -6,12 +6,12 @@ class TensorBoard(Board):
     """Extends Board class to use tensorboard to plot metrics
     in order to be used the same way we use matplotlib.
     """
-    def __init__(self, tf_session):
+    def __init__(self, tf_session, name_run):
         """Set the session, the scope and call
         the super constructor.
         """
         self.tf_session = tf_session
-        super(TensorBoard, self).__init__()
+        super(TensorBoard, self).__init__(name_run)
 
     def on_launch(self, **kwargs):
         """Instantiate tensorflow placeholders and variables
@@ -64,5 +64,10 @@ class TensorBoard(Board):
 
     def on_reset(self, t):
         """No need to reset with tensorboard.
+        """
+        pass
+
+    def save(self):
+        """No need to save anything with tensorboard.
         """
         pass

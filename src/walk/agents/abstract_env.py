@@ -23,6 +23,12 @@ class AbstractEnv(ABC):
         self.list_reset_t = []
         self.board = None
 
+        train_str = "train" if self.params.train else "run"
+        self.simplify_params = '_'.join([train_str,
+                                         str(self.params.batch_size),
+                                         str(self.params.epochs),
+                                         str(self.params.noise_threshold)])
+        
     @abstractmethod
     def plotting(self, **kwargs):
         pass
@@ -62,16 +68,18 @@ class AbstractMountainCarEnv(AbstractEnv, ABC):
         self.act_low = self.env.action_space.low
         self.act_high = self.env.action_space.high
 
+        self.name_run = '_'.join(["mountain", self.simplify_params])
+
     def use_matplotlib(self, title):
         """Set the agent to use matplotboard to plot metrics.
         """
-        self.board = MatplotBoard(title)
+        self.board = MatplotBoard(title, self.name_run)
         self.board.on_launch(row=2, column=3, labels=self.labels)
 
     def use_tensorboard(self, tf_session):
         """Set the agent to use tensorboard to plot metrics.
         """
-        self.board = TensorBoard(tf_session)
+        self.board = TensorBoard(tf_session, self.name_run)
         self.board.on_launch(labels=self.labels)
 
     def plotting(self, **kwargs):
@@ -174,16 +182,19 @@ class AbstractHumanoidEnv(AbstractEnv, ABC):
         self.act_low = self.env.action_space.low
         self.act_high = self.env.action_space.high
 
+        self.name_run = '_'.join(["roboschool",
+                                  self.simplify_params])
+
     def use_matplotlib(self, title):
         """Set the agent to use matplotboard to plot metrics.
         """
-        self.board = MatplotBoard(title)
+        self.board = MatplotBoard(title, self.name_run)
         self.board.on_launch(row=2, column=3, labels=self.labels)
 
     def use_tensorboard(self, tf_session):
         """Set the agent to use tensorboard to plot metrics.
         """
-        self.board = TensorBoard(tf_session)
+        self.board = TensorBoard(tf_session, self.name_run)
         self.board.on_launch(labels=self.labels)
 
     def plotting(self, **kwargs):
@@ -199,6 +210,7 @@ class AbstractHumanoidEnv(AbstractEnv, ABC):
             reward = kwargs.get('reward')
             c_loss = kwargs.get('c_loss')
             a_loss = kwargs.get('a_loss')
+            epoch = kwargs.get('epoch')
 
             # Get metrics
             target_dist = self.env.unwrapped.walk_target_dist
@@ -224,8 +236,9 @@ class AbstractHumanoidEnv(AbstractEnv, ABC):
                 info = ' '.join(["RESET at t =", str(self.last_t),
                                  ", Best t so far:",
                                  str(max(self.list_reset_t)),
-                                 ", Average t :",
-                                 str(np.average(self.list_reset_t))])
+                                 ", Average t:",
+                                 str(np.average(self.list_reset_t)),
+                                 ", Epoch:", str(epoch)])
 
             # Data to plot in the Y axis of the subplots
             self.board.on_running(ydatas=ydatas,
