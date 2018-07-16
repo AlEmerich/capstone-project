@@ -1,28 +1,31 @@
 from abc import ABC, abstractmethod
 import datetime
 import os
+import sys
 
 
 class Board(ABC):
     """Board in order to plot some metrics.
     The x axis is the same for all subplots.
     """
-    def __init__(self):
+    def __init__(self, name_run):
         """Set the up title of the plot.
         """
         folder = "plots"
-        now = str(datetime.datetime.now())
-        sub_folder = now.replace(" ", "_")
 
-        self._create_folder(folder)
-        self.path = os.path.join(folder, sub_folder)
-        self._create_folder(self.path)
+        if not os.path.exists(folder):
+            sys.exit("Please create the " + folder + " folder manually")
+        self.path = self._create_folder(os.path.join(folder, name_run))
 
-    def _create_folder(self, folder):
+    def _create_folder(self, folder, count=0):
         """Create folder if it doesn't exists.
         """
-        if not os.path.exists(folder):
-            os.makedirs(folder)
+        r_path = folder + "_" + str(count)
+        if os.path.exists(r_path):
+            return self._create_folder(folder, count=count+1)
+        else:
+            os.makedirs(r_path)
+        return r_path
 
     @abstractmethod
     def on_launch(self, **kwargs):

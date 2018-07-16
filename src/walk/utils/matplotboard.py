@@ -9,11 +9,11 @@ class MatplotBoard(Board):
     """Board in order to plot some metrics.
     The x axis is the same for all subplots.
     """
-    def __init__(self, title):
+    def __init__(self, title, name_run):
         """Set the up title of the plot.
         """
         self.title = title
-        super(MatplotBoard, self).__init__()
+        super(MatplotBoard, self).__init__(name_run)
 
     def on_launch(self, **kwargs):
         """Initialize the plot.

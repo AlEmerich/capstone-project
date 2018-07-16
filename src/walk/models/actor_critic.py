@@ -2,6 +2,7 @@ from abc import ABC
 import datetime
 import tensorflow as tf
 import os
+import sys
 
 
 class AbstractActorCritic(ABC):
@@ -9,19 +10,24 @@ class AbstractActorCritic(ABC):
     and have function to save it.
     """
     def __init__(self, observation_space, action_space,
-                 lr, tau, batch_size, scope):
+                 lr, tau, batch_size, scope,
+                 sub_folder=None):
         """Save state space and action space and create
         the folder where to save the weights of the neural network.
         """
         self.observation_space = observation_space
         self.action_space = action_space
         self.folder = "saved_folder"
-        # Get time as string
-        sub = str(datetime.datetime.now())
-        self.sub_folder = sub.replace(" ", "_")
-        self._create_weights_folder(self.folder)
-        self._create_weights_folder(
-            os.path.join(self.folder, self.sub_folder))
+
+        if not os.path.exists(self.folder):
+            sys.exit("Please create the " + folder + " folder manually.")
+
+        if sub_folder is None:
+            sub = str(datetime.datetime.now())
+            sub_folder = sub.replace(" ", "_")
+        
+        self.saved_folder = self._create_weights_folder(
+            os.path.join(self.folder, sub_folder))
         self.lr = lr
 
         self.tau = tau
@@ -31,10 +37,14 @@ class AbstractActorCritic(ABC):
         self.init_w = tf.random_normal_initializer(0., 0.3)
         self.init_b = tf.constant_initializer(0.1)
 
-    def _create_weights_folder(self, path):
+    def _create_weights_folder(self, path, count=0):
         """Create the weights folder if not exists."""
-        if not os.path.exists(path):
-            os.makedirs(path)
+        r_path = path + "_" + str(count)
+        if os.path.exists(r_path):
+            return self._create_weights_folder(path, count+1)
+        else:
+            os.makedirs(r_path)
+        return r_path
 
     def save_model_weights(self, sess, filepath):
         """Save the weights of thespecified model
@@ -42,15 +52,18 @@ class AbstractActorCritic(ABC):
         in __init__.
         """
         saver = tf.train.Saver()
-        saver.save(sess, os.path.join(self.folder, filepath))
+        saver.save(sess, os.path.join(self.saved_folder,
+                                      filepath))
 
-    def load_model_weights(self, sess, filepath):
+    def load_model_weights(self, sess, path, filepath):
         """Load the weights of the specified model
         to the specified file in folder specified
         in __init__.
         """
         saver = tf.train.Saver()
-        saver.restore(sess, os.path.join(self.folder, filepath))
+        saver.restore(sess, os.path.join(self.folder,
+                                         path,
+                                         filepath))
 
     def _soft_update_weights(self, sess, from_weights, just_copy):
         #########################################
@@ -88,14 +101,16 @@ class Actor(AbstractActorCritic):
                  scope,
                  dropout,
                  batch_norm,
-                 trainable=True):
+                 trainable=True,
+                 sub_folder=None):
         """Create the actor model and return it with
         input layer in order to train with the gradients
         of the critic network.
         """
         super(Actor, self).__init__(observation_space,
                                     action_space, lr, tau,
-                                    batch_size, scope)
+                                    batch_size, scope,
+                                    sub_folder)
 
         act = tf.nn.relu
         output_act = tf.nn.tanh
@@ -174,13 +189,15 @@ class Critic(AbstractActorCritic):
                  scope,
                  dropout,
                  batch_norm,
-                 trainable=True):
+                 trainable=True,
+                 sub_folder=None):
         """Create the critic model and return the two input layers
         in order to compute gradients from critic network.
         """
         super(Critic, self).__init__(observation_space,
                                      action_space, lr, tau,
-                                     batch_size, scope)
+                                     batch_size, scope,
+                                     sub_folder)
 
         act = tf.nn.relu
 

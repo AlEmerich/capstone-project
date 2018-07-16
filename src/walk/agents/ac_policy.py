@@ -12,7 +12,7 @@ from ..utils.noise import Noise
 # https://arxiv.org/pdf/1607.07086.pdf
 
 
-class AC_Policy(AbstractMountainCarEnv):
+class AC_Policy(AbstractHumanoidEnv):
     """Actor critic agent. Implements DDPG algorithm from
     https://arxiv.org/pdf/1509.02971v5.pdf.
     """
@@ -28,8 +28,8 @@ class AC_Policy(AbstractMountainCarEnv):
         self.tf_session = tf.Session()
 
         self.noise = Noise(mu=np.zeros(self.env.action_space.shape[0]))
-        self.actor_file = "actor.ckpt"
-        self.critic_file = "critic.ckpt"
+        self.actor_file = "actor"
+        self.critic_file = "critic"
         self.ratio_random_action = [0, 0]
         self.scale = np.vectorize(fit_normalize)
 
@@ -45,7 +45,8 @@ class AC_Policy(AbstractMountainCarEnv):
                                      self.params.batch_size,
                                      "network/actor",
                                      self.params.dropout,
-                                     self.params.actor_batch_norm)
+                                     self.params.actor_batch_norm,
+                                     sub_folder=self.name_run)
             self.actor_loss = 0
             self.a_params = tf.trainable_variables()
 
@@ -60,7 +61,8 @@ class AC_Policy(AbstractMountainCarEnv):
                                        self.params.batch_size,
                                        "network/critic",
                                        self.params.dropout,
-                                       self.params.critic_batch_norm)
+                                       self.params.critic_batch_norm,
+                                       sub_folder=self.name_run)
             self.critic_loss = 0
             self.c_params = tf.trainable_variables()[len(self.a_params):]
 
@@ -213,8 +215,8 @@ class AC_Policy(AbstractMountainCarEnv):
             # Update target network
             self._update_target_network()
         # Save weights of the models
-        self.actor_model.save_model_weights(self.tf_session, "actor.ckpt")
-        self.critic_model.save_model_weights(self.tf_session, "critic.ckpt")
+        self.actor_model.save_model_weights(self.tf_session, self.actor_file)
+        self.critic_model.save_model_weights(self.tf_session, self.critic_file)
 
     def _update_target_network(self, just_copy=False):
         """Update target network with soft update if just_copy is False
@@ -246,11 +248,11 @@ class AC_Policy(AbstractMountainCarEnv):
         print(self.params)
 
         # True to initialize actor and critic with saved weights
-        if self.params.load_weights:
+        if self.params.load_weights is not None:
             self.actor_model.load_model_weights(
-                self.tf_session, self.actor_file)
+                self.tf_session, self.params.load_weights, self.actor_file)
             self.critic_model.load_model_weights(
-                self.tf_session, self.critic_file)
+                self.tf_session, self.params.load_weights, self.critic_file)
 
         seed = 42
         np.random.seed(seed)
@@ -258,6 +260,7 @@ class AC_Policy(AbstractMountainCarEnv):
 
         for j in range(self.params.epochs):
             # Reset the environment if done
+            self.reset()
             state = self.env.reset()
 
             for i in range(self.params.pass_per_epoch):
@@ -283,11 +286,11 @@ class AC_Policy(AbstractMountainCarEnv):
                 # Plot needed values
                 self.plotting(state=state, reward=reward,
                               c_loss=self.critic_loss,
-                              a_loss=self.actor_loss)
+                              a_loss=self.actor_loss,
+                              epoch=j)
 
                 if done:
-                    self.reset()
-                    break
+                    break;
 
                 # Change current state
                 state = new_state
