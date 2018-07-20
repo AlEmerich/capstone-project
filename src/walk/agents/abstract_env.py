@@ -8,6 +8,7 @@ import numpy as np
 import roboschool
 import gym
 
+
 class AbstractEnv(ABC):
 
     def __init__(self, args):
@@ -46,8 +47,9 @@ class AbstractEnv(ABC):
         pass
 
     @abstractmethod
-    def run(self, train_pass, epochs):
+    def run(self):
         pass
+
 
 class AbstractMountainCarEnv(AbstractEnv, ABC):
     def __init__(self, args):
@@ -148,7 +150,7 @@ class AbstractMountainCarEnv(AbstractEnv, ABC):
         pass
 
     @abstractmethod
-    def run(self, train_pass, epochs):
+    def run(self):
         pass
 
 class AbstractHumanoidEnv(AbstractEnv, ABC):
@@ -272,5 +274,5 @@ class AbstractHumanoidEnv(AbstractEnv, ABC):
         pass
 
     @abstractmethod
-    def run(self, train_pass, epochs):
+    def run(self):
         pass

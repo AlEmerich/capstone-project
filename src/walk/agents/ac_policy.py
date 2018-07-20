@@ -1,11 +1,13 @@
-from .abstract_env import AbstractHumanoidEnv, AbstractMountainCarEnv
-from ..models.actor_critic import Actor, Critic
-from ..utils.memory import Memory
-from ..utils.noise import Noise
-from ..utils.array_utils import fit_normalize
-import numpy as np
-import tensorflow as tf
+""" Actor critic agent definition.
+"""
 import os
+import tensorflow as tf
+import numpy as np
+from ..utils.memory import Memory
+from ..models.actor_critic import Actor, Critic
+from ..utils.array_utils import fit_normalize
+from .abstract_env import AbstractHumanoidEnv, AbstractMountainCarEnv
+from ..utils.noise import Noise
 
 # https://arxiv.org/pdf/1607.07086.pdf
 
@@ -24,13 +26,13 @@ class AC_Policy(AbstractHumanoidEnv):
         if self.params.device == "cpu":
             os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
         self.tf_session = tf.Session()
-        
+
         self.noise = Noise(mu=np.zeros(self.env.action_space.shape[0]))
         self.actor_file = "actor"
         self.critic_file = "critic"
         self.ratio_random_action = [0, 0]
         self.scale = np.vectorize(fit_normalize)
-        
+
         with tf.variable_scope("network"):
             ################################################################
             # ACTOR
@@ -172,7 +174,7 @@ class AC_Policy(AbstractHumanoidEnv):
                     self.target_actor_model.input_ph: next_states
                 })
             next_actions = self.scale(next_actions, self.act_low, self.act_high)
-            
+
             # Compute the Q+1 value with next s+1 and a+1
             Q_next = self.tf_session.run(
                 self.target_critic_model.Q,
@@ -240,11 +242,11 @@ class AC_Policy(AbstractHumanoidEnv):
 
     def reset(self):
         super(AC_Policy, self).reset()
-        
+
     def run(self):
         """Run the simulation.
         """
-        print(self.params) 
+        print(self.params)
 
         # True to initialize actor and critic with saved weights
         if self.params.load_weights is not None:
@@ -261,14 +263,14 @@ class AC_Policy(AbstractHumanoidEnv):
             # Reset the environment if done
             self.reset()
             state = self.env.reset()
-            
+
             for i in range(self.params.pass_per_epoch):
                 print("EPOCHS:", j, "PASS:", i)
                 action = self.act(state)
                 if self.params.noisy and j < self.params.noise_threshold:
                     action += self.noise()
 
-                new_state, reward, done, info = self.env.step(action)
+                new_state, reward, done, _ = self.env.step(action)
 
                 # Put the current environment in the memory
                 # State interval is [-5;5] and action range is [-1;1]
