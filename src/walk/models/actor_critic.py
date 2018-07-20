@@ -160,22 +160,21 @@ class Actor(AbstractActorCritic):
             print("ACTOR NETWORK PARAMS IN MEMBER:\n", self.network_params)
             if trainable:
                 with tf.variable_scope("train"):
-                    self.unnormalized_actor_gradients = tf.gradients(
+                    self.actor_gradients = tf.gradients(
                         self.output, self.network_params, -self.action_gradients)
-                    self.actor_gradients = list(
-                        map(
-                            lambda x: tf.div(x, self.batch_size),
-                            self.unnormalized_actor_gradients))
-                    self.opt = tf.train.AdamOptimizer(
-                        self.lr).apply_gradients(
-                            zip(self.actor_gradients,
-                                self.network_params))
+                    self.loss = tf.reduce_mean(tf.multiply(
+                        -self.action_gradients,
+                        self.output))
+                    self.opt = tf.train.AdamOptimizer(self.lr).minimize(self.loss)
+                    #self.actor_gradients = list(
+                    #    map(
+                    #        lambda x: tf.div(x, self.batch_size),
+                    #        self.unnormalized_actor_gradients))
+                    #self.opt = tf.train.AdamOptimizer(
+                    #    self.lr).apply_gradients(
+                    #        zip(self.actor_gradients,
+                    #            self.network_params))
 
-                    # self.loss = tf.reduce_mean(
-                    #     tf.multiply(-self.action_gradients, self.output),
-                    #     name="loss")
-                    # self.opt = tf.train.AdamOptimizer(
-                    #     self.lr).minimize(self.loss)
 
 class Critic(AbstractActorCritic):
     """Q network.
@@ -215,7 +214,7 @@ class Critic(AbstractActorCritic):
                         tf.float32, [None, self.observation_space.shape[0]],
                         name='state_input')
                     h_state = None
-                    for i, nb_node in enumerate(layers):
+                    for i, nb_node in enumerate(layers[:-1]):
                         prefix = str(nb_node)+"_"+str(i)
                         h_state = tf.layers.dense(
                             h_state if h_state is not None
@@ -240,17 +239,15 @@ class Critic(AbstractActorCritic):
                     self.input_action_ph = tf.placeholder(
                         tf.float32, [None, self.action_space.shape[0]],
                         name='action_input')
-                    h_action = tf.layers.dense(
-                        self.input_action_ph,
-                        units=layers[-1],
-                        activation=act,
-                        kernel_initializer=self.init_w,
-                        bias_initializer=self.init_b,
-                        name="dense_"+str(layers[-1]))
 
                 with tf.variable_scope("Q_output"):
-                    merge = h_state + h_action
-                    # merge = tf.layers.dense(merge, 32, activation=act)
+                    merge = tf.concat([h_state, self.input_action_ph], -1)
+                    merge = tf.layers.dense(merge, layers[-1], activation=act,
+                                            kernel_initializer=self.init_w,
+                                            bias_initializer=self.init_b,
+                                            name="dense_"+str(layers[-1]))
+                    self._summary_layer("dense_"+str(layers[-1]))
+                    
                     l2_reg = tf.contrib.layers.l2_regularizer(scale=0.001)
                     self.Q = tf.layers.dense(merge, 1, activation=None,
                                              kernel_initializer=self.init_w,

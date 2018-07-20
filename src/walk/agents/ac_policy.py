@@ -203,8 +203,9 @@ class AC_Policy(AbstractHumanoidEnv):
                 self.actor_model.input_ph: states,
                 self.actor_model.action_gradients: critic_action_gradient[0]
             }
-            _ = self.tf_session.run([self.actor_model.opt],
-                                    feed_dict=feed_actor)
+            self.actor_loss, _ = self.tf_session.run(
+                [self.actor_model.loss, self.actor_model.opt],
+                feed_dict=feed_actor)
             # self.actor_loss, _ = self.tf_session.run([self.actor_model.loss,
             #                                           self.actor_model.opt],
             #                                          feed_dict=feed_actor)
