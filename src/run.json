@@ -5,7 +5,7 @@
     "plot": "tensorflow",
     "train": false,
     "noisy": false,
-    "load_weights": true,
+    "load_weights": "",
 
     "batch_size": 128,
     "epochs": 100,

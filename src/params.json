@@ -18,8 +18,8 @@
     "critic_batch_norm": true,
     "tau": 0.001,
     "gamma": 0.99,
-    "actor_layers": [400, 300],
-    "critic_layers": [400, 300],
+    "actor_layers": [256, 128, 17],
+    "critic_layers": [256, 128, 17],
     "reward_multiply": 1,
     "dropout": 0
 }

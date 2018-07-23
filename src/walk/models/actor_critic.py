@@ -153,7 +153,7 @@ class Actor(AbstractActorCritic):
                         activation=output_act,
                         name="output")
                     self._summary_layer("output")
-                    
+
 
             self.network_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES,
                                                     scope=self.scope+"/model")
