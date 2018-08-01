@@ -1,17 +1,19 @@
 from OpenGL import GLU # prevent running error
 from abc import ABC, abstractmethod
-from ..utils.params import Params
 from ..utils.matplotboard import MatplotBoard
 from ..utils.tensorboard import TensorBoard
 from collections import namedtuple
-import numpy as np
 import roboschool
+import numpy as np
+import os
 import gym
+import sys
+import datetime
 
 
 class AbstractEnv(ABC):
 
-    def __init__(self, args):
+    def __init__(self, args, sub_folder=None):
         self.params = namedtuple("Params", args.keys())(*args.values())
 
         # list of rewards updating at each step
@@ -29,7 +31,25 @@ class AbstractEnv(ABC):
                                          str(self.params.batch_size),
                                          str(self.params.epochs),
                                          str(self.params.noise_threshold)])
-        
+
+        self.folder = "saved_folder"
+
+        if sub_folder is None:
+            sub = str(datetime.datetime.now())
+            sub_folder = sub.replace(" ", "_")
+
+        if not os.path.exists(self.folder):
+            sys.exit("Please create the " + self.folder + " folder manually.")
+
+    def _create_weights_folder(self, path, count=0):
+        """Create the weights folder if not exists."""
+        r_path = path + "_" + str(count)
+        if os.path.exists(r_path):
+            return self._create_weights_folder(path, count+1)
+        else:
+            os.makedirs(r_path)
+        return r_path
+
     @abstractmethod
     def plotting(self, **kwargs):
         pass
@@ -71,6 +91,9 @@ class AbstractMountainCarEnv(AbstractEnv, ABC):
         self.act_high = self.env.action_space.high
 
         self.name_run = '_'.join(["mountain", self.simplify_params])
+        self.saved_folder = self._create_weights_folder(
+                os.path.join(self.folder, self.name_run))
+        print("FOLDER WEIGHTS:", self.saved_folder)
 
     def use_matplotlib(self, title):
         """Set the agent to use matplotboard to plot metrics.
@@ -186,6 +209,10 @@ class AbstractHumanoidEnv(AbstractEnv, ABC):
 
         self.name_run = '_'.join(["roboschool",
                                   self.simplify_params])
+
+        self.saved_folder = self._create_weights_folder(
+                os.path.join(self.folder, self.name_run))
+        print("FOLDER WEIGHTS:", self.saved_folder)
 
     def use_matplotlib(self, title):
         """Set the agent to use matplotboard to plot metrics.

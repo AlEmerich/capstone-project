@@ -30,7 +30,6 @@ class AC_Policy(AbstractHumanoidEnv):
         self.noise = Noise(mu=np.zeros(self.env.action_space.shape[0]))
         self.actor_file = "actor"
         self.critic_file = "critic"
-        self.ratio_random_action = [0, 0]
         self.scale = np.vectorize(fit_normalize)
 
         with tf.variable_scope("network"):
@@ -46,7 +45,7 @@ class AC_Policy(AbstractHumanoidEnv):
                                      "network/actor",
                                      self.params.dropout,
                                      self.params.actor_batch_norm,
-                                     sub_folder=self.name_run)
+                                     self.saved_folder)
             self.actor_loss = 0
             self.a_params = tf.trainable_variables()
 
@@ -62,7 +61,7 @@ class AC_Policy(AbstractHumanoidEnv):
                                        "network/critic",
                                        self.params.dropout,
                                        self.params.critic_batch_norm,
-                                       sub_folder=self.name_run)
+                                       self.saved_folder)
             self.critic_loss = 0
             self.c_params = tf.trainable_variables()[len(self.a_params):]
 
@@ -82,6 +81,7 @@ class AC_Policy(AbstractHumanoidEnv):
                                             "target_network/actor",
                                             self.params.dropout,
                                             self.params.actor_batch_norm,
+                                            self.saved_folder,
                                             trainable=False)
             self.at_params = tf.trainable_variables()[
                 len(self.c_params) + len(self.a_params):]
@@ -96,6 +96,7 @@ class AC_Policy(AbstractHumanoidEnv):
                                               "target_network/critic",
                                               self.params.dropout,
                                               self.params.critic_batch_norm,
+                                              self.saved_folder,
                                               trainable=False)
             self.ct_params = tf.trainable_variables()[
                 len(self.at_params) + len(self.c_params) + len(self.a_params):]
@@ -173,7 +174,8 @@ class AC_Policy(AbstractHumanoidEnv):
                 feed_dict={
                     self.target_actor_model.input_ph: next_states
                 })
-            next_actions = self.scale(next_actions, self.act_low, self.act_high)
+            next_actions = self.scale(next_actions, self.act_low,
+                                      self.act_high)
 
             # Compute the Q+1 value with next s+1 and a+1
             Q_next = self.tf_session.run(
@@ -205,8 +207,8 @@ class AC_Policy(AbstractHumanoidEnv):
                 self.actor_model.input_ph: states,
                 self.actor_model.action_gradients: critic_action_gradient[0]
             }
-            self.actor_loss, _ = self.tf_session.run(
-                [self.actor_model.loss, self.actor_model.opt],
+            self.tf_session.run(
+                [self.actor_model.opt],
                 feed_dict=feed_actor)
             # self.actor_loss, _ = self.tf_session.run([self.actor_model.loss,
             #                                           self.actor_model.opt],
@@ -242,6 +244,7 @@ class AC_Policy(AbstractHumanoidEnv):
 
     def reset(self):
         super(AC_Policy, self).reset()
+        return self.env.reset()
 
     def run(self):
         """Run the simulation.
@@ -259,10 +262,12 @@ class AC_Policy(AbstractHumanoidEnv):
         np.random.seed(seed)
         tf.set_random_seed(seed)
 
+        state = self.reset()
+
         for j in range(self.params.epochs):
             # Reset the environment if done
-            self.reset()
-            state = self.env.reset()
+            if self.params.reset:
+                state = self.reset()
 
             for i in range(self.params.pass_per_epoch):
                 print("EPOCHS:", j, "PASS:", i)
@@ -291,7 +296,7 @@ class AC_Policy(AbstractHumanoidEnv):
                               epoch=j)
 
                 if done:
-                    break;
+                    break
 
                 # Change current state
                 state = new_state

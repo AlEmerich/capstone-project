@@ -10,41 +10,23 @@ class AbstractActorCritic(ABC):
     and have function to save it.
     """
     def __init__(self, observation_space, action_space,
-                 lr, tau, batch_size, scope,
-                 sub_folder=None):
+                 lr, tau, batch_size, scope, path):
         """Save state space and action space and create
         the folder where to save the weights of the neural network.
         """
         self.observation_space = observation_space
         self.action_space = action_space
-        self.folder = "saved_folder"
 
-        if not os.path.exists(self.folder):
-            sys.exit("Please create the " + folder + " folder manually.")
-
-        if sub_folder is None:
-            sub = str(datetime.datetime.now())
-            sub_folder = sub.replace(" ", "_")
-        
-        self.saved_folder = self._create_weights_folder(
-            os.path.join(self.folder, sub_folder))
         self.lr = lr
 
         self.tau = tau
         self.batch_size = batch_size
         self.scope = scope
 
+        self.path = path
+
         self.init_w = tf.random_normal_initializer(0., 0.3)
         self.init_b = tf.constant_initializer(0.1)
-
-    def _create_weights_folder(self, path, count=0):
-        """Create the weights folder if not exists."""
-        r_path = path + "_" + str(count)
-        if os.path.exists(r_path):
-            return self._create_weights_folder(path, count+1)
-        else:
-            os.makedirs(r_path)
-        return r_path
 
     def save_model_weights(self, sess, filepath):
         """Save the weights of thespecified model
@@ -52,7 +34,7 @@ class AbstractActorCritic(ABC):
         in __init__.
         """
         saver = tf.train.Saver()
-        saver.save(sess, os.path.join(self.saved_folder,
+        saver.save(sess, os.path.join(self.path,
                                       filepath))
 
     def load_model_weights(self, sess, path, filepath):
@@ -61,7 +43,7 @@ class AbstractActorCritic(ABC):
         in __init__.
         """
         saver = tf.train.Saver()
-        saver.restore(sess, os.path.join(self.folder,
+        saver.restore(sess, os.path.join("saved_folder",
                                          path,
                                          filepath))
 
@@ -101,8 +83,8 @@ class Actor(AbstractActorCritic):
                  scope,
                  dropout,
                  batch_norm,
-                 trainable=True,
-                 sub_folder=None):
+                 path,
+                 trainable=True):
         """Create the actor model and return it with
         input layer in order to train with the gradients
         of the critic network.
@@ -110,7 +92,7 @@ class Actor(AbstractActorCritic):
         super(Actor, self).__init__(observation_space,
                                     action_space, lr, tau,
                                     batch_size, scope,
-                                    sub_folder)
+                                    path)
 
         act = tf.nn.relu
         output_act = tf.nn.tanh
@@ -125,7 +107,7 @@ class Actor(AbstractActorCritic):
                     tf.float32, [None, self.action_space.shape[0]],
                     name='action_gradients')
 
-                with tf.variable_scope("state_input"):
+                with tf.variable_scope("hidden_input"):
                     h_out = None
                     for i, nb_node in enumerate(layers):
                         prefix = str(nb_node)+"_"+str(i)
@@ -154,26 +136,26 @@ class Actor(AbstractActorCritic):
                         name="output")
                     self._summary_layer("output")
 
-
             self.network_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES,
                                                     scope=self.scope+"/model")
             print("ACTOR NETWORK PARAMS IN MEMBER:\n", self.network_params)
             if trainable:
                 with tf.variable_scope("train"):
                     self.actor_gradients = tf.gradients(
-                        self.output, self.network_params, -self.action_gradients)
-                    self.loss = tf.reduce_mean(tf.multiply(
-                        -self.action_gradients,
-                        self.output))
-                    self.opt = tf.train.AdamOptimizer(self.lr).minimize(self.loss)
-                    #self.actor_gradients = list(
+                        self.output, self.network_params,
+                        -self.action_gradients)
+                    # self.loss = tf.reduce_mean(tf.multiply(
+                    #     -self.action_gradients,
+                    #     self.output))
+                    # self.opt = tf.train.AdamOptimizer(self.lr).minimize(self.loss)
+                    # self.actor_gradients = list(
                     #    map(
                     #        lambda x: tf.div(x, self.batch_size),
                     #        self.unnormalized_actor_gradients))
-                    #self.opt = tf.train.AdamOptimizer(
-                    #    self.lr).apply_gradients(
-                    #        zip(self.actor_gradients,
-                    #            self.network_params))
+                    self.opt = tf.train.AdamOptimizer(
+                        self.lr).apply_gradients(
+                            zip(self.actor_gradients,
+                                self.network_params))
 
 
 class Critic(AbstractActorCritic):
@@ -188,15 +170,15 @@ class Critic(AbstractActorCritic):
                  scope,
                  dropout,
                  batch_norm,
-                 trainable=True,
-                 sub_folder=None):
+                 path,
+                 trainable=True):
         """Create the critic model and return the two input layers
         in order to compute gradients from critic network.
         """
         super(Critic, self).__init__(observation_space,
                                      action_space, lr, tau,
                                      batch_size, scope,
-                                     sub_folder)
+                                     path)
 
         act = tf.nn.relu
 
@@ -247,8 +229,8 @@ class Critic(AbstractActorCritic):
                                             bias_initializer=self.init_b,
                                             name="dense_"+str(layers[-1]))
                     self._summary_layer("dense_"+str(layers[-1]))
-                    
-                    l2_reg = tf.contrib.layers.l2_regularizer(scale=0.001)
+
+                    l2_reg = tf.contrib.layers.l2_regularizer(scale=0.01)
                     self.Q = tf.layers.dense(merge, 1, activation=None,
                                              kernel_initializer=self.init_w,
                                              bias_initializer=self.init_b,

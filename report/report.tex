@@ -262,17 +262,22 @@ The reward is a sum of 5 computed values: \begin{itemize}
 
 \subsection{Exploratory Visualization}
 
-% NOT WHAT ASKED FOR
-% To visualize the exploration, we can simply use the render function of the gym
-% environment which uses \verb?Roboschool? library to create the 3D plane and
-% humanoid such as show in the figure \ref{fig:roboschoolhumanoid}.  
+The fig. \ref{fig:exploratory} shows the distribution of observation
+space during 500 epochs when only random actions are taken. The observation
+space is defined in the interval -5 and 5, so does the ordinate axis.
 
-% \begin{figure}[ht]
-%   \centering
-%   \includegraphics[width=.5\textwidth]{roboschoolhumanoid}
-%   \caption{Roboschool environment}
-%   \label{fig:roboschoolhumanoid}
-% \end{figure}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{exploratory}
+  \caption{Roboschool environment}
+  \label{fig:exploratory}
+\end{figure}
+
+We can see that the majority of represented values is between -1 and 1. We guess
+easily that this easy the representation of joint values and their respective
+space, which correlates with the action state definition space. The other values
+represents the \verb?more? and \verb?j? vector presented earlier in section
+\ref{subsubsec:obs_space}.
 
 \subsection{Algorithm and Techniques}
 
@@ -756,6 +761,71 @@ diverges very fast.
 \section{Results}
 
 \subsection{Model Evaluation and Validation}
+
+\paragraph{}
+Before validating the model, I wanted to make sure the way I implemented Deep
+Deterministic Policy Gradients was correct. I then try to perform it on a
+simpler environment such as
+MountainCarContinous\footnote{\url{https://github.com/openai/gym/wiki/MountainCarContinuous-v0}}
+environment. The goal of that environment is a car who has to climb a mountain
+with a low power acceleration. To tackle that problem, the car has to learn to
+gain the potential energy from the mountain on its back in order to have enough
+speed to reach the goal on top of the mountain on its front. Understanding that
+make me aware that it will not reach the goal during that training because the
+challenge in that environment is too design a good exploration process, and I
+don't think the Ornstein-Uhlenbeck noise will suit that requirement.
+
+\begin{figure}[ht]
+  \begin{subfigure}[t]{.5\textwidth}
+    \centering
+    \includegraphics[width=1.\textwidth]{critic_mountain}
+    \caption{Critic loss}
+    \label{fig:criticlossmountain}
+  \end{subfigure}%
+  ~
+  \begin{subfigure}[t]{.5\textwidth}
+    \centering
+    \includegraphics[width=1.\textwidth]{avg_reward_mountain}
+    \caption{Average reward}
+    \label{fig:avgrewardmountain}
+  \end{subfigure}
+  \caption{Training of MountainCarContinuous environments}
+  \label{fig:mountaincartrain}
+\end{figure}
+
+\paragraph{}
+The fig. \ref{fig:mountaincartrain} shows that it learns the right first steps
+and then the loss diverges, showing that the noise process is either not noisy
+enough, or not enough suited to the environment. Since I just want to validate
+the algorithm and not the model, the fact that loss of the critic network is
+decreasing and the average reward is increasing the first 1000 epochs shows that
+my model is able to learn.
+
+\paragraph{}
+About validating the model, I designed it in tensorflow and plot in TensorBoard
+in order to check its structure.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{soft_target}
+  \caption{Soft target update operations graph}
+  \label{fig:softtargetgraph}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{critic_graph}
+  \caption{Critic network graph}
+  \label{fig:criticgraph}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{actor_graph}
+  \caption{Actor network graph}
+  \label{fig:actorgraph}
+\end{figure}
+
 
 \subsection{Justification}
 
