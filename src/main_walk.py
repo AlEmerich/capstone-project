@@ -29,8 +29,10 @@ def load_param_from_json():
     parser = argparse.ArgumentParser()
     parser.add_argument("--params", type=str, default="params.json",
                         help="File holding the paramet of the program.")
+    parser.add_argument("--name_run", type=str, default="unnamed",
+                        help="Name of the current run")
     args = vars(parser.parse_args())
-    return json.load(open(args['params']))
+    return (json.load(open(args['params'])), args["name_run"])
 
 
 def load_param_from_cli():
@@ -69,10 +71,10 @@ def main(args):
     """Entry point of the program.
     """
     # Send args to the actor and let it train
-    humanoid = AC_Policy(args)
+    args, name_run = (args)
+    humanoid = AC_Policy(args, name_run)
     humanoid.run()
 
 
 if __name__ == "__main__":
     main(load_param_from_json())
-

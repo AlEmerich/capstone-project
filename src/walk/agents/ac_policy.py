@@ -8,7 +8,6 @@ from ..models.actor_critic import Actor, Critic
 from ..utils.array_utils import fit_normalize
 from .abstract_env import AbstractHumanoidEnv, AbstractMountainCarEnv
 from ..utils.noise import Noise
-
 # https://arxiv.org/pdf/1607.07086.pdf
 
 
@@ -17,12 +16,13 @@ class AC_Policy(AbstractHumanoidEnv):
     https://arxiv.org/pdf/1509.02971v5.pdf.
     """
 
-    def __init__(self, args):
+    def __init__(self, args, name_run):
         """Initialize all the needed components and build
         the network.
         """
-        super(AC_Policy, self).__init__(args)
+        super(AC_Policy, self).__init__(args, name_run)
         self.memory = Memory()
+
         if self.params.device == "cpu":
             os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
         self.tf_session = tf.Session()
@@ -244,6 +244,7 @@ class AC_Policy(AbstractHumanoidEnv):
 
     def reset(self):
         super(AC_Policy, self).reset()
+        self.noise.reset()
         return self.env.reset()
 
     def run(self):
@@ -254,9 +255,9 @@ class AC_Policy(AbstractHumanoidEnv):
         # True to initialize actor and critic with saved weights
         if self.params.load_weights is not None:
             self.actor_model.load_model_weights(
-                self.tf_session, self.params.load_weights, self.actor_file)
+                self.tf_session, self.initial_name_run, self.actor_file)
             self.critic_model.load_model_weights(
-                self.tf_session, self.params.load_weights, self.critic_file)
+                self.tf_session, self.initial_name_run, self.critic_file)
 
         seed = 42
         np.random.seed(seed)
@@ -277,10 +278,12 @@ class AC_Policy(AbstractHumanoidEnv):
 
                 new_state, reward, done, _ = self.env.step(action)
 
+                reward *= self.params.reward_multiply
+
                 # Put the current environment in the memory
                 # State interval is [-5;5] and action range is [-1;1]
                 self.memory.remember(state, action,
-                                     reward * self.params.reward_multiply,
+                                     reward,
                                      new_state, done)
 
                 # Train the network
@@ -290,7 +293,8 @@ class AC_Policy(AbstractHumanoidEnv):
                 self.render()
 
                 # Plot needed values
-                self.plotting(state=state, reward=reward,
+                self.plotting(state=state,
+                              reward=reward,
                               c_loss=self.critic_loss,
                               a_loss=self.actor_loss,
                               epoch=j)

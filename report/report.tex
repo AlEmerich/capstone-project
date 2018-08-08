@@ -48,7 +48,7 @@
 \graphicspath{ {images/} }
 
 
-% \makeglossaries
+nnn% \makeglossaries
 % \input{glossary}
 
 \title{\textbf{Capstone Report}\\Arise and walk, by Deep Deterministic Policy Gradient algorithm}
@@ -499,19 +499,10 @@ gradients computed by critic network. I have three steps:
 \begin{enumerate}
 \item Compute the gradients:
 \begin{lstlisting}[language=Python]
-self.unnormalized_actor_gradients = tf.gradients(
+self.actor_gradients = tf.gradients(
     self.output, self.network_params, -self.action_gradients)
 \end{lstlisting}
-  I called these gradients unnormalized because since we compute gradients over
-  mini-batches, we need to ponderate gradients with the size of these batches.
-\item Ponderate gradients:
-\begin{lstlisting}[language=Python]
-self.actor_gradients = list(
-    map(
-        lambda x: tf.div(x, self.batch_size),
-        self.unnormalized_actor_gradients))
-\end{lstlisting}
-  Now that we have actor gradients, we can apply it to the actor variables:
+Now that we have actor gradients, we can apply it to the actor variables:
 \item Applying gradients:
 \begin{lstlisting}[language=Python]
 self.network_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.scope+"/model")
@@ -702,8 +693,6 @@ training.
       gamma & Discounted factor & 0.99 \\
       actor\_layers & Structure of actor network, depth and number of units in each layer & \verb?[400, 300]? \\
       critic\_layers & Structure of critic network, depth and number of units in each layer & \verb?[400, 300]? \\
-      action\_range & Size of the action range to normalize it between 0 and 1 & 2 \\
-      state\_range & Size of the state range to normalize it between 0 and 1 & 10 \\
       reward\_multiply & Multiply every reward with to reward more when good action is taken and less when a bad one is taken. & 1 \\
       dropout & percent of dropout to use after dense layers & 0 \\
       \hline
@@ -762,6 +751,8 @@ diverges very fast.
 
 \subsection{Model Evaluation and Validation}
 
+\subsubsection{Implementation}
+
 \paragraph{}
 Before validating the model, I wanted to make sure the way I implemented Deep
 Deterministic Policy Gradients was correct. I then try to perform it on a
@@ -807,24 +798,84 @@ in order to check its structure.
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=\textwidth]{soft_target}
+  \includegraphics[width=.5\textwidth]{soft_target}
   \caption{Soft target update operations graph}
   \label{fig:softtargetgraph}
 \end{figure}
 
+We can see in the fig. \ref{fig:softtargetgraph} the operations which handle the
+soft target update from networks to target networks.
+
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=\textwidth]{critic_graph}
+  \includegraphics[width=.5\textwidth]{critic_graph}
   \caption{Critic network graph}
   \label{fig:criticgraph}
 \end{figure}
 
+The fig. \ref{fig:criticgraph} shows the model of the critic network. This is
+the model I use for validating my results but I can easily add from hyper
+parameters new layers, batch normalization or dropout operations, but the action
+will always be added just before the last layer.
+
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=\textwidth]{actor_graph}
+  \includegraphics[width=.5\textwidth]{actor_graph}
   \caption{Actor network graph}
   \label{fig:actorgraph}
 \end{figure}
+
+The fig. \ref{fig:actorgraph} shows the model of the actor network. As critic
+networks, the model is easily customizable and looking a lot like crtic model.
+
+\subsubsection{Tweaking the model}
+\paragraph{}
+
+Initially, I trained the model with batch normalization because it has shown in
+many cases that it can improve learning speed without decreasing the
+performance. However, it is interesting to see how well it will performed
+without it. For dropout layer, I don't think forgetting some informations is a
+good trick to tackle that kind of problem because usually, this technique is
+used to prevent overfitting. Since DDPG is a deterministic policy, there is no
+such as overfitting in our case.
+
+\begin{figure}[ht]
+  \begin{subfigure}[t]{.5\textwidth}
+    \centering
+    \includegraphics[width=1.\textwidth]{bn_avgreward}
+    \caption{}
+    \label{fig:bn_avgreward}
+  \end{subfigure}%
+  ~
+  \begin{subfigure}[t]{.5\textwidth}
+    \centering
+    \includegraphics[width=1.\textwidth]{bn_loss}
+    \caption{}
+    \label{fig:bn_loss}
+  \end{subfigure}
+  \caption{Comparison of learning with and without batch normalization}
+  \label{fig:bn_tweakinggraph}
+\end{figure}
+
+\begin{figure}[ht]
+  \begin{subfigure}[t]{.5\textwidth}
+    \centering
+    \includegraphics[width=1.\textwidth]{dropout_avgreward}
+    \caption{}
+    \label{fig:bn_avgreward}
+  \end{subfigure}%
+  ~
+  \begin{subfigure}[t]{.5\textwidth}
+    \centering
+    \includegraphics[width=1.\textwidth]{dropout_loss}
+    \caption{}
+    \label{fig:bn_loss}
+  \end{subfigure}
+  \caption{Comparison of learning with and without dropout}
+  \label{fig:bn_tweakinggraph}
+\end{figure}
+
+\subsubsection{Evaluation}
 
 
 \subsection{Justification}

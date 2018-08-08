@@ -26,12 +26,6 @@ class AbstractEnv(ABC):
         self.list_reset_t = []
         self.board = None
 
-        train_str = "train" if self.params.train else "run"
-        self.simplify_params = '_'.join([train_str,
-                                         str(self.params.batch_size),
-                                         str(self.params.epochs),
-                                         str(self.params.noise_threshold)])
-
         self.folder = "saved_folder"
 
         if sub_folder is None:
@@ -72,7 +66,7 @@ class AbstractEnv(ABC):
 
 
 class AbstractMountainCarEnv(AbstractEnv, ABC):
-    def __init__(self, args):
+    def __init__(self, args, name_run):
         super(AbstractMountainCarEnv, self).__init__(args)
         # When training, we are not interested at the same metrics
         # than when not training
@@ -90,7 +84,7 @@ class AbstractMountainCarEnv(AbstractEnv, ABC):
         self.act_low = self.env.action_space.low
         self.act_high = self.env.action_space.high
 
-        self.name_run = '_'.join(["mountain", self.simplify_params])
+        self.name_run = name_run
         self.saved_folder = self._create_weights_folder(
                 os.path.join(self.folder, self.name_run))
         print("FOLDER WEIGHTS:", self.saved_folder)
@@ -119,18 +113,10 @@ class AbstractMountainCarEnv(AbstractEnv, ABC):
             reward = kwargs.get('reward')
             c_loss = kwargs.get('c_loss')
             a_loss = kwargs.get('a_loss')
-
+            train = kwargs.get('train')
             # increment t and add the reward to the list
             self.t += 1
             self.rewards.append(reward)
-
-            # Must match the order of the labels defined in __init__
-            ydatas = None
-            if self.params.train:
-                ydatas = [reward, np.average(self.rewards),
-                          c_loss, a_loss]
-            else:
-                ydatas = [np.average(self.rewards)]
 
             # Define text to display at the center of the figure
             info = None
@@ -140,6 +126,14 @@ class AbstractMountainCarEnv(AbstractEnv, ABC):
                                  str(max(self.list_reset_t)),
                                  ", Average t :",
                                  str(np.average(self.list_reset_t))])
+
+            # Must match the order of the labels defined in __init__
+            ydatas = None
+            if train:
+                ydatas = [reward, np.average(self.rewards),
+                          c_loss, a_loss]
+            else:
+                ydatas = [np.average(self.rewards)]
 
             # Data to plot in the Y axis of the subplots
             self.board.on_running(ydatas=ydatas,
@@ -176,11 +170,12 @@ class AbstractMountainCarEnv(AbstractEnv, ABC):
     def run(self):
         pass
 
+
 class AbstractHumanoidEnv(AbstractEnv, ABC):
     """ Super class of all policy.
     """
 
-    def __init__(self, args):
+    def __init__(self, args, name_run):
         """Instantiate Roboschool humanoid environment and reset it.
 
         :param args: arguments of the program to send to the Params.
@@ -190,13 +185,17 @@ class AbstractHumanoidEnv(AbstractEnv, ABC):
         # When training, we are not interested at the same metrics
         # than when not training
         self.labels = None
+
+        self.initial_name_run = name_run
         if self.params.train:
             self.labels = ["Reward", "Average reward",
                            "Distance gravity center from ground",
                            "Critic loss", "Actor loss"]
+            self.name_run = name_run + "_train"
         else:
             self.labels = ["Average reward", "Angle to target",
                            "Distance to target", "Gravity center from ground"]
+            self.name_run = name_run + "_run"
         self.env = gym.make("RoboschoolHumanoid-v1")
 
         # Defintion of observation and action space
@@ -206,9 +205,6 @@ class AbstractHumanoidEnv(AbstractEnv, ABC):
         self.obs_high.fill(5)
         self.act_low = self.env.action_space.low
         self.act_high = self.env.action_space.high
-
-        self.name_run = '_'.join(["roboschool",
-                                  self.simplify_params])
 
         self.saved_folder = self._create_weights_folder(
                 os.path.join(self.folder, self.name_run))
@@ -250,15 +246,6 @@ class AbstractHumanoidEnv(AbstractEnv, ABC):
             self.t += 1
             self.rewards.append(reward)
 
-            # Must match the order of the labels defined in __init__
-            ydatas = None
-            if self.params.train:
-                ydatas = [reward, np.average(self.rewards),
-                          dist_center_ground, c_loss, a_loss]
-            else:
-                ydatas = [np.average(self.rewards), angle_to_target,
-                          target_dist, dist_center_ground]
-
             # Define text to display at the center of the figure
             info = None
             if self.list_reset_t:
@@ -268,6 +255,15 @@ class AbstractHumanoidEnv(AbstractEnv, ABC):
                                  ", Average t:",
                                  str(np.average(self.list_reset_t)),
                                  ", Epoch:", str(epoch)])
+
+            # Must match the order of the labels defined in __init__
+            ydatas = None
+            if self.params.train:
+                ydatas = [reward, np.average(self.rewards),
+                          dist_center_ground, c_loss, a_loss]
+            else:
+                ydatas = [np.average(self.rewards), angle_to_target,
+                          target_dist, dist_center_ground]
 
             # Data to plot in the Y axis of the subplots
             self.board.on_running(ydatas=ydatas,

@@ -47,21 +47,6 @@ class AbstractActorCritic(ABC):
                                          path,
                                          filepath))
 
-    def _soft_update_weights(self, sess, from_weights, just_copy):
-        #########################################
-        # SOFT TARGET UPDATE
-        #########################################
-
-        copy = lambda to_, from_: from_
-        soft_update = lambda to_, from_: from_ * self.tau + (
-            1 - self.tau) * to_
-
-        fn_ = copy if just_copy else soft_update
-
-        for to_, from_ in zip(self.global_variables, from_weights):
-            op_ = tf.assign(to_, fn_(to_, from_), name="soft_update")
-            sess.run(op_)
-
     def _summary_layer(self, name):
         scope = tf.get_variable_scope().name
         var = tf.global_variables(scope=scope+"/"+name)
@@ -136,8 +121,9 @@ class Actor(AbstractActorCritic):
                         name="output")
                     self._summary_layer("output")
 
-            self.network_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES,
-                                                    scope=self.scope+"/model")
+            self.network_params = tf.get_collection(
+                tf.GraphKeys.TRAINABLE_VARIABLES,
+                scope=self.scope+"/model")
             print("ACTOR NETWORK PARAMS IN MEMBER:\n", self.network_params)
             if trainable:
                 with tf.variable_scope("train"):
@@ -181,6 +167,7 @@ class Critic(AbstractActorCritic):
                                      path)
 
         act = tf.nn.relu
+        output_act = tf.nn.tanh
 
         with tf.variable_scope("critic", reuse=tf.AUTO_REUSE):
             with tf.variable_scope("model"):
@@ -188,9 +175,9 @@ class Critic(AbstractActorCritic):
                     tf.float32, [None, 1],
                     name='true_target')
 
-                ################################################################
+                ##############################################
                 # STATE
-                ################################################################
+                ##############################################
                 with tf.variable_scope("state_input"):
                     self.input_state_ph = tf.placeholder(
                         tf.float32, [None, self.observation_space.shape[0]],
@@ -214,9 +201,9 @@ class Critic(AbstractActorCritic):
                                 h_state,
                                 name="batch_norm_"+prefix)
 
-                ################################################################
+                ###############################################
                 # ACTION
-                ################################################################
+                ###############################################
                 with tf.variable_scope("action_input"):
                     self.input_action_ph = tf.placeholder(
                         tf.float32, [None, self.action_space.shape[0]],
@@ -224,11 +211,16 @@ class Critic(AbstractActorCritic):
 
                 with tf.variable_scope("Q_output"):
                     merge = tf.concat([h_state, self.input_action_ph], -1)
-                    merge = tf.layers.dense(merge, layers[-1], activation=act,
+                    merge = tf.layers.dense(merge, layers[-1],
+                                            activation=output_act,
                                             kernel_initializer=self.init_w,
                                             bias_initializer=self.init_b,
                                             name="dense_"+str(layers[-1]))
                     self._summary_layer("dense_"+str(layers[-1]))
+                    if batch_norm:
+                        merge = tf.layers.batch_normalization(
+                            merge,
+                            name="batch_norm_merge")
 
                     l2_reg = tf.contrib.layers.l2_regularizer(scale=0.01)
                     self.Q = tf.layers.dense(merge, 1, activation=None,

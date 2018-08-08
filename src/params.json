@@ -1,5 +1,5 @@
 {
-    "device": "gpu",
+    "device": "cpu",
     "reset": true,
     "render": false,
     "plot": "tensorflow",
@@ -7,15 +7,15 @@
     "noisy": true,
     "load_weights": null,
 
-    "batch_size": 64,
+    "batch_size": 128,
     "epochs": 100,
     "pass_per_epoch": 100,
-    "noise_threshold": 50,
+    "noise_threshold": 100,
 
     "actor_learning_rate": 0.0001,
     "critic_learning_rate": 0.001,
-    "actor_batch_norm": false,
-    "critic_batch_norm": false,
+    "actor_batch_norm": true,
+    "critic_batch_norm": true,
     "tau": 0.001,
     "gamma": 0.99,
     "actor_layers": [400, 300],

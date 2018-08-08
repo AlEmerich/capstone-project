@@ -2,6 +2,8 @@ import numpy as np
 
 # Taken from https://github.com/openai/baselines/blob/master/baselines/ddpg/noise.py, which is
 # based on http://math.stackexchange.com/questions/1287634/implementing-ornstein-uhlenbeck-in-matlab
+
+
 class Noise:
     """Implements the Ornstein-Uhlenbeck noise to add to the output
     of the policy network.

@@ -4,15 +4,15 @@
    (TeX-add-to-alist 'LaTeX-provided-package-options
                      '(("babel" "english") ("natbib" "square" "comma" "sort" "numbers") ("ragged2e" "document") ("fontenc" "T1") ("caption" "font=scriptsize")))
    (add-to-list 'LaTeX-verbatim-environments-local "lstlisting")
-   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "lstinline")
-   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "hyperref")
-   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "hyperimage")
-   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "hyperbaseurl")
-   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "nolinkurl")
-   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "url")
    (add-to-list 'LaTeX-verbatim-macros-with-braces-local "path")
-   (add-to-list 'LaTeX-verbatim-macros-with-delims-local "lstinline")
+   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "url")
+   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "nolinkurl")
+   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "hyperbaseurl")
+   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "hyperimage")
+   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "hyperref")
+   (add-to-list 'LaTeX-verbatim-macros-with-braces-local "lstinline")
    (add-to-list 'LaTeX-verbatim-macros-with-delims-local "path")
+   (add-to-list 'LaTeX-verbatim-macros-with-delims-local "lstinline")
    (TeX-run-style-hooks
     "latex2e"
     "article"
@@ -35,6 +35,7 @@
     "caption")
    (LaTeX-add-labels
     "subsubsec:obs_space"
+    "fig:exploratory"
     "fig:actor-critic"
     "fig:algoDDPG"
     "fig:randompolicy"
@@ -42,7 +43,16 @@
     "subsubsec:hp_params"
     "tab:hyperparams"
     "fig:noise_600"
-    "fig:noise_350")
+    "fig:noise_350"
+    "fig:criticlossmountain"
+    "fig:avgrewardmountain"
+    "fig:mountaincartrain"
+    "fig:softtargetgraph"
+    "fig:criticgraph"
+    "fig:actorgraph"
+    "fig:bn_avgreward"
+    "fig:bn_loss"
+    "fig:bn_tweakinggraph")
    (LaTeX-add-bibliographies)
    (LaTeX-add-xcolor-definecolors
     "codegreen"

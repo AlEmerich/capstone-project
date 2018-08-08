@@ -5,7 +5,7 @@
     "plot": "tensorflow",
     "train": false,
     "noisy": false,
-    "load_weights": "roboschool_train_64_100_50_1",
+    "load_weights": true,
 
     "batch_size": 128,
     "epochs": 100,
@@ -14,8 +14,8 @@
 
     "actor_learning_rate": 0.0001,
     "critic_learning_rate": 0.001,
-    "actor_batch_norm": false,
-    "critic_batch_norm": false,
+    "actor_batch_norm": true,
+    "critic_batch_norm": true,
     "tau": 0.001,
     "gamma": 0.99,
     "actor_layers": [400, 300],
