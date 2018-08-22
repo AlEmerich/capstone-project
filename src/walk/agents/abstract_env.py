@@ -119,6 +119,7 @@ class AbstractBipedalEnv(AbstractEnv, ABC):
             reward = kwargs.get('reward')
             c_loss = kwargs.get('c_loss')
             a_loss = kwargs.get('a_loss')
+            additional = kwargs.get('additional')
 
             # increment t and add the reward to the list
             self.t += 1
@@ -144,6 +145,7 @@ class AbstractBipedalEnv(AbstractEnv, ABC):
             # Data to plot in the Y axis of the subplots
             self.board.on_running(ydatas=ydatas,
                                   xdata=self.t,
+                                  additional=additional,
                                   info=info)
 
     def reset(self):
@@ -242,6 +244,7 @@ class AbstractHumanoidEnv(AbstractEnv, ABC):
             c_loss = kwargs.get('c_loss')
             a_loss = kwargs.get('a_loss')
             epoch = kwargs.get('epoch')
+            additional = kwargs.get('additional')
 
             # Get metrics
             target_dist = self.env.unwrapped.walk_target_dist
@@ -274,6 +277,7 @@ class AbstractHumanoidEnv(AbstractEnv, ABC):
             # Data to plot in the Y axis of the subplots
             self.board.on_running(ydatas=ydatas,
                                   xdata=self.t,
+                                  additional=additional,
                                   info=info)
 
     def reset(self):

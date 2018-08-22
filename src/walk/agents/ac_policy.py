@@ -343,12 +343,21 @@ class AC_Policy(AbstractHumanoidEnv):
                 # Render the environment
                 self.render()
 
+                weights_biases_actor = self.actor_model.summary
+                weights_biases_critic = self.critic_model.summary
+                weights_biases_actor_t = self.target_actor_model.summary
+                weights_biases_critic_t = self.target_critic_model.summary
+
                 # Plot needed values
                 self.plotting(state=state,
                               reward=reward,
                               c_loss=self.critic_loss,
                               a_loss=self.actor_loss,
-                              epoch=j)
+                              epoch=j,
+                              additional=[weights_biases_actor,
+                                          weights_biases_critic,
+                                          weights_biases_actor_t,
+                                          weights_biases_critic_t])
 
                 fetched_timeline = timeline.Timeline(
                     self.run_metadata.step_stats)

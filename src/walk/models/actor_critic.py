@@ -26,32 +26,17 @@ class AbstractActorCritic(ABC):
         self.init_w = tf.random_normal_initializer(-3e-3, 3e-3)
         self.init_b = tf.constant_initializer(0.1)
 
-    def save_model_weights(self, sess, filepath):
-        """Save the weights of thespecified model
-        to the specified file in folder specified
-        in __init__.
-        """
-        saver = tf.train.Saver()
-        saver.save(sess, os.path.join(self.path,
-                                      filepath))
-
-    def load_model_weights(self, sess, path, filepath):
-        """Load the weights of the specified model
-        to the specified file in folder specified
-        in __init__.
-        """
-        saver = tf.train.Saver()
-        saver.restore(sess, os.path.join("saved_folder",
-                                         path,
-                                         filepath))
+        self.summary = []
 
     def _summary_layer(self, name):
         scope = tf.get_variable_scope().name
         var = tf.global_variables(scope=scope+"/"+name)
         weights = var[0]
         biases = var[1]
-        tf.summary.histogram(name+"/weights", weights)
-        tf.summary.histogram(name+"/biases", biases)
+        self.summary.append(
+            tf.summary.histogram(name+"/weights", weights))
+        self.summary.append(
+            tf.summary.histogram(name+"/biases", biases))
 
 
 class Actor(AbstractActorCritic):
@@ -102,7 +87,7 @@ class Actor(AbstractActorCritic):
                             activation=act,
                             kernel_initializer=self.init_w,
                             bias_initializer=self.init_b,
-                            kernel_regularizer=l2_reg,
+                            # kernel_regularizer=l2_reg,
                             name="dense_"+prefix)
                         self._summary_layer("dense_"+prefix)
                         if dropout is not 0:
@@ -188,7 +173,7 @@ class Critic(AbstractActorCritic):
                             activation=act,
                             kernel_initializer=self.init_w,
                             bias_initializer=self.init_b,
-                            kernel_regularizer=l2_reg,
+                            # kernel_regularizer=l2_reg,
                             name="dense_"+prefix)
                         self._summary_layer("dense_"+prefix)
                         if dropout is not 0:
@@ -212,7 +197,7 @@ class Critic(AbstractActorCritic):
                                             activation=act,
                                             kernel_initializer=self.init_w,
                                             bias_initializer=self.init_b,
-                                            kernel_regularizer=l2_reg,
+                                            # kernel_regularizer=l2_reg,
                                             name="dense_"+str(layers[-1]))
                     self._summary_layer("dense_"+str(layers[-1]))
                     if batch_norm:

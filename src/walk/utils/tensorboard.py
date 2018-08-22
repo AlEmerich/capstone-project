@@ -65,6 +65,7 @@ class TensorBoard(Board):
         ydatas = kwargs['ydatas']
         xdata = kwargs['xdata']
         info = kwargs['info']
+        additional = kwargs['additional']
 
         # Construct the dict we will feed with
         feed = {}
@@ -77,6 +78,11 @@ class TensorBoard(Board):
         summary = self.tf_session.run(merged, feed)
         # Write to disk
         self.writer.add_summary(summary, xdata)
+
+        if additional:
+            merge_additional = tf.summary.merge(additional)
+            summary_additional = self.tf_session.run(merge_additional)
+            self.writer.add_summary(summary_additional)
 
     def on_reset(self, t, rewards):
         """No need to reset with tensorboard.
