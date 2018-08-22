@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.8.1)  2 AUG 2018 10:22
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.8.1)  22 AUG 2018 10:18
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -658,7 +658,34 @@ Package: fontenc 2005/09/27 v1.99g Standard LaTeX package
 (/usr/share/texlive/texmf-dist/tex/latex/base/t1enc.def
 File: t1enc.def 2005/09/27 v1.99g Standard LaTeX file
 LaTeX Font Info:    Redeclaring font encoding T1 on input line 48.
-)) (./report.aux)
+))
+
+! LaTeX Error: Missing \begin{document}.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.51 n
+      nn% \makeglossaries
+? 
+(./report.aux
+
+LaTeX Warning: Label `fig:bn_avgreward' multiply defined.
+
+
+LaTeX Warning: Label `sub@fig:bn_avgreward' multiply defined.
+
+
+LaTeX Warning: Label `fig:bn_loss' multiply defined.
+
+
+LaTeX Warning: Label `sub@fig:bn_loss' multiply defined.
+
+
+LaTeX Warning: Label `fig:bn_tweakinggraph' multiply defined.
+
+)
 \openout1 = `report.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 58.
@@ -676,8 +703,7 @@ LaTeX Font Info:    ... okay on input line 58.
 LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 58.
 LaTeX Font Info:    ... okay on input line 58.
 LaTeX Font Info:    Try loading font information for T1+cmss on input line 58.
-
-(/usr/share/texlive/texmf-dist/tex/latex/base/t1cmss.fd
+ (/usr/share/texlive/texmf-dist/tex/latex/base/t1cmss.fd
 File: t1cmss.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 \AtBeginShipoutBox=\box63
@@ -736,9 +762,11 @@ Package ragged2e Info: ABD: executing \RaggedRight on input line 58.
 ABD: EverySelectfont initializing macros
 LaTeX Info: Redefining \selectfont on input line 58.
 \c@lstlisting=\count174
-LaTeX Font Info:    Try loading font information for U+msa on input line 61.
+ [1
 
-(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+LaTeX Font Info:    Try loading font information for U+msa on input line 61.
+ (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
 LaTeX Font Info:    Try loading font information for U+msb on input line 61.
@@ -746,16 +774,14 @@ LaTeX Font Info:    Try loading font information for U+msb on input line 61.
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<images/roboschoolhumanoid.png, id=132, 584.1825pt x 557.08125pt>
+<images/roboschoolhumanoid.png, id=147, 584.1825pt x 557.08125pt>
 File: images/roboschoolhumanoid.png Graphic file (type png)
 
 <use images/roboschoolhumanoid.png>
 Package pdftex.def Info: images/roboschoolhumanoid.png used on input line 62.
 (pdftex.def)             Requested size: 345.0pt x 329.0066pt.
- [1
-
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./images/roboschoolhumanoi
-d.png>] [2] [3]
+ [2 <./images/roboschoolhumanoid.png>]
+[3] [4]
 LaTeX Font Info:    Try loading font information for OMS+cmss on input line 181
 .
 LaTeX Font Info:    No file OMScmss.fd. on input line 181.
@@ -765,7 +791,7 @@ LaTeX Font Warning: Font shape `OMS/cmss/m/n' undefined
 (Font)              using `OMS/cmsy/m/n' instead
 (Font)              for symbol `textbullet' on input line 181.
 
-[4] (/usr/share/texlive/texmf-dist/tex/latex/listings/lstlang1.sty
+[5] (/usr/share/texlive/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2015/06/04 1.6 listings language file
 )
 LaTeX Font Info:    Try loading font information for T1+cmtt on input line 242.
@@ -774,129 +800,164 @@ LaTeX Font Info:    Try loading font information for T1+cmtt on input line 242.
 (/usr/share/texlive/texmf-dist/tex/latex/base/t1cmtt.fd
 File: t1cmtt.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
-<images/exploratory.png, id=194, 1339.8858pt x 716.9184pt>
+<images/exploratory.png, id=207, 1339.8858pt x 716.9184pt>
 File: images/exploratory.png Graphic file (type png)
 
 <use images/exploratory.png>
 Package pdftex.def Info: images/exploratory.png used on input line 271.
 (pdftex.def)             Requested size: 345.0pt x 184.5894pt.
- [5]
-<images/actor-critic.png, id=211, 354.32375pt x 351.3125pt>
+ [6]
+<images/actor-critic.png, id=224, 354.32375pt x 351.3125pt>
 File: images/actor-critic.png Graphic file (type png)
 
 <use images/actor-critic.png>
 Package pdftex.def Info: images/actor-critic.png used on input line 292.
 (pdftex.def)             Requested size: 172.5pt x 171.03497pt.
- [6 <./images/exploratory.png>]
-<images/algoDDPG.png, id=222, 524.96124pt x 391.4625pt>
+ [7 <./images/exploratory.png>]
+<images/algoDDPG.png, id=236, 524.96124pt x 391.4625pt>
 File: images/algoDDPG.png Graphic file (type png)
 
 <use images/algoDDPG.png>
 Package pdftex.def Info: images/algoDDPG.png used on input line 331.
 (pdftex.def)             Requested size: 345.0pt x 257.27293pt.
 
-<images/randompolicy.png, id=226, 937.3419pt x 258.7266pt>
+<images/randompolicy.png, id=240, 937.3419pt x 258.7266pt>
 File: images/randompolicy.png Graphic file (type png)
 
 <use images/randompolicy.png>
 Package pdftex.def Info: images/randompolicy.png used on input line 348.
 (pdftex.def)             Requested size: 345.0pt x 95.2299pt.
 
-<images/benchmark.png, id=230, 637.67647pt x 223.18677pt>
+<images/benchmark.png, id=244, 637.67647pt x 223.18677pt>
 File: images/benchmark.png Graphic file (type png)
 
 <use images/benchmark.png>
 Package pdftex.def Info: images/benchmark.png used on input line 368.
 (pdftex.def)             Requested size: 345.0pt x 120.75063pt.
- [7 <./images/actor-critic.png>] [8 <./images/algoDDPG.png>] [9 <./images/rando
-mpolicy.png> <./images/benchmark.png (PNG copy)>]
-[10] [11] [12] [13] [14]
-<images/plot_noise_600.png, id=421, 241.60854pt x 167.21294pt>
-File: images/plot_noise_600.png Graphic file (type png)
-
-<use images/plot_noise_600.png>
-Package pdftex.def Info: images/plot_noise_600.png used on input line 731.
-(pdftex.def)             Requested size: 172.5pt x 119.39047pt.
-
-<images/plot_noise_350.png, id=422, 243.73412pt x 170.04706pt>
-File: images/plot_noise_350.png Graphic file (type png)
-
-<use images/plot_noise_350.png>
-Package pdftex.def Info: images/plot_noise_350.png used on input line 738.
-(pdftex.def)             Requested size: 172.5pt x 120.35541pt.
-
-Overfull \hbox (6.66504pt too wide) in paragraph at lines 729--742
-[][]  []  
- []
-
+ [8 <./images/actor-critic.png>] [9 <./images/algoDDPG.png>] [10 <./images/rand
+ompolicy.png> <./images/benchmark.png (PNG copy)>]
+[11] [12] [13] [14]
 
 Package natbib Warning: Citation `DBLP:journals/corr/abs-1801-10425' on page 15
- undefined on input line 754.
+ undefined on input line 714.
 
-[15 <./images/plot_noise_600.png (PNG copy)> <./images/plot_noise_350.png (PNG 
-copy)>] <images/critic_mountain.png, id=434, 490.96468pt x 347.05484pt>
+[15] <images/critic_mountain.png, id=435, 490.96468pt x 347.05484pt>
 File: images/critic_mountain.png Graphic file (type png)
 
 <use images/critic_mountain.png>
-Package pdftex.def Info: images/critic_mountain.png used on input line 781.
+Package pdftex.def Info: images/critic_mountain.png used on input line 785.
 (pdftex.def)             Requested size: 172.5pt x 121.93703pt.
 
-<images/avg_reward_mountain.png, id=435, 494.10684pt x 346.26067pt>
+<images/avg_reward_mountain.png, id=436, 494.10684pt x 346.26067pt>
 File: images/avg_reward_mountain.png Graphic file (type png)
 
 <use images/avg_reward_mountain.png>
-Package pdftex.def Info: images/avg_reward_mountain.png used on input line 788.
+Package pdftex.def Info: images/avg_reward_mountain.png used on input line 792.
 
 (pdftex.def)             Requested size: 172.5pt x 120.8866pt.
 
-Overfull \hbox (6.66504pt too wide) in paragraph at lines 779--792
+Overfull \hbox (6.66504pt too wide) in paragraph at lines 783--796
 [][]  []  
  []
 
-<images/soft_target.png, id=437, 373.9187pt x 505.89pt>
+<images/soft_target.png, id=438, 373.9187pt x 505.89pt>
 File: images/soft_target.png Graphic file (type png)
 
 <use images/soft_target.png>
-Package pdftex.def Info: images/soft_target.png used on input line 810.
+Package pdftex.def Info: images/soft_target.png used on input line 814.
 (pdftex.def)             Requested size: 172.5pt x 233.38379pt.
 
-<images/critic_graph.png, id=438, 720.34337pt x 634.54648pt>
+<images/critic_graph.png, id=440, 720.34337pt x 634.54648pt>
 File: images/critic_graph.png Graphic file (type png)
 
 <use images/critic_graph.png>
-Package pdftex.def Info: images/critic_graph.png used on input line 817.
+Package pdftex.def Info: images/critic_graph.png used on input line 824.
 (pdftex.def)             Requested size: 172.5pt x 151.95538pt.
 
-<images/actor_graph.png, id=439, 506.67554pt x 385.17528pt>
+<images/actor_graph.png, id=442, 506.67554pt x 385.17528pt>
 File: images/actor_graph.png Graphic file (type png)
 
 <use images/actor_graph.png>
-Package pdftex.def Info: images/actor_graph.png used on input line 824.
+Package pdftex.def Info: images/actor_graph.png used on input line 836.
 (pdftex.def)             Requested size: 172.5pt x 131.13417pt.
- [16 <./images/critic_mountain.png (PNG copy)> <./images/avg_reward_mountain.pn
-g (PNG copy)>] [17 <./images/soft_target.png (PNG copy)>] [18 <./images/critic_
-graph.png (PNG copy)> <./images/actor_graph.png (PNG copy)>] (./report.bbl)
+ [16]
+
+! LaTeX Error: File `bn_avgreward' not found.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.858 ...raphics[width=1.\textwidth]{bn_avgreward}
+                                                  
+? 
+
+! LaTeX Error: File `bn_loss' not found.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.865 ...ludegraphics[width=1.\textwidth]{bn_loss}
+                                                  
+? 
+
+Overfull \hbox (6.66504pt too wide) in paragraph at lines 856--869
+[][]  []  
+ []
+
+
+! LaTeX Error: File `dropout_avgreward' not found.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.876 ...cs[width=1.\textwidth]{dropout_avgreward}
+                                                  
+? 
+
+! LaTeX Error: File `dropout_loss' not found.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.883 ...raphics[width=1.\textwidth]{dropout_loss}
+                                                  
+? 
+
+Overfull \hbox (6.66504pt too wide) in paragraph at lines 874--887
+[][]  []  
+ []
+
+[17 <./images/critic_mountain.png (PNG copy)> <./images/avg_reward_mountain.png
+ (PNG copy)>] [18 <./images/soft_target.png (PNG copy)>] (./report.bbl [19 <./i
+mages/critic_graph.png (PNG copy)> <./images/actor_graph.png (PNG copy)>])
 
 Package natbib Warning: There were undefined citations.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 874.
-[19]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 874.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 943.
+[20]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 943.
  (./report.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 874.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 874.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 943.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 943.
 Package rerunfilecheck Info: File `report.out' has not changed.
-(rerunfilecheck)             Checksum: 04CBA2CC3768FC48513D8B664D558177;2128.
+(rerunfilecheck)             Checksum: 3EEF092BBCC7363CCAA149289FC1374B;2285.
 
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
+
+LaTeX Warning: There were multiply-defined labels.
+
  ) 
 Here is how much of TeX's memory you used:
- 15478 strings out of 494953
- 231444 string characters out of 6180978
- 583108 words of memory out of 5000000
- 18219 multiletter control sequences out of 15000+600000
+ 15492 strings out of 494953
+ 231411 string characters out of 6180978
+ 583030 words of memory out of 5000000
+ 18214 multiletter control sequences out of 15000+600000
  22985 words of font info for 58 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  59i,13n,94p,1936b,1819s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -909,9 +970,9 @@ pdfTeX warning (dest): name{Hfootnote.2} has been referenced but does not exist
 pdfTeX warning (dest): name{Hfootnote.1} has been referenced but does not exist
 , replaced by a fixed one
 
- </home/alan/.texmf-var/fonts/pk/ljfour/jknappen/ec/ectt0800.600pk> </home/alan
-/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecsi0800.600pk> </home/alan/.texmf-var/
-fonts/pk/ljfour/jknappen/ec/ecss0900.600pk> </home/alan/.texmf-var/fonts/pk/ljf
+ </home/alan/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecss0900.600pk> </home/alan
+/.texmf-var/fonts/pk/ljfour/jknappen/ec/ectt0800.600pk> </home/alan/.texmf-var/
+fonts/pk/ljfour/jknappen/ec/ecsi0800.600pk> </home/alan/.texmf-var/fonts/pk/ljf
 our/jknappen/ec/ecsi1000.600pk> </home/alan/.texmf-var/fonts/pk/ljfour/jknappen
 /ec/ectt1000.600pk> </home/alan/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecss0500
 .600pk> </home/alan/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx1000.600pk> </ho
@@ -919,25 +980,26 @@ me/alan/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecss0800.600pk> </home/alan/.tex
 mf-var/fonts/pk/ljfour/jknappen/ec/ecss0600.600pk> </home/alan/.texmf-var/fonts
 /pk/ljfour/jknappen/ec/ecss0700.600pk> </home/alan/.texmf-var/fonts/pk/ljfour/j
 knappen/ec/ecsx1200.600pk> </home/alan/.texmf-var/fonts/pk/ljfour/jknappen/ec/e
-csx1440.600pk> </home/alan/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1000.600p
-k> </home/alan/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1200.600pk> </home/al
-an/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1728.600pk> </home/alan/.texmf-va
-r/fonts/pk/ljfour/jknappen/ec/ecsx1728.600pk></usr/share/texlive/texmf-dist/fon
-ts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/typ
-e1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/pub
-lic/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/ams
-fonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/c
-m/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.
-pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></us
-r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/shar
-e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/share/texli
-ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texm
-f-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dist/
-fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on report.pdf (19 pages, 1052338 bytes).
+csx1440.600pk> </home/alan/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1200.600p
+k> </home/alan/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1728.600pk> </home/al
+an/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx1728.600pk> </home/alan/.texmf-va
+r/fonts/pk/ljfour/jknappen/ec/ecss1000.600pk> </home/alan/.texmf-var/fonts/pk/l
+jfour/jknappen/ec/ecrm1000.600pk></usr/share/texlive/texmf-dist/fonts/type1/pub
+lic/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/am
+sfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts
+/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmm
+i7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb>
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/sh
+are/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texl
+ive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/share/texlive/texmf-dis
+t/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts
+/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+public/amsfonts/symbols/msbm10.pfb>
+Output written on report.pdf (20 pages, 1026307 bytes).
 PDF statistics:
- 1148 PDF objects out of 1200 (max. 8388607)
- 557 compressed objects within 6 object streams
- 233 named destinations out of 1000 (max. 500000)
- 322 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1156 PDF objects out of 1200 (max. 8388607)
+ 576 compressed objects within 6 object streams
+ 238 named destinations out of 1000 (max. 500000)
+ 328 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -1,4 +1,5 @@
 """ Actor critic agent definition.
+https://arxiv.org/pdf/1607.07086.pdf
 """
 import os
 import tensorflow as tf
@@ -6,12 +7,11 @@ import numpy as np
 from ..utils.memory import Memory
 from ..models.actor_critic import Actor, Critic
 from ..utils.array_utils import fit_normalize
-from .abstract_env import AbstractHumanoidEnv, AbstractMountainCarEnv
+from .abstract_env import AbstractHumanoidEnv, AbstractBipedalEnv
 from ..utils.noise import Noise
-# https://arxiv.org/pdf/1607.07086.pdf
 
 
-class AC_Policy(AbstractHumanoidEnv):
+class AC_Policy(AbstractBipedalEnv):
     """Actor critic agent. Implements DDPG algorithm from
     https://arxiv.org/pdf/1509.02971v5.pdf.
     """
@@ -25,7 +25,10 @@ class AC_Policy(AbstractHumanoidEnv):
 
         if self.params.device == "cpu":
             os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-        self.tf_session = tf.Session()
+        self.tf_session = tf.Session(config=tf.ConfigProto(
+            inter_op_parallelism_threads=4,
+            log_device_placement=False,
+            allow_soft_placement=True))
 
         self.noise = Noise(mu=np.zeros(self.env.action_space.shape[0]))
         self.actor_file = "actor"
@@ -264,7 +267,6 @@ class AC_Policy(AbstractHumanoidEnv):
         tf.set_random_seed(seed)
 
         state = self.reset()
-
         for j in range(self.params.epochs):
             # Reset the environment if done
             if self.params.reset:

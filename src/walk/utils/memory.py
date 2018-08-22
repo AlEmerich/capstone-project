@@ -1,13 +1,14 @@
 from collections import deque
 import numpy as np
 
+
 class Memory():
     """Implement the Experience Replay logic in order to
     train over samples of the memory at each pass and not just
     on the current state. Hold the queue of
     <state, action, reward, next_state, done>.
     """
-    def __init__(self, length=10000):
+    def __init__(self, length=1000):
         """Instantiate the queue
         """
         self.mem = deque(maxlen=length)
@@ -21,12 +22,10 @@ class Memory():
         """Retrieve random batch_size of elements from the
         memory
         """
-        indices = np.random.choice(np.arange(len(self.mem)),
-                                   size=batch_size,
-                                   replace=False)
-        idx = [self.mem[i] for i in indices]
-
-        return self._stack_memory(idx)
+        idx = np.random.choice(len(self.mem),
+                               size=batch_size,
+                               replace=False)
+        return self._stack_memory(np.array(self.mem)[idx])
 
     def _stack_memory(self, samples):
         """Separate the samples into numpy arrays of states, of
@@ -50,6 +49,7 @@ class Memory():
         rewards = np.array(rewards).reshape(len(rewards), 1)
         new_states = np.array(new_states)
         dones = np.array(dones).reshape(len(dones), 1)
+
         return states, actions, rewards, new_states, dones
 
     def __len__(self):

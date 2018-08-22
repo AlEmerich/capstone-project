@@ -48,7 +48,7 @@
 \graphicspath{ {images/} }
 
 
-nnn% \makeglossaries
+% \makeglossaries
 % \input{glossary}
 
 \title{\textbf{Capstone Report}\\Arise and walk, by Deep Deterministic Policy Gradient algorithm}
@@ -352,8 +352,8 @@ happen in a worse case scenario ?
 
 The figure \ref{fig:randompolicy} shows that the agent fall and fall again,
 without any chance to stand. The relevant information here is the average
-reward. The average reward of the random policy over 500 epochs is around 20 and
-the agent never lives more than 30 epochs.
+reward. The average reward of the random policy over 500 epochs is betweeb -1
+and -2 and the agent never lives more than 30 epochs.
 \paragraph{}
 Now we have a low benchmark, we have to dig into previous work of the community
 in order to find the state-of-the-art paper for that task. The work of
@@ -466,20 +466,23 @@ Tensorflow and it will be a good occasion to start to learn it.
 
 \paragraph{The Actor}
 
-The actor model is composed by fully-connected layers followed by Rectified
+The actor model is composed by fully-connected layers followed by Leaky Rectified
 Linear Unit activation function and then by batch normalization, because it
-gives better training speed and efficiency. The input is a shape of 44 float
-values for the state and the output is a shape of 17 float values activated by
-hyperbolic tangent because the range of the action values is equal to defintion
-range of the hyperbolic tangent, [-1, 1].
+gives better training speed and efficiency. Why Leaky ? Because the ReLU
+function is a function which makes weights equal to 0 when they are negative.
+The problem with that is that a lot of information can be forgotten and we then
+face a problem of dying neurons. The Leaky ReLU is less severe and defined as
+follow: $f(x) = max(x, \alpha*x)$ where $\alpha <= 1$. 
+The input is a shape of 44 float values for the state and the output is a shape
+of 17 float values activated by hyperbolic tangent because the range of the
+action values is equal to defintion range of the hyperbolic tangent, [-1, 1].
 
 \paragraph{The Critic}
 
 The critic model is composed by two inputs, one for the state and one for the
-action. The state input is followed by several dense layers activated by ReLU
-and batch normalization. The action input is followed by one layer with the same
-number of node than the last layer of the state network in order to be able to
-merge them. That layer is also followed by activation ReLU activation and
+action. The state input is followed by several dense layers activated by Leaky ReLU
+and batch normalization. The action input is concat just before the last layer
+of the state network. That layer is also followed by Leaky ReLU activation and
 batch normalization. These two layers is then added and followed by the output
 layer, a single-node one representing the Q-value of the state-action pair.
 
@@ -497,12 +500,21 @@ training and decrease variance of outputs.
 To train the actor network, we must define operations capable of applying action
 gradients computed by critic network. I have three steps:
 \begin{enumerate}
+  
 \item Compute the gradients:
 \begin{lstlisting}[language=Python]
-self.actor_gradients = tf.gradients(
+self.unnormalized_actor_gradients = tf.gradients(
     self.output, self.network_params, -self.action_gradients)
 \end{lstlisting}
-Now that we have actor gradients, we can apply it to the actor variables:
+  
+\item Normalize with size of batches:
+  \begin{lstlisting}[language=Python]
+self.actor_gradients = list(
+    map(
+       lambda x: tf.div(x, self.batch_size),
+       self.unnormalized_actor_gradients))  
+\end{lstlisting}
+  
 \item Applying gradients:
 \begin{lstlisting}[language=Python]
 self.network_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.scope+"/model")
@@ -620,7 +632,8 @@ environment. It was a decaying asymptotic-to-zero function used to generate less
 and less random actions over time. But then I discovered noise function to
 reduce variance and increase stability over taken actions, like
 Ornstein-Uhlenbeck noise. It computes a vector of float equal to the shape
-passed in parameters and we can add it to the action given by the actor.
+passed in parameters and we can add it to the action given by the actor. I used
+$\sigma = 0.2$ and $\theta = 0.15$.
 
 \subsubsection{The Agent}
 
@@ -660,6 +673,51 @@ for j in range(self.params.epochs):
     state = new_state
 \end{lstlisting}
 
+\footnotetext{Roboschool has a bug which lead to give vector of \textit{inf} after the second reset when rendering, so when I train the networks, I don't render it.}
+
+\subsection{Refinement}
+
+% \subsubsection{Noise}
+
+% To find the best tuning for my training, I changed the way I added the noise
+% into the action, the learning operation of my actor network and its layer
+% defintion. For the noise, I added it every steps. It then produces a bad
+% training making the loss of the critic network going up at around 350 steps
+% (Fig. \ref{fig:noise_600}).
+
+% \begin{figure}[ht]
+%   \begin{subfigure}[t]{.5\textwidth}
+%     \centering
+%     \includegraphics[width=1.\textwidth]{plot_noise_600}
+%     \caption{Training with noise every steps until the epoch 600}
+%     \label{fig:noise_600}
+%   \end{subfigure}%
+%   ~
+%   \begin{subfigure}[t]{.5\textwidth}
+%     \centering
+%     \includegraphics[width=1.\textwidth]{plot_noise_350}
+%     \caption{Training with noise every steps until the epoch 350}
+%     \label{fig:noise_350}
+%   \end{subfigure}
+%   \caption{Affect of the noise on the training process.}
+% \end{figure}
+
+% We can see in the figure that the noise is too much after around 350 epochs, so I changed
+% the parameter \verb?noise_threshold? to 350 and the result is shown in Fig. \ref{fig:noise_350}.
+% It shows that removing the noise at the epoch 350 remove the divergence of the loss. Henceforth,
+% we can interprete from the stagnation of the loss that the agent doesn't learn anymore.
+
+\subsubsection{Network definition} 
+
+Thanks to the architecture of my code, I am able to change the model of the networks easyly so I
+tuned these parameter a lot. A lot of paper written about DDPG \cite{journals/corr/LillicrapHPHETS15}
+\cite{DBLP:journals/corr/abs-1801-10425} used layers of 400 and 300 units with action added at the second
+layer in the critic networkd. I then decided to follow that benchmark since it gave good results with
+a lot of environment. In order to have a learning more efficient and to see how a modification would effect,
+I changed the depth or the number of units. I found out that decreasing the number of units doesn't affect
+the quality of the learning but decrease the speed and building the networks deeper make the critic loss
+diverges very fast.
+
 \subsubsection{Hyper Parameters}
 \label{subsubsec:hp_params}
 
@@ -682,9 +740,9 @@ training.
       noisy & Add noise to action outputs & \verb?true? \\
       load\_weights & Load previously saved weights & \verb?false? \\
       batch\_size & Number of samples to train from the momery & 128 \\
-      epochs & Number of epochs & 1000 \\
-      pass\_per\_epoch & Number of action during one epoch & 100 \\ 
-      noise\_threshold & At which epochs the program stops adding noise to actions & 500 \\
+      epochs & Number of epochs & 100 \\
+      pass\_per\_epoch & Number of action during one epoch & 200 \\ 
+      noise\_threshold & At which epochs the program stops adding noise to actions & 75 \\
       actor\_learning\_rate & Learning rate for the actor & 0.0001 \\
       critic\_learning\_rate & Learning rate for the critic & 0.001 \\
       actor\_batch\_norm & Add batch normalization after dense layers of the actor network & \verb?true? \\
@@ -701,51 +759,6 @@ training.
   \caption{Hyper parameters description and definition for training purpose}
   \label{tab:hyperparams}
 \end{table}
-
-\footnotetext{Roboschool has a bug which lead to give vector of \textit{inf} after the second reset when rendering, so when I train the networks, I don't render it.}
-
-\subsection{Refinement}
-
-\subsubsection{Noise}
-
-To find the best tuning for my training, I changed the way I added the noise
-into the action, the learning operation of my actor network and its layer
-defintion. For the noise, I added it every steps. It then produces a bad
-training making the loss of the critic network going up at around 350 steps
-(Fig. \ref{fig:noise_600}).
-
-\begin{figure}[ht]
-  \begin{subfigure}[t]{.5\textwidth}
-    \centering
-    \includegraphics[width=1.\textwidth]{plot_noise_600}
-    \caption{Training with noise every steps until the epoch 600}
-    \label{fig:noise_600}
-  \end{subfigure}%
-  ~
-  \begin{subfigure}[t]{.5\textwidth}
-    \centering
-    \includegraphics[width=1.\textwidth]{plot_noise_350}
-    \caption{Training with noise every steps until the epoch 350}
-    \label{fig:noise_350}
-  \end{subfigure}
-  \caption{Affect of the noise on the training process.}
-\end{figure}
-
-We can see in the figure that the noise is too much after around 350 epochs, so I changed
-the parameter \verb?noise_threshold? to 350 and the result is shown in Fig. \ref{fig:noise_350}.
-It shows that removing the noise at the epoch 350 remove the divergence of the loss. Henceforth,
-we can interprete from the stagnation of the loss that the agent doesn't learn anymore.
-
-\subsubsection{Network definition} 
-
-Thanks to the architecture of my code, I am able to change the model of the networks easyly so I
-tuned these parameter a lot. A lot of paper written about DDPG \cite{journals/corr/LillicrapHPHETS15}
-\cite{DBLP:journals/corr/abs-1801-10425} used layers of 400 and 300 units with action added at the second
-layer in the critic networkd. I then decided to follow that benchmark since it gave good results with
-a lot of environment. In order to have a learning more efficient and to see how a modification would effect,
-I changed the depth or the number of units. I found out that decreasing the number of units doesn't affect
-the quality of the learning but decrease the speed and building the networks deeper make the critic loss
-diverges very fast.
 
 \section{Results}
 
@@ -836,8 +849,8 @@ many cases that it can improve learning speed without decreasing the
 performance. However, it is interesting to see how well it will performed
 without it. For dropout layer, I don't think forgetting some informations is a
 good trick to tackle that kind of problem because usually, this technique is
-used to prevent overfitting. Since DDPG is a deterministic policy, there is no
-such as overfitting in our case.
+used to prevent overfitting. Since DDPG is a deterministic policy, I don't think
+overfitting will be a crucial issue.
 
 \begin{figure}[ht]
   \begin{subfigure}[t]{.5\textwidth}
@@ -891,33 +904,37 @@ To tackle the problem, I first learned how Deep Deterministic Policy Gradients w
 scientific paper on that subject. I then started my implementation starting by the replay buffer
 and then the DDPG algorithm itself. I added soft target update and noise addition after. Seeing
 that results was not good and resolving coding mistakes (which took me a lot of time as Tensorflow
-was new to me), I started to read more scientific paper and try their results with their model
-architecture and their parameters. Without any more good results, it could be for two reasons:
-either in some ways I have a problem in my implementation of DDPG and the update of my gradients,
-either I don't have enough power on my machine to see results. The paper from
-\citeauthor{journals/corr/LillicrapHPHETS15} says that DDPG has the inconvenient to be efficient
-after a lot of training epochs. The first thing I wanted to test is to validate the implementation
-with a more simpler environment so I tested it on the CartPole environment.
+was new to me), I started to read more scientific paper and tried their results with their model
+architecture and their parameters. My agent started to started to learn how to
+stand but not how to walk, and it could be for two reasons: either in some ways
+I have a problem in my implementation of DDPG and the update of my gradients,
+either it must take time a lot of time (the time of the longest training I
+performed was 3 days). The paper from
+\citeauthor{journals/corr/LillicrapHPHETS15} shows that DDPG has the
+inconvenient to be efficient after a lot of training epochs. 
+
 
 \paragraph{}
 The most interesting part of the project was to see how the changes in my implementation in terms
 of algorithm and parameters could change the behavior of the actor. It was also really interesting
-to learn techniques scientist often use to increase stability, performance or quality of results
+to learn techniques scientists often use to increase stability, performance or quality of results
 like noise addition or soft target update. Implementing the Deep Deterministic Policy Gradients
 was also really enriching because I learned to use Tensorflow and working directly with weights,
 biases and gradients and by that way increased my knowledge over how deep learning is working
 mathematically (which is rather dificult to understand when we just read the theory without
-actually using it). Contrary, the most difficult part was to actually validate my network. The
-difficulty came from the fact that I defined my network as in the paper I read and I had trouble
-having proper results. 
+actually using it). In contrary, the most chanllenging part was to actually validate my network. The
+difficulty came from the fact that it was hard to determine if a training was bad
+because my network was not fitted the problem or because I didn't let it train enough.
 
 \subsection{Improvement}
 
 In terms of coding, a good improvement would be to be able to launch the training over a cloud,
 like AWS from Amazon or CloudML from Google. The training would be very faster and the validation
 of the model as well. About the algorithm I am using, DDPG, \citeauthor{GuLilGhaTurLev17} shows
-that Q-prop is more suitable for a 3d walking agent because it is more stable than DDPG during
-training. It would be intersting to actually validate that statement.
+that TRPO (Trust Region Policy Optimization) is more suitable for a 3d walking
+agent because it is more stable than DDPG during training. It would be
+interesting for me to actually validate that statement and learn about more
+algorithms as TRPO, Q-Prop or DQN.
 
 \bibliography{report}
 \bibliographystyle{plainnat}

@@ -1,5 +1,6 @@
 from .board import Board
 import tensorflow as tf
+import numpy as np
 
 
 class TensorBoard(Board):
@@ -21,16 +22,31 @@ class TensorBoard(Board):
         self.labels = kwargs["labels"]
         # The dict we will have to feed
         self.d = {}
+        self.on_launch_summary = []
+        self.on_reset_summary = []
 
         with tf.variable_scope("plot"):
             # Set placeholders to dict and use it as scalar summary
             for label in self.labels:
                 self.d[label] = tf.Variable(0.0)
-                tf.summary.scalar(label, self.d[label])
+                summary = tf.summary.scalar(label, self.d[label])
+                self.on_launch_summary.append(summary)
 
             # Set the placeholder for the info text
             self.d["info"] = tf.placeholder(tf.string, name="info")
-            tf.summary.text("info", self.d["info"])
+            summary = tf.summary.text("info", self.d["info"])
+            self.on_launch_summary.append(summary)
+
+            # Variables for plotting rewards for each episode
+            self.r_var = tf.Variable(0.0)
+            summary = tf.summary.scalar(
+                "Reward_per_episod", self.r_var)
+            self.on_reset_summary.append(summary)
+
+            self.avg_r_var = tf.Variable(0.0)
+            summary = tf.summary.scalar("Average_reward_per_episod",
+                                        self.avg_r_var)
+            self.on_reset_summary.append(summary)
 
         # Instantiate the writer
         self.writer = tf.summary.FileWriter(self.path,
@@ -56,16 +72,20 @@ class TensorBoard(Board):
             feed[self.d[label]] = ydatas[i]
             feed[self.d["info"]] = "" if not info else info
 
-        self.merged = tf.summary.merge_all()
+        merged = tf.summary.merge(self.on_launch_summary)
         # Get the value to plot
-        summary = self.tf_session.run(self.merged, feed)
+        summary = self.tf_session.run(merged, feed)
         # Write to disk
         self.writer.add_summary(summary, xdata)
 
-    def on_reset(self, t):
+    def on_reset(self, t, rewards):
         """No need to reset with tensorboard.
         """
-        pass
+        merge = tf.summary.merge(self.on_reset_summary)
+        summary = self.tf_session.run(merge, {
+            self.r_var: sum(rewards),
+            self.avg_r_var: np.average(rewards)})
+        self.writer.add_summary(summary, t)
 
     def save(self):
         """No need to save anything with tensorboard.

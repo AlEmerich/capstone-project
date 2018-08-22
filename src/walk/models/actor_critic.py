@@ -25,7 +25,7 @@ class AbstractActorCritic(ABC):
 
         self.path = path
 
-        self.init_w = tf.random_normal_initializer(0., 0.3)
+        self.init_w = tf.random_normal_initializer(-3e-3, 3e-3)
         self.init_b = tf.constant_initializer(0.1)
 
     def save_model_weights(self, sess, filepath):
@@ -79,8 +79,9 @@ class Actor(AbstractActorCritic):
                                     batch_size, scope,
                                     path)
 
-        act = tf.nn.relu
+        act = tf.nn.leaky_relu
         output_act = tf.nn.tanh
+        l2_reg = tf.contrib.layers.l2_regularizer(scale=0.01)
 
         with tf.variable_scope("actor", reuse=tf.AUTO_REUSE):
             with tf.variable_scope("model"):
@@ -103,6 +104,7 @@ class Actor(AbstractActorCritic):
                             activation=act,
                             kernel_initializer=self.init_w,
                             bias_initializer=self.init_b,
+                            kernel_regularizer=l2_reg,
                             name="dense_"+prefix)
                         self._summary_layer("dense_"+prefix)
                         if dropout is not 0:
@@ -127,17 +129,13 @@ class Actor(AbstractActorCritic):
             print("ACTOR NETWORK PARAMS IN MEMBER:\n", self.network_params)
             if trainable:
                 with tf.variable_scope("train"):
-                    self.actor_gradients = tf.gradients(
+                    self.unnormalized_actor_gradients = tf.gradients(
                         self.output, self.network_params,
                         -self.action_gradients)
-                    # self.loss = tf.reduce_mean(tf.multiply(
-                    #     -self.action_gradients,
-                    #     self.output))
-                    # self.opt = tf.train.AdamOptimizer(self.lr).minimize(self.loss)
-                    # self.actor_gradients = list(
-                    #    map(
-                    #        lambda x: tf.div(x, self.batch_size),
-                    #        self.unnormalized_actor_gradients))
+                    self.actor_gradients = list(
+                       map(
+                           lambda x: tf.div(x, self.batch_size),
+                           self.unnormalized_actor_gradients))
                     self.opt = tf.train.AdamOptimizer(
                         self.lr).apply_gradients(
                             zip(self.actor_gradients,
@@ -166,8 +164,8 @@ class Critic(AbstractActorCritic):
                                      batch_size, scope,
                                      path)
 
-        act = tf.nn.relu
-        output_act = tf.nn.tanh
+        act = tf.nn.leaky_relu
+        l2_reg = tf.contrib.layers.l2_regularizer(scale=0.01)
 
         with tf.variable_scope("critic", reuse=tf.AUTO_REUSE):
             with tf.variable_scope("model"):
@@ -192,6 +190,7 @@ class Critic(AbstractActorCritic):
                             activation=act,
                             kernel_initializer=self.init_w,
                             bias_initializer=self.init_b,
+                            kernel_regularizer=l2_reg,
                             name="dense_"+prefix)
                         self._summary_layer("dense_"+prefix)
                         if dropout is not 0:
@@ -212,9 +211,10 @@ class Critic(AbstractActorCritic):
                 with tf.variable_scope("Q_output"):
                     merge = tf.concat([h_state, self.input_action_ph], -1)
                     merge = tf.layers.dense(merge, layers[-1],
-                                            activation=output_act,
+                                            activation=act,
                                             kernel_initializer=self.init_w,
                                             bias_initializer=self.init_b,
+                                            kernel_regularizer=l2_reg,
                                             name="dense_"+str(layers[-1]))
                     self._summary_layer("dense_"+str(layers[-1]))
                     if batch_norm:
@@ -222,11 +222,9 @@ class Critic(AbstractActorCritic):
                             merge,
                             name="batch_norm_merge")
 
-                    l2_reg = tf.contrib.layers.l2_regularizer(scale=0.01)
                     self.Q = tf.layers.dense(merge, 1, activation=None,
                                              kernel_initializer=self.init_w,
                                              bias_initializer=self.init_b,
-                                             kernel_regularizer=l2_reg,
                                              name="out")
                     self._summary_layer("out")
 

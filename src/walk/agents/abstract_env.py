@@ -65,18 +65,24 @@ class AbstractEnv(ABC):
         pass
 
 
-class AbstractMountainCarEnv(AbstractEnv, ABC):
+class AbstractBipedalEnv(AbstractEnv, ABC):
     def __init__(self, args, name_run):
-        super(AbstractMountainCarEnv, self).__init__(args)
+        super(AbstractBipedalEnv, self).__init__(args)
         # When training, we are not interested at the same metrics
         # than when not training
         self.labels = None
         if self.params.train:
             self.labels = ["Reward", "Average reward",
                            "Critic loss", "Actor loss"]
+            self.name_run = name_run + "_train"
+
         else:
-            self.labels = ["Average reward"]
-        self.env = gym.make("MountainCarContinuous-v0")
+            self.labels = ["Reward", "Average reward"]
+            self.name_run = name_run + "_run"
+
+        self.env = gym.make("BipedalWalker-v2")
+
+        self.initial_name_run = name_run
 
         # Definition of the observation and action space
         self.obs_low = self.env.observation_space.low
@@ -113,7 +119,7 @@ class AbstractMountainCarEnv(AbstractEnv, ABC):
             reward = kwargs.get('reward')
             c_loss = kwargs.get('c_loss')
             a_loss = kwargs.get('a_loss')
-            train = kwargs.get('train')
+
             # increment t and add the reward to the list
             self.t += 1
             self.rewards.append(reward)
@@ -129,11 +135,11 @@ class AbstractMountainCarEnv(AbstractEnv, ABC):
 
             # Must match the order of the labels defined in __init__
             ydatas = None
-            if train:
+            if self.params.train:
                 ydatas = [reward, np.average(self.rewards),
                           c_loss, a_loss]
             else:
-                ydatas = [np.average(self.rewards)]
+                ydatas = [reward, np.average(self.rewards)]
 
             # Data to plot in the Y axis of the subplots
             self.board.on_running(ydatas=ydatas,
@@ -150,11 +156,11 @@ class AbstractMountainCarEnv(AbstractEnv, ABC):
             self.list_reset_t.append(current_t)
             self.last_t = self.t
 
+            # reset env and plot red line on subplots to indicate reset
+            self.board.on_reset(self.t, self.rewards)
+
             # reset the list of reward to average with new values
             self.rewards = []
-
-            # reset env and plot red line on subplots to indicate reset
-            self.board.on_reset(self.t)
 
     def render(self):
         """render the environment if asked to
@@ -280,11 +286,11 @@ class AbstractHumanoidEnv(AbstractEnv, ABC):
             self.list_reset_t.append(current_t)
             self.last_t = self.t
 
+            # reset env and plot red line on subplots to indicate reset
+            self.board.on_reset(self.t, self.rewards)
+
             # reset the list of reward to average with new values
             self.rewards = []
-
-            # reset env and plot red line on subplots to indicate reset
-            self.board.on_reset(self.t)
 
     def render(self):
         """render the environment if asked to

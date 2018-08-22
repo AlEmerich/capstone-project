@@ -6,7 +6,7 @@ import numpy as np
 
 class Noise:
     """Implements the Ornstein-Uhlenbeck noise to add to the output
-    of the policy network.
+    o0f the policy network.
     """
     def __init__(self, mu, sigma=0.2, theta=.15, dt=1e-2, x0=None):
         """Initiliaze parameters mu, sigma, theta, dt and x0."""
