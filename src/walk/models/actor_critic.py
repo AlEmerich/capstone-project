@@ -62,7 +62,7 @@ class Actor(AbstractActorCritic):
                                     batch_size, scope,
                                     path)
 
-        act = tf.nn.leaky_relu
+        act = tf.nn.relu
         output_act = tf.nn.tanh
         l2_reg = tf.contrib.layers.l2_regularizer(scale=0.01)
 
@@ -87,7 +87,7 @@ class Actor(AbstractActorCritic):
                             activation=act,
                             kernel_initializer=self.init_w,
                             bias_initializer=self.init_b,
-                            # kernel_regularizer=l2_reg,
+                            kernel_regularizer=l2_reg,
                             name="dense_"+prefix)
                         self._summary_layer("dense_"+prefix)
                         if dropout is not 0:
@@ -147,7 +147,7 @@ class Critic(AbstractActorCritic):
                                      batch_size, scope,
                                      path)
 
-        act = tf.nn.leaky_relu
+        act = tf.nn.relu
         l2_reg = tf.contrib.layers.l2_regularizer(scale=0.01)
 
         with tf.variable_scope("critic", reuse=tf.AUTO_REUSE):
@@ -173,7 +173,7 @@ class Critic(AbstractActorCritic):
                             activation=act,
                             kernel_initializer=self.init_w,
                             bias_initializer=self.init_b,
-                            # kernel_regularizer=l2_reg,
+                            kernel_regularizer=l2_reg,
                             name="dense_"+prefix)
                         self._summary_layer("dense_"+prefix)
                         if dropout is not 0:
@@ -197,7 +197,7 @@ class Critic(AbstractActorCritic):
                                             activation=act,
                                             kernel_initializer=self.init_w,
                                             bias_initializer=self.init_b,
-                                            # kernel_regularizer=l2_reg,
+                                            kernel_regularizer=l2_reg,
                                             name="dense_"+str(layers[-1]))
                     self._summary_layer("dense_"+str(layers[-1]))
                     if batch_norm:

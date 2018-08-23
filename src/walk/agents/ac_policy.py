@@ -12,7 +12,7 @@ from ..utils.noise import Noise
 from tensorflow.python.client import timeline
 
 
-class AC_Policy(AbstractHumanoidEnv):
+class AC_Policy(AbstractBipedalEnv):
     """Actor critic agent. Implements DDPG algorithm from
     https://arxiv.org/pdf/1509.02971v5.pdf.
     """
@@ -326,6 +326,7 @@ class AC_Policy(AbstractHumanoidEnv):
                 action = self.act(state)
                 if self.params.noisy and j < self.params.noise_threshold:
                     action += self.noise()
+                    action = np.clip(action, self.act_low, self.act_high)
 
                 new_state, reward, done, _ = self.env.step(action)
 
