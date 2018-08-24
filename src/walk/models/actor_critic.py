@@ -163,7 +163,7 @@ class Critic(AbstractActorCritic):
                         tf.float32, [None, self.observation_space.shape[0]],
                         name='state_input')
                     h_state = None
-                    for i, nb_node in enumerate(layers[:-1]):
+                    for i, nb_node in enumerate(layers):
                         prefix = str(nb_node)+"_"+str(i)
                         h_state = tf.layers.dense(
                             h_state if h_state is not None
@@ -188,9 +188,14 @@ class Critic(AbstractActorCritic):
                     self.input_action_ph = tf.placeholder(
                         tf.float32, [None, self.action_space.shape[0]],
                         name='action_input')
+                    h_action = tf.layers.dense(self.input_action_ph,
+                                               layers[-1],
+                                               kernel_initializer=self.init_w,
+                                               bias_initializer=self.init_b,
+                                               name="dense_"+str(layers[-1]))
 
                 with tf.variable_scope("Q_output"):
-                    merge = tf.concat([h_state, self.input_action_ph], -1)
+                    merge = h_state + h_action
                     merge = tf.layers.dense(merge, layers[-1],
                                             activation=act,
                                             kernel_initializer=self.init_w,
