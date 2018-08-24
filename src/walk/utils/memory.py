@@ -8,7 +8,7 @@ class Memory():
     on the current state. Hold the queue of
     <state, action, reward, next_state, done>.
     """
-    def __init__(self, length=1000):
+    def __init__(self, length=10000):
         """Instantiate the queue
         """
         self.mem = deque(maxlen=length)

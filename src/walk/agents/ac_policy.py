@@ -12,7 +12,7 @@ from ..utils.noise import Noise
 from tensorflow.python.client import timeline
 
 
-class AC_Policy(AbstractBipedalEnv):
+class AC_Policy(AbstractHumanoidEnv):
     """Actor critic agent. Implements DDPG algorithm from
     https://arxiv.org/pdf/1509.02971v5.pdf.
     """
@@ -195,7 +195,7 @@ class AC_Policy(AbstractBipedalEnv):
             return
 
         # Don't train if there is not enough samples in the memory
-        if len(self.memory) < self.params.batch_size:
+        if len(self.memory) < self.params.exp_needed_to_train:
             return
 
         # Get samples of memory
