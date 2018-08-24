@@ -82,7 +82,7 @@ class TensorBoard(Board):
         if additional:
             merge_additional = tf.summary.merge(additional)
             summary_additional = self.tf_session.run(merge_additional)
-            self.writer.add_summary(summary_additional)
+            self.writer.add_summary(summary_additional, xdata)
 
     def on_reset(self, t, rewards):
         """No need to reset with tensorboard.

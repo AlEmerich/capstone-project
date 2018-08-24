@@ -326,6 +326,7 @@ class AC_Policy(AbstractHumanoidEnv):
                 action = self.act(state)
                 if self.params.noisy and j < self.params.noise_threshold:
                     action += self.noise()
+                    action = np.clip(action, self.act_low, self.act_high)
 
                 new_state, reward, done, _ = self.env.step(action)
 
