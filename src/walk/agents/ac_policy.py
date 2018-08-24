@@ -260,10 +260,6 @@ class AC_Policy(AbstractHumanoidEnv):
         self.critic_saver.save(self.tf_session,
                                os.path.join(self.critic_model.path,
                                             self.critic_file))
-        # self.actor_model.save_model_weights(self.tf_session,
-        #                                     self.actor_file)
-        # self.critic_model.save_model_weights(self.tf_session,
-        #                                      self.critic_file)
 
     def _update_target_network(self, just_copy=False):
         """Update target network with soft update if just_copy is False
@@ -306,16 +302,13 @@ class AC_Policy(AbstractHumanoidEnv):
                                       os.path.join("saved_folder",
                                                    self.initial_name_run,
                                                    self.critic_file))
-            # self.actor_model.load_model_weights(
-            #     self.tf_session, self.initial_name_run, self.actor_file)
-            # self.critic_model.load_model_weights(
-            #     self.tf_session, self.initial_name_run, self.critic_file)
 
         seed = 42
         np.random.seed(seed)
         tf.set_random_seed(seed)
 
-        state = self.reset()
+        state = None
+
         for j in range(self.params.epochs):
             # Reset the environment if done
             if self.params.reset:
