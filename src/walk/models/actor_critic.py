@@ -64,7 +64,7 @@ class Actor(AbstractActorCritic):
 
         act = tf.nn.relu
         output_act = tf.nn.tanh
-        l2_reg = tf.contrib.layers.l2_regularizer(scale=0.01)
+        # l2_reg = tf.contrib.layers.l2_regularizer(scale=0.01)
 
         with tf.variable_scope("actor", reuse=tf.AUTO_REUSE):
             with tf.variable_scope("model"):
@@ -87,7 +87,6 @@ class Actor(AbstractActorCritic):
                             activation=act,
                             kernel_initializer=self.init_w,
                             bias_initializer=self.init_b,
-                            kernel_regularizer=l2_reg,
                             name="dense_"+prefix)
                         self._summary_layer("dense_"+prefix)
                         if dropout is not 0:
@@ -173,7 +172,6 @@ class Critic(AbstractActorCritic):
                             activation=act,
                             kernel_initializer=self.init_w,
                             bias_initializer=self.init_b,
-                            kernel_regularizer=l2_reg,
                             name="dense_"+prefix)
                         self._summary_layer("dense_"+prefix)
                         if dropout is not 0:
@@ -208,6 +206,7 @@ class Critic(AbstractActorCritic):
                     self.Q = tf.layers.dense(merge, 1, activation=None,
                                              kernel_initializer=self.init_w,
                                              bias_initializer=self.init_b,
+                                             kernel_regularizer=l2_reg,
                                              name="out")
                     self._summary_layer("out")
 

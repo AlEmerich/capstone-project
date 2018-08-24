@@ -6,7 +6,7 @@ import numpy as np
 
 class Noise:
     """Implements the Ornstein-Uhlenbeck noise to add to the output
-    o0f the policy network.
+    of the policy network.
     """
     def __init__(self, mu, sigma=0.2, theta=.15, dt=1e-2, x0=None):
         """Initiliaze parameters mu, sigma, theta, dt and x0."""
@@ -21,7 +21,8 @@ class Noise:
         """Compute *x-1* + theta *(mu - *x-1*) * dt + sigma * sqrt(dt) * normal(shape(mu))
         """
         x = self.x_prev + self.theta * (self.mu - self.x_prev) * self.dt + \
-                self.sigma * np.sqrt(self.dt) * np.random.normal(size=self.mu.shape)
+            self.sigma * np.sqrt(self.dt) * np.random.normal(
+                size=self.mu.shape)
         self.x_prev = x
         return x
 

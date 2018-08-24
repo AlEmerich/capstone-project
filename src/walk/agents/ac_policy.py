@@ -12,7 +12,7 @@ from ..utils.noise import Noise
 from tensorflow.python.client import timeline
 
 
-class AC_Policy(AbstractHumanoidEnv):
+class AC_Policy(AbstractBipedalEnv):
     """Actor critic agent. Implements DDPG algorithm from
     https://arxiv.org/pdf/1509.02971v5.pdf.
     """
