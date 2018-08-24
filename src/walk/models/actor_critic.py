@@ -200,6 +200,7 @@ class Critic(AbstractActorCritic):
                                             activation=act,
                                             kernel_initializer=self.init_w,
                                             bias_initializer=self.init_b,
+                                            kernel_regularizer=l2_reg,
                                             name="dense_"+str(layers[-1]))
                     self._summary_layer("dense_"+str(layers[-1]))
                     if batch_norm:
