@@ -113,7 +113,7 @@ class Actor(AbstractActorCritic):
                 with tf.variable_scope("train"):
                     self.unnormalized_actor_gradients = tf.gradients(
                         self.output, self.network_params,
-                        -self.action_gradients)
+                        self.action_gradients)
                     self.actor_gradients = list(
                        map(
                            lambda x: tf.div(x, self.batch_size),
@@ -206,13 +206,14 @@ class Critic(AbstractActorCritic):
                                             activation=act,
                                             kernel_initializer=self.init_w,
                                             bias_initializer=self.init_b,
-                                            kernel_regularizer=l2_reg,
                                             name="dense_"+str(layers[-1]))
                     self._summary_layer("dense_"+str(layers[-1]))
                     if batch_norm:
                         merge = tf.layers.batch_normalization(
                             merge,
                             name="batch_norm_merge")
+                    if dropout is not 0:
+                        merge = tf.nn.dropout(merge, dropout) 
 
                     self.Q = tf.layers.dense(merge, 1, activation=None,
                                              kernel_initializer=self.init_w,
