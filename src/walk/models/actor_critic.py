@@ -163,7 +163,7 @@ class Critic(AbstractActorCritic):
                         tf.float32, [None, self.observation_space.shape[0]],
                         name='state_input')
                     h_state = None
-                    for i, nb_node in enumerate(layers):
+                    for i, nb_node in enumerate(layers[:-1]):
                         prefix = str(nb_node)+"_"+str(i)
                         h_state = tf.layers.dense(
                             h_state if h_state is not None
@@ -180,6 +180,12 @@ class Critic(AbstractActorCritic):
                             h_state = tf.layers.batch_normalization(
                                 h_state,
                                 name="batch_norm_"+prefix)
+
+                    h_state = tf.layers.dense(h_state,
+                                              layers[-1],
+                                              kernel_initializer=self.init_w,
+                                              bias_initializer=self.init_b,
+                                              name="dense_"+str(layers[-1]))
 
                 ###############################################
                 # ACTION
