@@ -11,7 +11,7 @@ class Board(ABC):
     def __init__(self, name_run):
         """Set the up title of the plot.
         """
-        folder = "plots"
+        folder = "logs"
 
         if not os.path.exists(folder):
             sys.exit("Please create the " + folder + " folder manually")

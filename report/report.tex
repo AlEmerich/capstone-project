@@ -677,38 +677,31 @@ for j in range(self.params.epochs):
 
 \subsection{Refinement}
 
-% \subsubsection{Noise}
+\subsubsection{Noise}
 
-% To find the best tuning for my training, I changed the way I added the noise
-% into the action, the learning operation of my actor network and its layer
-% defintion. For the noise, I added it every steps. It then produces a bad
-% training making the loss of the critic network going up at around 350 steps
-% (Fig. \ref{fig:noise_600}).
+To find the best tuning for my training, I changed the way I added the noise
+into the action, the learning operation of my actor network and its layer
+defintion. For the noise, I added it every steps. It then produces a bad
+training making the loss of the critic network going up at around 1000 steps,
+which corresponds to around 50 epochs. Removing that noise at this moment does
+not removing the loss decreasing, as shown in the Fig. \ref{fig:noise_cancellation}.
 
-% \begin{figure}[ht]
-%   \begin{subfigure}[t]{.5\textwidth}
-%     \centering
-%     \includegraphics[width=1.\textwidth]{plot_noise_600}
-%     \caption{Training with noise every steps until the epoch 600}
-%     \label{fig:noise_600}
-%   \end{subfigure}%
-%   ~
-%   \begin{subfigure}[t]{.5\textwidth}
-%     \centering
-%     \includegraphics[width=1.\textwidth]{plot_noise_350}
-%     \caption{Training with noise every steps until the epoch 350}
-%     \label{fig:noise_350}
-%   \end{subfigure}
-%   \caption{Affect of the noise on the training process.}
-% \end{figure}
+\begin{figure}[ht]
+  \includegraphics[width=1.\textwidth]{noise_cancellation}
+  \caption{The light blue line is the run with noise removed at step 50, and the
+  dark blue is with noise always added.}
+  \label{fig:noise_cancellation}
+\end{figure}
 
-% We can see in the figure that the noise is too much after around 350 epochs, so I changed
-% the parameter \verb?noise_threshold? to 350 and the result is shown in Fig. \ref{fig:noise_350}.
-% It shows that removing the noise at the epoch 350 remove the divergence of the loss. Henceforth,
-% we can interprete from the stagnation of the loss that the agent doesn't learn anymore.
+Since it does not affect the training (the reward is not affected either), I
+will keep adding noise until some convergence starts to occur. In the later
+work, I won't keep a good eye on the loss of the critic. The study of the noise
+addition makes me think that it is normal if the loss is increasing, since the
+environment is moving and the reward more and more difficult to compute.
 
 \subsubsection{Network definition} 
 
+\paragraph{}
 Thanks to the architecture of my code, I am able to change the model of the networks easyly so I
 tuned these parameter a lot. A lot of paper written about DDPG \cite{journals/corr/LillicrapHPHETS15}
 \cite{DBLP:journals/corr/abs-1801-10425} used layers of 400 and 300 units with action added at the second
@@ -716,7 +709,8 @@ layer in the critic networkd. I then decided to follow that benchmark since it g
 a lot of environment. In order to have a learning more efficient and to see how a modification would effect,
 I changed the depth or the number of units. I found out that decreasing the number of units doesn't affect
 the quality of the learning but decrease the speed and building the networks deeper make the critic loss
-diverges very fast.
+diverges very fast. I also add L2 weight deway to the critic network to
+stabilize the learning.
 
 \subsubsection{Hyper Parameters}
 \label{subsubsec:hp_params}
@@ -799,11 +793,11 @@ don't think the Ornstein-Uhlenbeck noise will suit that requirement.
 
 \paragraph{}
 The fig. \ref{fig:mountaincartrain} shows that it learns the right first steps
-and then the loss diverges, showing that the noise process is either not noisy
-enough, or not enough suited to the environment. Since I just want to validate
-the algorithm and not the model, the fact that loss of the critic network is
-decreasing and the average reward is increasing the first 1000 epochs shows that
-my model is able to learn.
+and then the loss diverges and the reward never increases, showing that the
+noise process is either not noisy enough, or not enough suited to the environment.
+Since I just want to validate the algorithm and not the model, the fact that
+loss of the critic network is decreasing and the average reward is increasing
+the first 1000 epochs shows that my model is able to learn.
 
 \paragraph{}
 About validating the model, I designed it in tensorflow and plot in TensorBoard
@@ -839,54 +833,20 @@ will always be added just before the last layer.
 \end{figure}
 
 The fig. \ref{fig:actorgraph} shows the model of the actor network. As critic
-networks, the model is easily customizable and looking a lot like crtic model.
+networks, the model is easily customizable and looking a lot like critic model.
 
 \subsubsection{Tweaking the model}
 \paragraph{}
 
 Initially, I trained the model with batch normalization because it has shown in
 many cases that it can improve learning speed without decreasing the
-performance. However, it is interesting to see how well it will performed
-without it. For dropout layer, I don't think forgetting some informations is a
-good trick to tackle that kind of problem because usually, this technique is
-used to prevent overfitting. Since DDPG is a deterministic policy, I don't think
-overfitting will be a crucial issue.
-
-\begin{figure}[ht]
-  \begin{subfigure}[t]{.5\textwidth}
-    \centering
-    \includegraphics[width=1.\textwidth]{bn_avgreward}
-    \caption{}
-    \label{fig:bn_avgreward}
-  \end{subfigure}%
-  ~
-  \begin{subfigure}[t]{.5\textwidth}
-    \centering
-    \includegraphics[width=1.\textwidth]{bn_loss}
-    \caption{}
-    \label{fig:bn_loss}
-  \end{subfigure}
-  \caption{Comparison of learning with and without batch normalization}
-  \label{fig:bn_tweakinggraph}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{subfigure}[t]{.5\textwidth}
-    \centering
-    \includegraphics[width=1.\textwidth]{dropout_avgreward}
-    \caption{}
-    \label{fig:bn_avgreward}
-  \end{subfigure}%
-  ~
-  \begin{subfigure}[t]{.5\textwidth}
-    \centering
-    \includegraphics[width=1.\textwidth]{dropout_loss}
-    \caption{}
-    \label{fig:bn_loss}
-  \end{subfigure}
-  \caption{Comparison of learning with and without dropout}
-  \label{fig:bn_tweakinggraph}
-\end{figure}
+performance. However, the soft target update must be made differently for the
+batch normalization layer than the dense one. So first of all, it is interesting
+to see how well it will performed without it. For dropout layer, I don't think
+forgetting some informations is a good trick to tackle that kind of problem
+because usually, this technique is used to prevent overfitting. Since DDPG is a
+deterministic policy, I don't think overfitting will be a crucial issue but it
+could help to not ave Q output in a local maxima.
 
 \subsubsection{Evaluation}
 
@@ -922,9 +882,7 @@ like noise addition or soft target update. Implementing the Deep Deterministic P
 was also really enriching because I learned to use Tensorflow and working directly with weights,
 biases and gradients and by that way increased my knowledge over how deep learning is working
 mathematically (which is rather dificult to understand when we just read the theory without
-actually using it). In contrary, the most chanllenging part was to actually validate my network. The
-difficulty came from the fact that it was hard to determine if a training was bad
-because my network was not fitted the problem or because I didn't let it train enough.
+actually using it). In contrary, the most chanllenging part was to actually validate my network. 
 
 \subsection{Improvement}
 

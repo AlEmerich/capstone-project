@@ -1,6 +1,5 @@
 from abc import ABC
 import tensorflow as tf
-import os
 
 
 class AbstractActorCritic(ABC):
@@ -23,8 +22,9 @@ class AbstractActorCritic(ABC):
 
         self.path = path
 
-        self.init_w = tf.random_normal_initializer(-3e-3, 3e-3)
-        self.init_b = tf.constant_initializer(0.1)
+        self.init_w_u = tf.random_uniform_initializer(-3e-3, 3e-3)
+        self.init_w_n = tf.truncated_normal_initializer(-3e-3, 3e-3)
+        self.init_b = tf.constant_initializer(0.0)
 
         self.summary = []
 
@@ -64,7 +64,7 @@ class Actor(AbstractActorCritic):
 
         act = tf.nn.relu
         output_act = tf.nn.tanh
-        # l2_reg = tf.contrib.layers.l2_regularizer(scale=0.01)
+        # l2_reg = tf.contrib.layers.l2_regularizer(scale=0.001)
 
         with tf.variable_scope("actor", reuse=tf.AUTO_REUSE):
             with tf.variable_scope("model"):
@@ -85,7 +85,7 @@ class Actor(AbstractActorCritic):
                             else self.input_ph,
                             units=nb_node,
                             activation=act,
-                            kernel_initializer=self.init_w,
+                            kernel_initializer=self.init_w_n,
                             bias_initializer=self.init_b,
                             name="dense_"+prefix)
                         self._summary_layer("dense_"+prefix)
@@ -94,6 +94,7 @@ class Actor(AbstractActorCritic):
                         if batch_norm:
                             h_out = tf.layers.batch_normalization(
                                 h_out,
+                                training=trainable,
                                 name="batch_norm_"+prefix)
 
                 with tf.variable_scope("action_output"):
@@ -102,22 +103,24 @@ class Actor(AbstractActorCritic):
                     self.output = tf.layers.dense(
                         h_out, units=self.action_space.shape[0],
                         activation=output_act,
+                        kernel_initializer=self.init_w_u,
+                        bias_initializer=self.init_b,
                         name="output")
                     self._summary_layer("output")
 
             self.network_params = tf.get_collection(
-                tf.GraphKeys.TRAINABLE_VARIABLES,
+                tf.GraphKeys.GLOBAL_VARIABLES,
                 scope=self.scope+"/model")
-            print("ACTOR NETWORK PARAMS IN MEMBER:\n", self.network_params)
+
             if trainable:
                 with tf.variable_scope("train"):
-                    self.unnormalized_actor_gradients = tf.gradients(
+                    self.actor_gradients = tf.gradients(
                         self.output, self.network_params,
-                        self.action_gradients)
-                    self.actor_gradients = list(
-                       map(
-                           lambda x: tf.div(x, self.batch_size),
-                           self.unnormalized_actor_gradients))
+                        -self.action_gradients)
+                    # self.actor_gradients = list(
+                    #    map(
+                    #        lambda x: tf.div(x, self.batch_size),
+                    #        self.unnormalized_actor_gradients))
                     self.opt = tf.train.AdamOptimizer(
                         self.lr).apply_gradients(
                             zip(self.actor_gradients,
@@ -147,7 +150,7 @@ class Critic(AbstractActorCritic):
                                      path)
 
         act = tf.nn.relu
-        l2_reg = tf.contrib.layers.l2_regularizer(scale=0.01)
+        l2_reg = tf.contrib.layers.l2_regularizer(scale=0.001)
 
         with tf.variable_scope("critic", reuse=tf.AUTO_REUSE):
             with tf.variable_scope("model"):
@@ -170,7 +173,7 @@ class Critic(AbstractActorCritic):
                             else self.input_state_ph,
                             units=nb_node,
                             activation=act,
-                            kernel_initializer=self.init_w,
+                            kernel_initializer=self.init_w_n,
                             bias_initializer=self.init_b,
                             name="dense_"+prefix)
                         self._summary_layer("dense_"+prefix)
@@ -179,13 +182,8 @@ class Critic(AbstractActorCritic):
                         if batch_norm:
                             h_state = tf.layers.batch_normalization(
                                 h_state,
+                                training=trainable,
                                 name="batch_norm_"+prefix)
-
-                    h_state = tf.layers.dense(h_state,
-                                              layers[-1],
-                                              kernel_initializer=self.init_w,
-                                              bias_initializer=self.init_b,
-                                              name="dense_"+str(layers[-1]))
 
                 ###############################################
                 # ACTION
@@ -194,33 +192,47 @@ class Critic(AbstractActorCritic):
                     self.input_action_ph = tf.placeholder(
                         tf.float32, [None, self.action_space.shape[0]],
                         name='action_input')
-                    h_action = tf.layers.dense(self.input_action_ph,
-                                               layers[-1],
-                                               kernel_initializer=self.init_w,
-                                               bias_initializer=self.init_b,
-                                               name="dense_"+str(layers[-1]))
+
+                with tf.variable_scope("merging"):
+                    h_action = tf.layers.dense(
+                        self.input_action_ph,
+                        layers[-1],
+                        kernel_initializer=self.init_w_n,
+                        name="dense_action_"+str(layers[-1]))
+
+                    h_state = tf.layers.dense(
+                        h_state,
+                        layers[-1],
+                        kernel_initializer=self.init_w_n,
+                        use_bias=False,
+                        name="dense_state_"+str(layers[-1]))
 
                 with tf.variable_scope("Q_output"):
-                    merge = h_state + h_action
-                    merge = tf.layers.dense(merge, layers[-1],
-                                            activation=act,
-                                            kernel_initializer=self.init_w,
-                                            bias_initializer=self.init_b,
-                                            name="dense_"+str(layers[-1]))
-                    self._summary_layer("dense_"+str(layers[-1]))
+                    merge = act(h_state + h_action)
+                    # merge = tf.layers.dense(merge, layers[-1],
+                    #                         activation=act,
+                    #                         kernel_initializer=self.init_w_n,
+                    #                         bias_initializer=self.init_b,
+                    #                         name="dense_"+str(layers[-1]))
+                    # self._summary_layer("dense_"+str(layers[-1]))
                     if batch_norm:
                         merge = tf.layers.batch_normalization(
                             merge,
+                            training=trainable,
                             name="batch_norm_merge")
                     if dropout is not 0:
-                        merge = tf.nn.dropout(merge, dropout) 
+                        merge = tf.nn.dropout(merge, dropout)
 
                     self.Q = tf.layers.dense(merge, 1, activation=None,
-                                             kernel_initializer=self.init_w,
+                                             kernel_initializer=self.init_w_u,
                                              bias_initializer=self.init_b,
                                              kernel_regularizer=l2_reg,
                                              name="out")
                     self._summary_layer("out")
+
+            self.network_params = tf.get_collection(
+                tf.GraphKeys.GLOBAL_VARIABLES,
+                scope=self.scope+"/model")
 
             if trainable:
                 with tf.variable_scope("gradients"):

@@ -1,5 +1,6 @@
-from .abstract_env import AbstractHumanoidEnv
+from .abstract_humanoid import AbstractHumanoidEnv
 import time
+
 
 class RandomPolicy(AbstractHumanoidEnv):
     """Class who let the roboschool humanoid

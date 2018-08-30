@@ -7,12 +7,12 @@ import numpy as np
 from ..utils.memory import Memory
 from ..models.actor_critic import Actor, Critic
 from ..utils.array_utils import fit_normalize
-from .abstract_env import AbstractHumanoidEnv, AbstractBipedalEnv
+from .abstract_inverted_pendulum import AbstractInvertedPendulumEnv
 from ..utils.noise import Noise
 from tensorflow.python.client import timeline
 
 
-class AC_Policy(AbstractHumanoidEnv):
+class AC_Policy(AbstractInvertedPendulumEnv):
     """Actor critic agent. Implements DDPG algorithm from
     https://arxiv.org/pdf/1509.02971v5.pdf.
     """
@@ -26,15 +26,19 @@ class AC_Policy(AbstractHumanoidEnv):
 
         self.__init_session__()
 
-        self.noise = Noise(mu=np.zeros(self.env.action_space.shape[0]))
+        self.noise = Noise(mu=np.zeros(self.env.action_space.shape[0]),
+                           sigma=self.params.sigma,
+                           theta=self.params.theta)
         self.actor_file = "actor"
         self.critic_file = "critic"
         self.scale = np.vectorize(fit_normalize)
 
         self.__init_networks__()
 
-        self.actor_saver = tf.train.Saver(var_list=self.a_params)
-        self.critic_saver = tf.train.Saver(var_list=self.c_params)
+        self.actor_saver = tf.train.Saver(
+            var_list=self.actor_model.network_params)
+        self.critic_saver = tf.train.Saver(
+            var_list=self.critic_model.network_params)
 
         self.__init_soft_target_ops__()
 
@@ -81,7 +85,6 @@ class AC_Policy(AbstractHumanoidEnv):
                                      self.params.actor_batch_norm,
                                      self.saved_folder)
             self.actor_loss = 0
-            self.a_params = tf.trainable_variables()
 
             ################################################################
             # CRITIC
@@ -97,7 +100,6 @@ class AC_Policy(AbstractHumanoidEnv):
                                        self.params.critic_batch_norm,
                                        self.saved_folder)
             self.critic_loss = 0
-            self.c_params = tf.trainable_variables()[len(self.a_params):]
 
         ################################################################
         # TARGET NETWORK
@@ -117,8 +119,7 @@ class AC_Policy(AbstractHumanoidEnv):
                                             self.params.actor_batch_norm,
                                             self.saved_folder,
                                             trainable=False)
-            self.at_params = tf.trainable_variables()[
-                len(self.c_params) + len(self.a_params):]
+
             # Get a second critic model to use it for target and copy their
             # weight of the first critic model to it
             self.target_critic_model = Critic(self.env.observation_space,
@@ -132,53 +133,55 @@ class AC_Policy(AbstractHumanoidEnv):
                                               self.params.critic_batch_norm,
                                               self.saved_folder,
                                               trainable=False)
-            self.ct_params = tf.trainable_variables()[
-                len(self.at_params) + len(self.c_params) + len(self.a_params):]
 
     def __init_soft_target_ops__(self):
         """Defines soft and hard target updates operations.
         """
         # Defines the soft target update operations
         self.update_critic_target = \
-            [self.ct_params[i].assign(tf.multiply(self.c_params[i],
-                                                  self.params.tau) +
-                                      tf.multiply(self.ct_params[i],
-                                                  1. - self.params.tau))
-             for i in range(len(self.ct_params))]
+            [self.target_critic_model.network_params[i].assign(
+                tf.multiply(self.critic_model.network_params[i],
+                            self.params.tau) +
+                tf.multiply(self.target_critic_model.network_params[i],
+                            1. - self.params.tau))
+             for i in range(len(self.target_critic_model.network_params))]
         self.update_actor_target = \
-            [self.at_params[i].assign(tf.multiply(self.a_params[i],
-                                                  self.params.tau) +
-                                      tf.multiply(self.at_params[i],
-                                                  1. - self.params.tau))
-             for i in range(len(self.at_params))]
+            [self.target_actor_model.network_params[i].assign(
+                tf.multiply(self.actor_model.network_params[i],
+                            self.params.tau) +
+                tf.multiply(self.target_actor_model.network_params[i],
+                            1. - self.params.tau))
+             for i in range(len(self.target_actor_model.network_params))]
 
         # Defines the initialization of the target parameter operations
         self.init_critic_target = \
-            [self.ct_params[i].assign(self.c_params[i])
-             for i in range(len(self.ct_params))]
+            [self.target_critic_model.network_params[i].assign(
+                self.critic_model.network_params[i])
+             for i in range(len(self.target_critic_model.network_params))]
         self.init_actor_target = \
-            [self.at_params[i].assign(self.a_params[i])
-             for i in range(len(self.at_params))]
+            [self.target_actor_model.network_params[i].assign(
+                self.actor_model.network_params[i])
+             for i in range(len(self.target_actor_model.network_params))]
 
     def __print_params__(self):
         """Print parameters of neural nets.
         """
         print("************** ACTOR PARAMS",
-              len(self.a_params),
+              len(self.actor_model.network_params),
               "**********************")
-        print(self.a_params)
+        print(self.actor_model.network_params)
         print("************** CRITIC PARAMS",
-              len(self.c_params),
+              len(self.critic_model.network_params),
               "*********************")
-        print(self.c_params)
+        print(self.critic_model.network_params)
         print("********** TARGET ACTOR PARAMS",
-              len(self.at_params),
+              len(self.target_actor_model.network_params),
               "******************")
-        print(self.at_params)
+        print(self.target_actor_model.network_params)
         print("********** TARGET CRITIC PARAMS",
-              len(self.ct_params),
+              len(self.target_critic_model.network_params),
               "*****************")
-        print(self.ct_params)
+        print(self.target_critic_model.network_params)
 
     def tf_run_op(self, op, feed_dict=None):
         return self.tf_session.run(op,
@@ -192,10 +195,6 @@ class AC_Policy(AbstractHumanoidEnv):
         Train and update the target network with soft update.
         """
         if not self.params.train:
-            return
-
-        # Don't train if there is not enough samples in the memory
-        if len(self.memory) < self.params.exp_needed_to_train:
             return
 
         # Get samples of memory
@@ -222,37 +221,44 @@ class AC_Policy(AbstractHumanoidEnv):
                 })
 
             # gamma is the discounted factor
-            Q_next = self.params.gamma * Q_next * (1 - dones)
-            Q_next = np.add(Q_next, rewards)
+            expected_reward = rewards + self.params.gamma * Q_next * (1-dones)
 
             # Train the critic network and get gradients
-            feed_critic = {
-                self.critic_model.input_state_ph: states,
-                self.critic_model.input_action_ph: actions,
-                self.critic_model.true_target_ph: Q_next
-            }
-            self.critic_loss, _, critic_action_gradient = \
+            self.critic_loss, _ = \
                 self.tf_run_op(
-                    [self.critic_model.loss, self.critic_model.opt,
-                     self.critic_model.action_gradients],
-                    feed_dict=feed_critic)
+                    [self.critic_model.loss, self.critic_model.opt],
+                    feed_dict={
+                        self.critic_model.input_state_ph: states,
+                        self.critic_model.input_action_ph: actions,
+                        self.critic_model.true_target_ph: expected_reward
+                    })
+
+            act_for_grad = self.tf_run_op(
+                self.actor_model.output,
+                feed_dict={
+                    self.actor_model.input_ph: states
+                })
+
+            action_gradient = self.tf_run_op(
+                self.critic_model.action_gradients,
+                feed_dict={
+                    self.critic_model.input_action_ph: act_for_grad,
+                    self.critic_model.input_state_ph: states
+                })
 
         with tf.variable_scope("train_actor"):
             # Train the actor network with the critic gradients
-            feed_actor = {
-                self.actor_model.input_ph: states,
-                self.actor_model.action_gradients: critic_action_gradient[0]
-            }
             self.tf_run_op(
                 [self.actor_model.opt],
-                feed_dict=feed_actor)
-            # self.actor_loss, _ = self.tf_session.run([self.actor_model.loss,
-            #                                           self.actor_model.opt],
-            #                                          feed_dict=feed_actor)
+                feed_dict={
+                    self.actor_model.input_ph: states,
+                    self.actor_model.action_gradients: action_gradient[0]
+                })
 
         with tf.variable_scope("soft_update"):
             # Update target network
             self._update_target_network()
+
         # Save weights of the models
         self.actor_saver.save(self.tf_session,
                               os.path.join(self.actor_model.path,
@@ -272,10 +278,17 @@ class AC_Policy(AbstractHumanoidEnv):
             self.tf_run_op(self.update_actor_target)
             self.tf_run_op(self.update_critic_target)
 
+    def act_random(self):
+        return self.env.action_space.sample()
+
     def act(self, state):
         """Return action given a state.
         Implements epsilon-greedy exploration.
         """
+        # Act randomly if there is not enough samples in the memory
+        if len(self.memory) < self.params.warm_up_step:
+            return self.act_random()
+
         # Predict action from state
         reshaped_state = state.reshape(1, self.env.observation_space.shape[0])
         feed = {self.actor_model.input_ph: reshaped_state}
@@ -306,23 +319,31 @@ class AC_Policy(AbstractHumanoidEnv):
         seed = 42
         np.random.seed(seed)
         tf.set_random_seed(seed)
-
+        self.env.seed(seed)
         state = None
 
         for j in range(self.params.epochs):
             # Reset the environment if done
-            if self.params.reset:
+            if self.params.reset or state is None:
                 state = self.reset()
 
-            for i in range(self.params.pass_per_epoch):
-                print("EPOCHS:", j, "PASS:", i)
+            noise_scale = (self.params.initial_noise_scale *
+                           self.params.noise_decay ** j) * (
+                               self.act_high - self.act_low)
+
+            for i in range(self.params.steps):
+                print("EPOCH:", j, "STEP:", i, "NOISE DECAY:", noise_scale)
+
+                # Render the environment
+                self.render()
+
                 action = self.act(state)
-                if self.params.noisy and j < self.params.noise_threshold:
-                    action += self.noise()
+                if j < self.params.noise_threshold_epoch:
+                    action += self.noise() * noise_scale
                     action = np.clip(action, self.act_low, self.act_high)
 
                 new_state, reward, done, _ = self.env.step(action)
-
+                print("REWARD:", reward, "DONE:", done)
                 reward *= self.params.reward_multiply
 
                 # Put the current environment in the memory
@@ -331,11 +352,10 @@ class AC_Policy(AbstractHumanoidEnv):
                                      reward,
                                      new_state, done)
 
-                # Train the network
-                self.train()
-
-                # Render the environment
-                self.render()
+                # Don't train if there is not enough samples in the memory
+                if len(self.memory) > self.params.warm_up_step:
+                    # Train the network
+                    self.train()
 
                 weights_biases_actor = self.actor_model.summary
                 weights_biases_critic = self.critic_model.summary

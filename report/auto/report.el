@@ -40,6 +40,7 @@
     "fig:algoDDPG"
     "fig:randompolicy"
     "fig:benchmark"
+    "fig:noise_cancellation"
     "subsubsec:hp_params"
     "tab:hyperparams"
     "fig:criticlossmountain"
@@ -47,10 +48,7 @@
     "fig:mountaincartrain"
     "fig:softtargetgraph"
     "fig:criticgraph"
-    "fig:actorgraph"
-    "fig:bn_avgreward"
-    "fig:bn_loss"
-    "fig:bn_tweakinggraph")
+    "fig:actorgraph")
    (LaTeX-add-bibliographies)
    (LaTeX-add-xcolor-definecolors
     "codegreen"

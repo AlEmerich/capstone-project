@@ -20,9 +20,8 @@ class Noise:
     def __call__(self):
         """Compute *x-1* + theta *(mu - *x-1*) * dt + sigma * sqrt(dt) * normal(shape(mu))
         """
-        x = self.x_prev + self.theta * (self.mu - self.x_prev) * self.dt + \
-            self.sigma * np.sqrt(self.dt) * np.random.normal(
-                size=self.mu.shape)
+        x = self.x_prev + self.theta * (self.mu - self.x_prev) + \
+            self.sigma * np.random.normal(size=len(self.mu))
         self.x_prev = x
         return x
 

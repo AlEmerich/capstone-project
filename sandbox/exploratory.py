@@ -1,9 +1,9 @@
 import roboschool, gym
 import matplotlib.pyplot as plt
 
-env = gym.make("RoboschoolHumanoid-v1")
+env = gym.make("RoboschoolInvertedPendulum-v1")
 
-EPOCHS = 500
+EPOCHS = 1000
 
 s = env.reset()
 
