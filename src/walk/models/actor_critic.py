@@ -109,20 +109,20 @@ class Actor(AbstractActorCritic):
                     self._summary_layer("output")
 
             self.network_params = tf.get_collection(
-                tf.GraphKeys.GLOBAL_VARIABLES,
+                tf.GraphKeys.TRAINABLE_VARIABLES,
                 scope=self.scope+"/model")
 
             if trainable:
                 with tf.variable_scope("train"):
                     self.actor_gradients = tf.gradients(
                         self.output, self.network_params,
-                        -self.action_gradients)
+                        self.action_gradients)
                     # self.actor_gradients = list(
                     #    map(
                     #        lambda x: tf.div(x, self.batch_size),
                     #        self.unnormalized_actor_gradients))
                     self.opt = tf.train.AdamOptimizer(
-                        self.lr).apply_gradients(
+                        -self.lr).apply_gradients(
                             zip(self.actor_gradients,
                                 self.network_params))
 
@@ -231,7 +231,7 @@ class Critic(AbstractActorCritic):
                     self._summary_layer("out")
 
             self.network_params = tf.get_collection(
-                tf.GraphKeys.GLOBAL_VARIABLES,
+                tf.GraphKeys.TRAINABLE_VARIABLES,
                 scope=self.scope+"/model")
 
             if trainable:

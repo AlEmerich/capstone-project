@@ -1,2 +1,4 @@
 def fit_normalize(x, low, high):
-    return low + x * (high + low)
+    if x < 0:
+        return x * -low
+    return x * high
