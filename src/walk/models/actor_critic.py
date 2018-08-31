@@ -1,5 +1,6 @@
 from abc import ABC
 import tensorflow as tf
+import math
 
 
 class AbstractActorCritic(ABC):
@@ -27,6 +28,10 @@ class AbstractActorCritic(ABC):
         self.init_b = tf.constant_initializer(0.0)
 
         self.summary = []
+
+    def _variable(self, shape, dim, name):
+        return tf.Variable(tf.random_uniform(
+            shape, -1/math.sqrt(dim), 1/math.sqrt(dim)), name=name)
 
     def _summary_layer(self, name):
         scope = tf.get_variable_scope().name
@@ -66,63 +71,62 @@ class Actor(AbstractActorCritic):
         output_act = tf.nn.tanh
         # l2_reg = tf.contrib.layers.l2_regularizer(scale=0.001)
 
-        with tf.variable_scope("actor", reuse=tf.AUTO_REUSE):
+        with tf.variable_scope("actor"):
             with tf.variable_scope("model"):
                 self.input_ph = tf.placeholder(
                     tf.float32, [None, self.observation_space.shape[0]],
                     name='state_input')
 
-                self.action_gradients = tf.placeholder(
-                    tf.float32, [None, self.action_space.shape[0]],
-                    name='action_gradients')
+                W1 = self._variable(
+                    [self.observation_space.shape[0], layers[0]],
+                    self.observation_space.shape[0], name="W1")
+                self.summary.append(tf.summary.histogram("layer1/weights", W1))
+                B1 = self._variable(
+                    [layers[0]],
+                    self.observation_space.shape[0], name="B1")
+                self.summary.append(tf.summary.histogram("layer1/biases", B1))
+                W2 = self._variable(
+                    [layers[0], layers[1]],
+                    layers[0], name="W2")
+                self.summary.append(tf.summary.histogram("layer2/weights", W2))
+                B2 = self._variable(
+                    [layers[1]],
+                    layers[0], name="B2")
+                self.summary.append(tf.summary.histogram("layer2/biases", B2))
+                W3 = tf.Variable(
+                    tf.random_uniform(
+                        [layers[1], self.action_space.shape[0]],
+                        -3e-3,
+                        3e-3), name="W3")
+                self.summary.append(tf.summary.histogram("layer3/weights", W3))
+                B3 = tf.Variable(
+                    tf.random_uniform(
+                        [self.action_space.shape[0]],
+                        -3e-3,
+                        3e-3), name="B3")
+                self.summary.append(tf.summary.histogram("layer3/biases", B3))
 
-                with tf.variable_scope("hidden_input"):
-                    h_out = None
-                    for i, nb_node in enumerate(layers):
-                        prefix = str(nb_node)+"_"+str(i)
-                        h_out = tf.layers.dense(
-                            h_out if h_out is not None
-                            else self.input_ph,
-                            units=nb_node,
-                            activation=act,
-                            kernel_initializer=self.init_w_n,
-                            bias_initializer=self.init_b,
-                            name="dense_"+prefix)
-                        self._summary_layer("dense_"+prefix)
-                        if dropout is not 0:
-                            h_out = tf.nn.dropout(h_out, dropout)
-                        if batch_norm:
-                            h_out = tf.layers.batch_normalization(
-                                h_out,
-                                training=trainable,
-                                name="batch_norm_"+prefix)
+            layer1 = act(tf.matmul(self.input_ph, W1) + B1)
+            layer2 = act(tf.matmul(layer1, W2) + B2)
+            self.output = output_act(tf.matmul(layer2, W3) + B3)
 
-                with tf.variable_scope("action_output"):
-                    # Action space is from -1 to 1 and it is the range of
-                    # hyperbolic tangent
-                    self.output = tf.layers.dense(
-                        h_out, units=self.action_space.shape[0],
-                        activation=output_act,
-                        kernel_initializer=self.init_w_u,
-                        bias_initializer=self.init_b,
-                        name="output")
-                    self._summary_layer("output")
-
-            self.network_params = tf.get_collection(
-                tf.GraphKeys.TRAINABLE_VARIABLES,
-                scope=self.scope+"/model")
+            self.network_params = [W1, B1, W2, B2, W3, B3]
 
             if trainable:
                 with tf.variable_scope("train"):
+                    self.action_gradients = tf.placeholder(
+                        tf.float32, [None, self.action_space.shape[0]],
+                        name='action_gradients')
+
                     self.actor_gradients = tf.gradients(
                         self.output, self.network_params,
-                        self.action_gradients)
-                    # self.actor_gradients = list(
-                    #    map(
-                    #        lambda x: tf.div(x, self.batch_size),
-                    #        self.unnormalized_actor_gradients))
+                        -self.action_gradients)
+                    self.actor_gradients = list(
+                       map(
+                           lambda x: tf.div(x, self.batch_size),
+                           self.actor_gradients))
                     self.opt = tf.train.AdamOptimizer(
-                        -self.lr).apply_gradients(
+                        self.lr).apply_gradients(
                             zip(self.actor_gradients,
                                 self.network_params))
 
@@ -152,87 +156,59 @@ class Critic(AbstractActorCritic):
         act = tf.nn.relu
         l2_reg = tf.contrib.layers.l2_regularizer(scale=0.001)
 
-        with tf.variable_scope("critic", reuse=tf.AUTO_REUSE):
+        with tf.variable_scope("critic"):
             with tf.variable_scope("model"):
                 self.true_target_ph = tf.placeholder(
                     tf.float32, [None, 1],
                     name='true_target')
-
-                ##############################################
-                # STATE
-                ##############################################
-                with tf.variable_scope("state_input"):
-                    self.input_state_ph = tf.placeholder(
+                self.input_state_ph = tf.placeholder(
                         tf.float32, [None, self.observation_space.shape[0]],
                         name='state_input')
-                    h_state = None
-                    for i, nb_node in enumerate(layers[:-1]):
-                        prefix = str(nb_node)+"_"+str(i)
-                        h_state = tf.layers.dense(
-                            h_state if h_state is not None
-                            else self.input_state_ph,
-                            units=nb_node,
-                            activation=act,
-                            kernel_initializer=self.init_w_n,
-                            bias_initializer=self.init_b,
-                            name="dense_"+prefix)
-                        self._summary_layer("dense_"+prefix)
-                        if dropout is not 0:
-                            h_state = tf.nn.dropout(h_state, dropout)
-                        if batch_norm:
-                            h_state = tf.layers.batch_normalization(
-                                h_state,
-                                training=trainable,
-                                name="batch_norm_"+prefix)
-
-                ###############################################
-                # ACTION
-                ###############################################
-                with tf.variable_scope("action_input"):
-                    self.input_action_ph = tf.placeholder(
+                self.input_action_ph = tf.placeholder(
                         tf.float32, [None, self.action_space.shape[0]],
                         name='action_input')
 
-                with tf.variable_scope("merging"):
-                    h_action = tf.layers.dense(
-                        self.input_action_ph,
-                        layers[-1],
-                        kernel_initializer=self.init_w_n,
-                        name="dense_action_"+str(layers[-1]))
+                W1 = self._variable(
+                        [self.observation_space.shape[0], layers[0]],
+                        self.observation_space.shape[0], name="W1")
+                self.summary.append(tf.summary.histogram("layer1/weights", W1))
+                B1 = self._variable(
+                        [layers[0]],
+                        self.observation_space.shape[0], name="B1")
+                self.summary.append(tf.summary.histogram("layer1/biases", B1))
+                W2 = self._variable(
+                        [layers[0], layers[1]],
+                        layers[0] + self.action_space.shape[0], name="W2")
+                self.summary.append(tf.summary.histogram("layer2/weights", W2))
+                W2_action = self._variable(
+                    [self.action_space.shape[0], layers[1]],
+                    layers[0] + self.action_space.shape[0], name="W2_action")
+                self.summary.append(
+                    tf.summary.histogram("layer_action/weights", W2_action))
+                B2 = self._variable(
+                    [layers[1]],
+                    layers[0] + self.action_space.shape[0], name="B2")
+                self.summary.append(tf.summary.histogram("layer2/biases", B2))
+                W3 = tf.Variable(
+                    tf.random_uniform(
+                        [layers[1], 1],
+                        -3e-3,
+                        3e-3))
+                self.summary.append(tf.summary.histogram("layer3/weights", W3))
+                B3 = tf.Variable(
+                    tf.random_uniform(
+                        [1],
+                        -3e-3,
+                        3e-3), name="B3")
+                self.summary.append(tf.summary.histogram("layer3/biases", B3))
 
-                    h_state = tf.layers.dense(
-                        h_state,
-                        layers[-1],
-                        kernel_initializer=self.init_w_n,
-                        use_bias=False,
-                        name="dense_state_"+str(layers[-1]))
+                layer1 = act(tf.matmul(self.input_state_ph, W1) + B1)
+                layer2 = act(tf.matmul(layer1, W2) +
+                             tf.matmul(self.input_action_ph, W2_action) +
+                             B2)
+                self.Q = tf.identity(tf.matmul(layer2, W3) + B3)
 
-                with tf.variable_scope("Q_output"):
-                    merge = act(h_state + h_action)
-                    # merge = tf.layers.dense(merge, layers[-1],
-                    #                         activation=act,
-                    #                         kernel_initializer=self.init_w_n,
-                    #                         bias_initializer=self.init_b,
-                    #                         name="dense_"+str(layers[-1]))
-                    # self._summary_layer("dense_"+str(layers[-1]))
-                    if batch_norm:
-                        merge = tf.layers.batch_normalization(
-                            merge,
-                            training=trainable,
-                            name="batch_norm_merge")
-                    if dropout is not 0:
-                        merge = tf.nn.dropout(merge, dropout)
-
-                    self.Q = tf.layers.dense(merge, 1, activation=None,
-                                             kernel_initializer=self.init_w_u,
-                                             bias_initializer=self.init_b,
-                                             kernel_regularizer=l2_reg,
-                                             name="out")
-                    self._summary_layer("out")
-
-            self.network_params = tf.get_collection(
-                tf.GraphKeys.TRAINABLE_VARIABLES,
-                scope=self.scope+"/model")
+            self.network_params = [W1, B1, W2, W2_action, B2, W3, B3]
 
             if trainable:
                 with tf.variable_scope("gradients"):

@@ -49,7 +49,7 @@ class AC_Policy(AbstractInvertedPendulumEnv):
             self.use_matplotlib("Actor Critic algorithm")
 
         # Initialize global variables of the session
-        self.tf_session.run(tf.global_variables_initializer())
+        self.tf_session.run(tf.initialize_all_variables())
         self._update_target_network(just_copy=True)
 
     def __init_session__(self):
@@ -338,18 +338,18 @@ class AC_Policy(AbstractInvertedPendulumEnv):
                 self.render()
 
                 action = self.act(state)
+                print(action)
                 if j < self.params.noise_threshold_epoch:
                     action += self.noise() * noise_scale
                     action = np.clip(action, self.act_low, self.act_high)
 
                 new_state, reward, done, _ = self.env.step(action)
                 print("REWARD:", reward, "DONE:", done)
-                reward *= self.params.reward_multiply
 
                 # Put the current environment in the memory
                 # State interval is [-5;5] and action range is [-1;1]
                 self.memory.remember(state, action,
-                                     reward,
+                                     reward * self.params.reward_multiply,
                                      new_state, done)
 
                 # Don't train if there is not enough samples in the memory
@@ -373,12 +373,13 @@ class AC_Policy(AbstractInvertedPendulumEnv):
                                           weights_biases_actor_t,
                                           weights_biases_critic_t])
 
-                fetched_timeline = timeline.Timeline(
-                    self.run_metadata.step_stats)
-                chrome_trace = fetched_timeline.generate_chrome_trace_format()
+                # fetched_timeline = timeline.Timeline(
+                #     self.run_metadata.step_stats)
+                # chrome_trace = fetched_timeline.generate_chrome_trace_format()
 
-                with open('trace/timeline_%d.json' % i, 'w') as f:
-                    f.write(chrome_trace)
+                # with open('trace/timeline_%d.json' % i, 'w') as f:
+                #     f.write(chrome_trace)
+
                 if done:
                     break
 
