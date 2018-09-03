@@ -9,7 +9,7 @@ from ..models.actor_critic import Actor, Critic
 from ..utils.array_utils import fit_normalize
 from .abstract_inverted_pendulum import AbstractInvertedPendulumEnv
 from ..utils.noise import Noise
-from tensorflow.python.client import timeline
+# from tensorflow.python.client import timeline
 
 
 class AC_Policy(AbstractInvertedPendulumEnv):
@@ -338,13 +338,16 @@ class AC_Policy(AbstractInvertedPendulumEnv):
                 self.render()
 
                 action = self.act(state)
-                print(action)
+                print("ACTION:", action)
                 if j < self.params.noise_threshold_epoch:
                     action += self.noise() * noise_scale
                     action = np.clip(action, self.act_low, self.act_high)
+                print("ACTION WITH NOISE:", action)
 
                 new_state, reward, done, _ = self.env.step(action)
-                print("REWARD:", reward, "DONE:", done)
+                print("REWARD:", reward,
+                      "MULTIPLY:", self.params.reward_multiply,
+                      "DONE:", done)
 
                 # Put the current environment in the memory
                 # State interval is [-5;5] and action range is [-1;1]

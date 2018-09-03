@@ -98,13 +98,13 @@ class Actor(AbstractActorCritic):
                         [layers[1], self.action_space.shape[0]],
                         -3e-3,
                         3e-3), name="W3")
-                self.summary.append(tf.summary.histogram("layer3/weights", W3))
+                self.summary.append(tf.summary.histogram("output/weights", W3))
                 B3 = tf.Variable(
                     tf.random_uniform(
                         [self.action_space.shape[0]],
                         -3e-3,
                         3e-3), name="B3")
-                self.summary.append(tf.summary.histogram("layer3/biases", B3))
+                self.summary.append(tf.summary.histogram("output/biases", B3))
 
             layer1 = act(tf.matmul(self.input_ph, W1) + B1)
             layer2 = act(tf.matmul(layer1, W2) + B2)
@@ -193,7 +193,7 @@ class Critic(AbstractActorCritic):
                     tf.random_uniform(
                         [layers[1], 1],
                         -3e-3,
-                        3e-3))
+                        3e-3), name="W3")
                 self.summary.append(tf.summary.histogram("layer3/weights", W3))
                 B3 = tf.Variable(
                     tf.random_uniform(
