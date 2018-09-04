@@ -219,4 +219,4 @@ class Critic(AbstractActorCritic):
                     self.loss = tf.losses.mean_squared_error(
                         self.true_target_ph, self.Q)
                     self.opt = tf.train.AdamOptimizer(
-                        self.lr).minimize(self.loss)
+                        self.lr).minimize(self.loss / self.batch_size)
