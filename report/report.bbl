@@ -1,4 +1,4 @@
-\begin{thebibliography}{3}
+\begin{thebibliography}{4}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -28,5 +28,14 @@ Timothy~P. Lillicrap, Jonathan~J. Hunt, Alexander Pritzel, Nicolas Heess, Tom
 \newblock \emph{CoRR}, abs/1509.02971, 2015.
 \newblock URL
   \url{http://dblp.uni-trier.de/db/journals/corr/corr1509.html#LillicrapHPHETS15}.
+
+\bibitem[Teja et~al.(2018)Teja, Dewangan, Guhan, Sarkar, and
+  Krishna]{DBLP:journals/corr/abs-1801-10425}
+S.~Phani Teja, Parijat Dewangan, Pooja Guhan, Abhishek Sarkar, and K.~Madhava
+  Krishna.
+\newblock A deep reinforcement learning approach for dynamically stable inverse
+  kinematics of humanoid robots.
+\newblock \emph{CoRR}, abs/1801.10425, 2018.
+\newblock URL \url{http://arxiv.org/abs/1801.10425}.
 
 \end{thebibliography}

@@ -403,30 +403,34 @@ I present you below the structure of my project:
 .2 walk.
 .3 agents.
 .4 abstract\_env.py.
+.4 abstract\_humanoid.py.
+.4 abstract\_bipedal.py.
+.4 abstract\_inverted\_pendulum.py.
 .4 ac\_policy.py.
 .4 random\_policy.py.
 .3 models.
 .4 actor\_critic.py.
 .3 utils.
+.4 array\_utils.py.
 .4 board.py.
 .4 matplotboard.py.
 .4 memory.py.
 .4 noise.py.
-.4 params.py.
 .4 tensorboard.py.
 }
 
 In the \verb?agents? folder, the \verb?abstract_env.py? file is meant to be the
 super class of every policy I could implement, managing operation that every
 environment has to manage like instancing the plotting library or resetting the
-environment and its variables. In the \verb?models? folder, we have our actor
-and critic networks definitions. In the \verb?utils? folder, we have all classes
-used by our algorithm to make it work properly like visualization class, data
-structure and noise definition. The last thing I need to precise is that a lot
-of parameters in my program is written in \verb?params.json? and read at
-runtime. By this way, I can search for the good set of parameters without
-entering into the code. I will explain in section \ref{subsubsec:hp_params} this
-file precisely after my implementation description.
+environment and its variables. You can see I implemented the subclasses for the
+environment InvertedPendulum and BipedalWalker. In the \verb?models? folder, we
+have our actor and critic networks definitions. In the \verb?utils? folder, we
+have all classes used by our algorithm to make it work properly like
+visualization class, data structure and noise definition. The last thing I need
+to precise is that a lot of parameters in my program is written in
+\verb?params.json? and read at runtime. By this way, I can search for the good
+set of parameters without entering into the code. I will explain in section
+\ref{subsubsec:hp_params} this file precisely after my implementation description.
 
 \subsubsection{Replay buffer}
 
@@ -466,13 +470,10 @@ Tensorflow and it will be a good occasion to start to learn it.
 
 \paragraph{The Actor}
 
-The actor model is composed by fully-connected layers followed by Leaky Rectified
+The actor model is composed by fully-connected layers followed by Rectified
 Linear Unit activation function and then by batch normalization, because it
-gives better training speed and efficiency. Why Leaky ? Because the ReLU
-function is a function which makes weights equal to 0 when they are negative.
-The problem with that is that a lot of information can be forgotten and we then
-face a problem of dying neurons. The Leaky ReLU is less severe and defined as
-follow: $f(x) = max(x, \alpha*x)$ where $\alpha <= 1$. 
+gives better training speed and efficiency. The ReLU function is defined as
+follow: $f(x) = max(0, x)$. 
 The input is a shape of 44 float values for the state and the output is a shape
 of 17 float values activated by hyperbolic tangent because the range of the
 action values is equal to defintion range of the hyperbolic tangent, [-1, 1].
@@ -480,9 +481,9 @@ action values is equal to defintion range of the hyperbolic tangent, [-1, 1].
 \paragraph{The Critic}
 
 The critic model is composed by two inputs, one for the state and one for the
-action. The state input is followed by several dense layers activated by Leaky ReLU
-and batch normalization. The action input is concat just before the last layer
-of the state network. That layer is also followed by Leaky ReLU activation and
+action. The state input is followed by two dense layers activated by ReLU
+and batch normalization. The action input is concatenated just before the last layer
+of the state network. That layer is also followed by ReLU activation and
 batch normalization. These two layers is then added and followed by the output
 layer, a single-node one representing the Q-value of the state-action pair.
 
@@ -497,8 +498,14 @@ training and decrease variance of outputs.
 
 \paragraph{The Actor}
 
-To train the actor network, we must define operations capable of applying action
-gradients computed by critic network. I have three steps:
+To train the actor network, we must define operations capable of applying the
+sampled policy gradients computed by critic network. The mathematical term is:
+
+\begin{equation}
+\nabla_{\theta^{\mu}}J\approx\frac{1}{N}\sum_{i}\nabla_{\alpha}Q(s,a|\theta^{Q})|s=s_{i},a=\mu(s_{i})\nabla_{\theta^{\mu}\mu(s|\theta^{\mu})|s_{i}}
+\end{equation}
+
+For the implemenation, I have three steps:
 \begin{enumerate}
   
 \item Compute the gradients:
@@ -508,7 +515,7 @@ self.unnormalized_actor_gradients = tf.gradients(
 \end{lstlisting}
   
 \item Normalize with size of batches:
-  \begin{lstlisting}[language=Python]
+\begin{lstlisting}[language=Python]
 self.actor_gradients = list(
     map(
        lambda x: tf.div(x, self.batch_size),
@@ -517,8 +524,6 @@ self.actor_gradients = list(
   
 \item Applying gradients:
 \begin{lstlisting}[language=Python]
-self.network_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.scope+"/model")
-# ...
 self.opt = tf.train.AdamOptimizer(
     self.lr).apply_gradients(
         zip(self.actor_gradients, self.network_params))
@@ -529,7 +534,21 @@ self.opt = tf.train.AdamOptimizer(
 
 I defined training operations for the critic with a mean squared error loss
 function and the ADAM optimizer, with learning rate defined in parameters and
-minimizing the loss.
+minimizing the loss. Since the learning is on batch and the environment
+constantly evolving, I need to divide the loss by the size of the batch before
+back-propagation. The formula is defined as follow:
+
+\begin{equation}
+L = \frac{1}{N}\sum_{i}(y_{i}-Q(s_{i},a_{i}|\theta^{\mu}))^{2}
+\end{equation}
+
+with $N$ the size of the batch. The difficulty in my implementation comes a lot
+from that formula because I thought the function in Tensorflow who compute the
+mean squared error computed exactly this formula but I noticed that it sums
+without divided by the batch size. The loss was still decreasing so it misguided
+me and when I added the division, the loss was increasing but the reward as
+well. It is normal to see the loss increasing since the environment is moving as
+we go along with the training.
 
 \paragraph{Process}
 Here comes the salt and pepper of Deep Deterministic Policy Gradients. I need
@@ -641,9 +660,15 @@ Here is the main loop of the program:
 
 \begin{lstlisting}[language=Python]
 for j in range(self.params.epochs):
+
+    noise_scale = (self.params.initial_noise_scale *
+               self.params.noise_decay ** j) * (
+                   self.act_high - self.act_low)
+
     action = self.act(state)
     if self.params.noisy and j < self.params.noise_threshold:
-        action += self.noise()
+        action += self.noise() * noise_scale
+        action = np.clip(action, self.act_low, self.act_high)
 
     new_state, reward, done, info = self.env.step(action)
 
@@ -687,7 +712,8 @@ which corresponds to around 50 epochs. Removing that noise at this moment does
 not removing the loss decreasing, as shown in the Fig. \ref{fig:noise_cancellation}.
 
 \begin{figure}[ht]
-  \includegraphics[width=1.\textwidth]{noise_cancellation}
+  \centering
+  \includegraphics[width=.5\textwidth]{noise_cancellation}
   \caption{The light blue line is the run with noise removed at step 50, and the
   dark blue is with noise always added.}
   \label{fig:noise_cancellation}
@@ -698,6 +724,18 @@ will keep adding noise until some convergence starts to occur. In the later
 work, I won't keep a good eye on the loss of the critic. The study of the noise
 addition makes me think that it is normal if the loss is increasing, since the
 environment is moving and the reward more and more difficult to compute.
+However, I added noise decay to decrease the noise over time. Since the agent
+learn over time, it should not need as mush noise as the beggining to learn a
+good policy. For that, I am scaling the noise with the a scale computed by the
+follwing formula:
+
+\begin{equation}
+NS = (I * \alpha^{t}) * (high - low) 
+\end{equation}
+
+, $I$ being the initial noise scale gave in parameters, $\alpha^{t}$ the noise
+decay factor ponderate over time and everything is scaled by the bound of
+actions.
 
 \subsubsection{Network definition} 
 
@@ -705,12 +743,11 @@ environment is moving and the reward more and more difficult to compute.
 Thanks to the architecture of my code, I am able to change the model of the networks easyly so I
 tuned these parameter a lot. A lot of paper written about DDPG \cite{journals/corr/LillicrapHPHETS15}
 \cite{DBLP:journals/corr/abs-1801-10425} used layers of 400 and 300 units with action added at the second
-layer in the critic networkd. I then decided to follow that benchmark since it gave good results with
+layer in the critic network. I then decided to follow that benchmark since it gave good results with
 a lot of environment. In order to have a learning more efficient and to see how a modification would effect,
 I changed the depth or the number of units. I found out that decreasing the number of units doesn't affect
-the quality of the learning but decrease the speed and building the networks deeper make the critic loss
-diverges very fast. I also add L2 weight deway to the critic network to
-stabilize the learning.
+the quality of the learning but decreases the speed and building the networks deeper make the critic loss
+diverges very fast.
 
 \subsubsection{Hyper Parameters}
 \label{subsubsec:hp_params}
@@ -734,9 +771,14 @@ training.
       noisy & Add noise to action outputs & \verb?true? \\
       load\_weights & Load previously saved weights & \verb?false? \\
       batch\_size & Number of samples to train from the momery & 128 \\
-      epochs & Number of epochs & 100 \\
-      pass\_per\_epoch & Number of action during one epoch & 200 \\ 
-      noise\_threshold & At which epochs the program stops adding noise to actions & 75 \\
+      epochs & Number of epochs & 10000 \\
+      steps & Number of action during one epoch & 100 \\ 
+      noise\_threshold & At which epochs the program stops adding noise to actions & 500 \\
+      warm\_up\_step & Epoch to wait before training & 128 \\
+      sigma & Used in the computation of noise, representing the variance & 0.2 \\
+      theta & Used in the computation of noise, representing the center & 0.15 \\
+      initial\_noise\_scale & the initial noise scale used in the computation of noise decay & 0.1 \\
+      noise\_decay & The noise decay factor & 0.99 \\
       actor\_learning\_rate & Learning rate for the actor & 0.0001 \\
       critic\_learning\_rate & Learning rate for the critic & 0.001 \\
       actor\_batch\_norm & Add batch normalization after dense layers of the actor network & \verb?true? \\
@@ -764,40 +806,22 @@ training.
 Before validating the model, I wanted to make sure the way I implemented Deep
 Deterministic Policy Gradients was correct. I then try to perform it on a
 simpler environment such as
-MountainCarContinous\footnote{\url{https://github.com/openai/gym/wiki/MountainCarContinuous-v0}}
-environment. The goal of that environment is a car who has to climb a mountain
-with a low power acceleration. To tackle that problem, the car has to learn to
-gain the potential energy from the mountain on its back in order to have enough
-speed to reach the goal on top of the mountain on its front. Understanding that
-make me aware that it will not reach the goal during that training because the
-challenge in that environment is too design a good exploration process, and I
-don't think the Ornstein-Uhlenbeck noise will suit that requirement.
+Pendulum\footnote{\url{https://github.com/openai/gym/wiki/Pendulum-v0}}
+environment. The goal of that environment is to make the pendulum standing up in
+balance. My network succeed to make the pendulum stay as shown in the Fig. \ref{fig:result_pendulum}.
 
 \begin{figure}[ht]
-  \begin{subfigure}[t]{.5\textwidth}
-    \centering
-    \includegraphics[width=1.\textwidth]{critic_mountain}
-    \caption{Critic loss}
-    \label{fig:criticlossmountain}
-  \end{subfigure}%
-  ~
-  \begin{subfigure}[t]{.5\textwidth}
-    \centering
-    \includegraphics[width=1.\textwidth]{avg_reward_mountain}
-    \caption{Average reward}
-    \label{fig:avgrewardmountain}
-  \end{subfigure}
-  \caption{Training of MountainCarContinuous environments}
-  \label{fig:mountaincartrain}
+  \centering
+  \includegraphics[width=.5\textwidth]{avg_per_episode_pendulum}
+  \caption{Results of pendulum environment}
+  \label{fig:result_pendulum}
 \end{figure}
 
 \paragraph{}
-The fig. \ref{fig:mountaincartrain} shows that it learns the right first steps
-and then the loss diverges and the reward never increases, showing that the
-noise process is either not noisy enough, or not enough suited to the environment.
-Since I just want to validate the algorithm and not the model, the fact that
-loss of the critic network is decreasing and the average reward is increasing
-the first 1000 epochs shows that my model is able to learn.
+It shows the pendulum learn a good policy, the rewards is going up to converge
+at 4000 epochs. The rewards is defined in the range -inf to 0 so it is totally
+normal that the graph never shows a positive reward. In the render, the pendulum
+runs-up and when it is up, it keeps the position until the end of 100 epochs.
 
 \paragraph{}
 About validating the model, I designed it in tensorflow and plot in TensorBoard
@@ -813,28 +837,6 @@ in order to check its structure.
 We can see in the fig. \ref{fig:softtargetgraph} the operations which handle the
 soft target update from networks to target networks.
 
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width=.5\textwidth]{critic_graph}
-  \caption{Critic network graph}
-  \label{fig:criticgraph}
-\end{figure}
-
-The fig. \ref{fig:criticgraph} shows the model of the critic network. This is
-the model I use for validating my results but I can easily add from hyper
-parameters new layers, batch normalization or dropout operations, but the action
-will always be added just before the last layer.
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width=.5\textwidth]{actor_graph}
-  \caption{Actor network graph}
-  \label{fig:actorgraph}
-\end{figure}
-
-The fig. \ref{fig:actorgraph} shows the model of the actor network. As critic
-networks, the model is easily customizable and looking a lot like critic model.
-
 \subsubsection{Tweaking the model}
 \paragraph{}
 
@@ -846,9 +848,10 @@ to see how well it will performed without it. For dropout layer, I don't think
 forgetting some informations is a good trick to tackle that kind of problem
 because usually, this technique is used to prevent overfitting. Since DDPG is a
 deterministic policy, I don't think overfitting will be a crucial issue but it
-could help to not ave Q output in a local maxima.
+could help to not have the Q output in a local maxima.
 
 \subsubsection{Evaluation}
+
 
 
 \subsection{Justification}
@@ -865,7 +868,7 @@ scientific paper on that subject. I then started my implementation starting by t
 and then the DDPG algorithm itself. I added soft target update and noise addition after. Seeing
 that results was not good and resolving coding mistakes (which took me a lot of time as Tensorflow
 was new to me), I started to read more scientific paper and tried their results with their model
-architecture and their parameters. My agent started to started to learn how to
+architecture and their parameters. My agent started to learn how to
 stand but not how to walk, and it could be for two reasons: either in some ways
 I have a problem in my implementation of DDPG and the update of my gradients,
 either it must take time a lot of time (the time of the longest training I

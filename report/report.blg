@@ -3,46 +3,44 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: report.aux
 The style file: plainnat.bst
 Database file #1: report.bib
-Warning--I didn't find a database entry for "DBLP:journals/corr/abs-1801-10425"
-You've used 3 entries,
+You've used 4 entries,
             2773 wiz_defined-function locations,
-            613 strings with 5725 characters,
-and the built_in function-call counts, 1885 in all, are:
-= -- 144
-> -- 189
+            618 strings with 5966 characters,
+and the built_in function-call counts, 2416 in all, are:
+= -- 188
+> -- 237
 < -- 0
-+ -- 63
-- -- 60
-* -- 177
-:= -- 313
-add.period$ -- 11
-call.type$ -- 3
-change.case$ -- 29
-chr.to.int$ -- 3
-cite$ -- 6
-duplicate$ -- 60
-empty$ -- 106
-format.name$ -- 63
-if$ -- 373
++ -- 79
+- -- 75
+* -- 226
+:= -- 402
+add.period$ -- 15
+call.type$ -- 4
+change.case$ -- 37
+chr.to.int$ -- 4
+cite$ -- 8
+duplicate$ -- 80
+empty$ -- 137
+format.name$ -- 79
+if$ -- 479
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 2
-newline$ -- 24
-num.names$ -- 12
-pop$ -- 61
+missing$ -- 3
+newline$ -- 30
+num.names$ -- 16
+pop$ -- 74
 preamble$ -- 1
-purify$ -- 26
+purify$ -- 33
 quote$ -- 0
-skip$ -- 57
+skip$ -- 75
 stack$ -- 0
-substring$ -- 6
-swap$ -- 5
+substring$ -- 8
+swap$ -- 6
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 33
+type$ -- 44
 warning$ -- 0
-while$ -- 9
+while$ -- 12
 width$ -- 0
-write$ -- 47
-(There was 1 warning)
+write$ -- 62

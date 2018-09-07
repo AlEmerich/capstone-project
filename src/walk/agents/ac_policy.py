@@ -7,12 +7,12 @@ import numpy as np
 from ..utils.memory import Memory
 from ..models.actor_critic import Actor, Critic
 from ..utils.array_utils import fit_normalize
-from .abstract_inverted_pendulum import AbstractInvertedPendulumEnv
+from .abstract_humanoid import AbstractHumanoidEnv
 from ..utils.noise import Noise
 # from tensorflow.python.client import timeline
 
 
-class AC_Policy(AbstractInvertedPendulumEnv):
+class AC_Policy(AbstractHumanoidEnv):
     """Actor critic agent. Implements DDPG algorithm from
     https://arxiv.org/pdf/1509.02971v5.pdf.
     """
@@ -32,6 +32,10 @@ class AC_Policy(AbstractInvertedPendulumEnv):
         self.actor_file = "actor"
         self.critic_file = "critic"
         self.scale = np.vectorize(fit_normalize)
+
+        self.decaying_noise = True
+        if not self.params.initial_noise_scale or not self.params.noise_decay:
+            self.decaying_noise = False
 
         self.__init_networks__()
 
@@ -327,12 +331,13 @@ class AC_Policy(AbstractInvertedPendulumEnv):
             if self.params.reset or state is None:
                 state = self.reset()
 
-            noise_scale = (self.params.initial_noise_scale *
-                           self.params.noise_decay ** j) * (
-                               self.act_high - self.act_low)
+            if self.decaying_noise:
+                noise_scale = (self.params.initial_noise_scale *
+                               self.params.noise_decay ** j) * (
+                                   self.act_high - self.act_low)
 
             for i in range(self.params.steps):
-                print("EPOCH:", j, "STEP:", i, "NOISE DECAY:", noise_scale)
+                print("EPOCH:", j, "STEP:", i)
 
                 # Render the environment
                 self.render()
@@ -340,7 +345,10 @@ class AC_Policy(AbstractInvertedPendulumEnv):
                 action = self.act(state)
                 print("ACTION:", action)
                 if j < self.params.noise_threshold_epoch:
-                    action += self.noise() * noise_scale
+                    if self.decaying_noise:
+                        action += self.noise() * noise_scale
+                    else:
+                        action += self.noise()
                     action = np.clip(action, self.act_low, self.act_high)
                 print("ACTION WITH NOISE:", action)
 

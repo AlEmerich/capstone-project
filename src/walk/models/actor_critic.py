@@ -106,10 +106,16 @@ class Actor(AbstractActorCritic):
                         3e-3), name="B3")
                 self.summary.append(tf.summary.histogram("output/biases", B3))
 
-            layer1 = act(tf.matmul(self.input_ph, W1) + B1)
-            layer2 = act(tf.matmul(layer1, W2) + B2)
-            self.output = output_act(tf.matmul(layer2, W3) + B3)
-
+            if not batch_norm:
+                layer1 = act(tf.matmul(self.input_ph, W1) + B1)
+                layer2 = act(tf.matmul(layer1, W2) + B2)
+                self.output = output_act(tf.matmul(layer2, W3) + B3)
+            else:
+                layer1 = act(tf.matmul(self.input_ph, W1) + B1)
+                bn1 = tf.layers.batch_normalization(layer1)
+                layer2 = act(tf.matmul(bn1, W2) + B2)
+                bn2 = tf.layers.batch_normalization(layer2)
+                self.output = output_act(tf.matmul(bn2, W3) + B3)
             self.network_params = [W1, B1, W2, B2, W3, B3]
 
             if trainable:
@@ -202,11 +208,20 @@ class Critic(AbstractActorCritic):
                         3e-3), name="B3")
                 self.summary.append(tf.summary.histogram("layer3/biases", B3))
 
-                layer1 = act(tf.matmul(self.input_state_ph, W1) + B1)
-                layer2 = act(tf.matmul(layer1, W2) +
-                             tf.matmul(self.input_action_ph, W2_action) +
-                             B2)
-                self.Q = tf.identity(tf.matmul(layer2, W3) + B3)
+                if not batch_norm:
+                    layer1 = act(tf.matmul(self.input_state_ph, W1) + B1)
+                    layer2 = act(tf.matmul(layer1, W2) +
+                                 tf.matmul(self.input_action_ph, W2_action) +
+                                 B2)
+                    self.Q = tf.identity(tf.matmul(layer2, W3) + B3)
+                else:
+                    layer1 = act(tf.matmul(self.input_state_ph, W1) + B1)
+                    bn1 = tf.layers.batch_normalization(layer1)
+                    layer2 = act(tf.matmul(bn1, W2) +
+                                 tf.matmul(self.input_action_ph, W2_action) +
+                                 B2)
+                    bn2 = tf.layers.batch_normalization(layer2)
+                    self.Q = tf.identity(tf.matmul(bn2, W3) + B3)
 
             self.network_params = [W1, B1, W2, W2_action, B2, W3, B3]
 
@@ -217,6 +232,6 @@ class Critic(AbstractActorCritic):
 
                 with tf.variable_scope("train"):
                     self.loss = tf.losses.mean_squared_error(
-                        self.true_target_ph, self.Q)
+                        self.true_target_ph, self.Q) / self.batch_size
                     self.opt = tf.train.AdamOptimizer(
-                        self.lr).minimize(self.loss / self.batch_size)
+                        self.lr).minimize(self.loss)
