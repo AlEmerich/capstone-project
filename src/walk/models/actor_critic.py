@@ -231,7 +231,7 @@ class Critic(AbstractActorCritic):
                         self.Q, self.input_action_ph, name="action_gradients")
 
                 with tf.variable_scope("train"):
-                    self.loss = tf.losses.mean_squared_error(
-                        self.true_target_ph, self.Q) # / self.batch_size
+                    self.loss = tf.reduce_mean(tf.squared_difference((
+                        self.true_target_ph, self.Q)))
                     self.opt = tf.train.AdamOptimizer(
                         self.lr).minimize(self.loss)
