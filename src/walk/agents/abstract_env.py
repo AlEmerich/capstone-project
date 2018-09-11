@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from collections import namedtuple
 import os
 import sys
+import json
 import datetime
 
 
@@ -38,6 +39,11 @@ class AbstractEnv(ABC):
             os.makedirs(r_path)
         return r_path
 
+    def _save_params_info(self, path):
+        if os.path.exists(path):
+            with open('params.json', 'w') as f:
+                json.dump(self.params._asdict(), f)
+        
     @abstractmethod
     def plotting(self, **kwargs):
         pass

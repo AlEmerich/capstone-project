@@ -127,10 +127,10 @@ class Actor(AbstractActorCritic):
                     self.actor_gradients = tf.gradients(
                         self.output, self.network_params,
                         -self.action_gradients)
-                    self.actor_gradients = list(
-                       map(
-                           lambda x: tf.div(x, self.batch_size),
-                           self.actor_gradients))
+                    # self.actor_gradients = list(
+                    #    map(
+                    #        lambda x: tf.div(x, self.batch_size),
+                    #        self.actor_gradients))
                     self.opt = tf.train.AdamOptimizer(
                         self.lr).apply_gradients(
                             zip(self.actor_gradients,
@@ -232,6 +232,6 @@ class Critic(AbstractActorCritic):
 
                 with tf.variable_scope("train"):
                     self.loss = tf.losses.mean_squared_error(
-                        self.true_target_ph, self.Q) / self.batch_size
+                        self.true_target_ph, self.Q) # / self.batch_size
                     self.opt = tf.train.AdamOptimizer(
                         self.lr).minimize(self.loss)

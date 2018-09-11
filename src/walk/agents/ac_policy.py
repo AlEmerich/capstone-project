@@ -22,6 +22,9 @@ class AC_Policy(AbstractHumanoidEnv):
         the network.
         """
         super(AC_Policy, self).__init__(args, name_run)
+        
+        self._save_params_info(self.saved_folder)
+
         self.memory = Memory()
 
         self.__init_session__()
