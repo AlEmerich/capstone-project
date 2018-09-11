@@ -127,10 +127,9 @@ class Actor(AbstractActorCritic):
                     self.actor_gradients = tf.gradients(
                         self.output, self.network_params,
                         -self.action_gradients)
-                    # self.actor_gradients = list(
-                    #    map(
-                    #        lambda x: tf.div(x, self.batch_size),
-                    #        self.actor_gradients))
+                    self.actor_gradients = tf.div(
+                        self.actor_gradients,
+                        tf.constant(self.batch_size, dtype=tf.float32))
                     self.opt = tf.train.AdamOptimizer(
                         self.lr).apply_gradients(
                             zip(self.actor_gradients,
