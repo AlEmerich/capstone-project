@@ -106,17 +106,17 @@ class Actor(AbstractActorCritic):
                         3e-3), name="B3")
                 self.summary.append(tf.summary.histogram("output/biases", B3))
 
-            if not batch_norm:
-                layer1 = act(tf.matmul(self.input_ph, W1) + B1)
-                layer2 = act(tf.matmul(layer1, W2) + B2)
-                self.output = output_act(tf.matmul(layer2, W3) + B3)
-            else:
-                layer1 = act(tf.matmul(self.input_ph, W1) + B1)
-                bn1 = tf.layers.batch_normalization(layer1)
-                layer2 = act(tf.matmul(bn1, W2) + B2)
-                bn2 = tf.layers.batch_normalization(layer2)
-                self.output = output_act(tf.matmul(bn2, W3) + B3)
-            self.network_params = [W1, B1, W2, B2, W3, B3]
+                if not batch_norm:
+                    layer1 = act(tf.matmul(self.input_ph, W1) + B1)
+                    layer2 = act(tf.matmul(layer1, W2) + B2)
+                    self.output = output_act(tf.matmul(layer2, W3) + B3)
+                else:
+                    layer1 = act(tf.matmul(self.input_ph, W1) + B1)
+                    bn1 = tf.layers.batch_normalization(layer1)
+                    layer2 = act(tf.matmul(bn1, W2) + B2)
+                    bn2 = tf.layers.batch_normalization(layer2)
+                    self.output = output_act(tf.matmul(bn2, W3) + B3)
+                self.network_params = [W1, B1, W2, B2, W3, B3]
 
             if trainable:
                 with tf.variable_scope("train"):
@@ -127,9 +127,10 @@ class Actor(AbstractActorCritic):
                     self.actor_gradients = tf.gradients(
                         self.output, self.network_params,
                         -self.action_gradients)
-                    self.actor_gradients = tf.div(
-                        self.actor_gradients,
-                        tf.constant(self.batch_size, dtype=tf.float32))
+                    self.actor_gradients = list(
+                        map(lambda x: tf.div(
+                            x, self.batch_size),
+                            self.actor_gradients))
                     self.opt = tf.train.AdamOptimizer(
                         self.lr).apply_gradients(
                             zip(self.actor_gradients,
@@ -230,7 +231,7 @@ class Critic(AbstractActorCritic):
                         self.Q, self.input_action_ph, name="action_gradients")
 
                 with tf.variable_scope("train"):
-                    self.loss = tf.reduce_mean(tf.squared_difference((
-                        self.true_target_ph, self.Q)))
+                    self.loss = tf.reduce_mean(tf.squared_difference(
+                        self.true_target_ph, self.Q))
                     self.opt = tf.train.AdamOptimizer(
                         self.lr).minimize(self.loss)

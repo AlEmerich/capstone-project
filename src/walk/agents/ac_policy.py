@@ -4,9 +4,9 @@ https://arxiv.org/pdf/1607.07086.pdf
 import os
 import tensorflow as tf
 import numpy as np
+from ..utils.array_utils import scale
 from ..utils.memory import Memory
 from ..models.actor_critic import Actor, Critic
-from ..utils.array_utils import fit_normalize
 from .abstract_humanoid import AbstractHumanoidEnv
 from ..utils.noise import Noise
 # from tensorflow.python.client import timeline
@@ -22,7 +22,7 @@ class AC_Policy(AbstractHumanoidEnv):
         the network.
         """
         super(AC_Policy, self).__init__(args, name_run)
-        
+
         self._save_params_info(self.saved_folder)
 
         self.memory = Memory()
@@ -34,7 +34,6 @@ class AC_Policy(AbstractHumanoidEnv):
                            theta=self.params.theta)
         self.actor_file = "actor"
         self.critic_file = "critic"
-        self.scale = np.vectorize(fit_normalize)
 
         self.decaying_noise = True
         if not self.params.initial_noise_scale or not self.params.noise_decay:
@@ -56,7 +55,7 @@ class AC_Policy(AbstractHumanoidEnv):
             self.use_matplotlib("Actor Critic algorithm")
 
         # Initialize global variables of the session
-        self.tf_session.run(tf.initialize_all_variables())
+        self.tf_session.run(tf.global_variables_initializer())
         self._update_target_network(just_copy=True)
 
     def __init_session__(self):
@@ -216,8 +215,7 @@ class AC_Policy(AbstractHumanoidEnv):
                 feed_dict={
                     self.target_actor_model.input_ph: next_states
                 })
-            next_actions = self.scale(next_actions, self.act_low,
-                                      self.act_high)
+            next_actions = scale(next_actions, self.act_low, self.act_high)
 
             # Compute the Q+1 value with next s+1 and a+1
             Q_next = self.tf_run_op(
@@ -240,11 +238,11 @@ class AC_Policy(AbstractHumanoidEnv):
                         self.critic_model.true_target_ph: expected_reward
                     })
 
-            act_for_grad = self.tf_run_op(
+            act_for_grad = scale(self.tf_run_op(
                 self.actor_model.output,
                 feed_dict={
                     self.actor_model.input_ph: states
-                })
+                }), self.act_low, self.act_high)
 
             action_gradient = self.tf_run_op(
                 self.critic_model.action_gradients,
@@ -299,8 +297,8 @@ class AC_Policy(AbstractHumanoidEnv):
         # Predict action from state
         reshaped_state = state.reshape(1, self.env.observation_space.shape[0])
         feed = {self.actor_model.input_ph: reshaped_state}
-        actions = self.tf_run_op(self.actor_model.output, feed)[0]
-        return self.scale(actions, self.act_low, self.act_high)
+        return scale(self.tf_run_op(self.actor_model.output, feed)[0],
+                     self.act_low, self.act_high)
 
     def reset(self):
         super(AC_Policy, self).reset()
