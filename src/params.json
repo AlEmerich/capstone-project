@@ -1,1 +1,29 @@
-{"sigma": 0.2, "load_weights": null, "dropout": 0, "epochs": 10000, "device": "gpu", "tau": 0.01, "actor_learning_rate": 0.0001, "actor_layers": [400, 300], "noise_decay": 0.9, "gamma": 0.99, "plot": "tensorflow", "critic_batch_norm": false, "render": false, "noise_threshold_epoch": 20, "warm_up_step": 64, "reward_multiply": 1, "initial_noise_scale": 0.1, "train": true, "batch_size": 64, "critic_layers": [400, 300], "reset": true, "steps": 100, "theta": 0.15, "critic_learning_rate": 0.001, "actor_batch_norm": false}
+{
+    "device": "gpu",
+    "reset": true,
+    "render": false,
+    "plot": "tensorflow",
+    "train": true,
+    "load_weights": null,
+
+    "batch_size": 64,
+    "epochs": 10000,
+    "steps": 200,
+    "noise_threshold_epoch": 200,
+    "warm_up_step": 64,
+    "sigma": 0.2,
+    "theta": 0.15,
+    "initial_noise_scale": null,
+    "noise_decay": null,
+
+    "actor_learning_rate": 0.0001,
+    "critic_learning_rate": 0.001,
+    "actor_batch_norm": false,
+    "critic_batch_norm": false,
+    "tau": 0.001,
+    "gamma": 0.99,
+    "actor_layers": [400, 300],
+    "critic_layers": [400, 300],
+    "reward_multiply": 1,
+    "dropout": 0
+}
