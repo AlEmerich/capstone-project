@@ -41,9 +41,9 @@ class AbstractEnv(ABC):
 
     def _save_params_info(self, path):
         if os.path.exists(path):
-            with open('params.json', 'w') as f:
+            with open(path+'params.json', 'w') as f:
                 json.dump(self.params._asdict(), f)
-        
+
     @abstractmethod
     def plotting(self, **kwargs):
         pass
