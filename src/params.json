@@ -1,29 +1,37 @@
 {
     "device": "gpu",
-    "reset": true,
-    "render": false,
     "plot": "tensorflow",
+    "render": false,
+    "reset": true,
     "train": true,
     "load_weights": null,
 
-    "batch_size": 64,
     "epochs": 10000,
     "steps": 200,
-    "noise_threshold_epoch": 200,
+    "batch_size": 64,
     "warm_up_step": 64,
-    "sigma": 0.2,
-    "theta": 0.15,
-    "initial_noise_scale": null,
-    "noise_decay": null,
 
-    "actor_learning_rate": 0.0001,
-    "critic_learning_rate": 0.001,
+    "actor_layers": [
+        400,
+        300
+    ],
+    "critic_layers": [
+        400,
+        300
+    ],
     "actor_batch_norm": false,
     "critic_batch_norm": false,
-    "tau": 0.001,
+    "actor_learning_rate": 0.0001,
+    "critic_learning_rate": 0.001,
     "gamma": 0.99,
-    "actor_layers": [400, 300],
-    "critic_layers": [400, 300],
+    "dropout": 0,
+
+    "initial_noise_scale": null,
+    "noise_threshold_epoch": 200,
+    "noise_decay": null,
+
     "reward_multiply": 1,
-    "dropout": 0
+    "sigma": 0.2,
+    "tau": 0.001,
+    "theta": 0.15
 }
