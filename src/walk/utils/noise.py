@@ -8,7 +8,8 @@ class Noise:
     """Implements the Ornstein-Uhlenbeck noise to add to the output
     of the policy network.
     """
-    def __init__(self, mu, sigma=0.1, theta=.15, dt=1e-2, x0=None):
+    def __init__(self, mu, sigma=0.1, theta=.15,
+                 dt=1e-2, x0=None):
         """Initiliaze parameters mu, sigma, theta, dt and x0."""
         self.theta = theta
         self.mu = mu

@@ -332,13 +332,13 @@ class AC_Policy(AbstractHumanoidEnv):
             if self.params.reset or state is None:
                 state = self.reset()
 
-            if self.decaying_noise:
-                noise_scale = (self.params.initial_noise_scale *
-                               self.params.noise_decay ** j) * (
-                                   self.act_high - self.act_low)
-
             for i in range(self.params.steps):
                 print("EPOCH:", j, "STEP:", i)
+
+                if self.decaying_noise:
+                    noise_scale = (self.params.initial_noise_scale *
+                                   self.params.noise_decay ** i) * (
+                                       self.act_high - self.act_low)
 
                 # Render the environment
                 self.render()
