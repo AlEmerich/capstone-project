@@ -29,9 +29,14 @@ class AbstractActorCritic(ABC):
 
         self.summary = []
 
-    def _variable(self, shape, dim, name):
-        return tf.Variable(tf.random_uniform(
-            shape, -1/math.sqrt(dim), 1/math.sqrt(dim)), name=name)
+    def _variable(self, name, shape, dim, reg=None):
+        return tf.get_variable(
+            name=name,
+            initializer=tf.random_uniform(
+                shape,
+                -1/math.sqrt(dim), 1/math.sqrt(dim)),
+            regularizer=reg
+        )
 
     def _summary_layer(self, name):
         scope = tf.get_variable_scope().name
@@ -69,7 +74,6 @@ class Actor(AbstractActorCritic):
 
         act = tf.nn.relu
         output_act = tf.nn.tanh
-        # l2_reg = tf.contrib.layers.l2_regularizer(scale=0.001)
 
         with tf.variable_scope("actor"):
             with tf.variable_scope("model"):
@@ -78,32 +82,44 @@ class Actor(AbstractActorCritic):
                     name='state_input')
 
                 W1 = self._variable(
+                    "W1",
                     [self.observation_space.shape[0], layers[0]],
-                    self.observation_space.shape[0], name="W1")
+                    self.observation_space.shape[0]
+                )
                 self.summary.append(tf.summary.histogram("layer1/weights", W1))
                 B1 = self._variable(
+                    "B1",
                     [layers[0]],
-                    self.observation_space.shape[0], name="B1")
+                    self.observation_space.shape[0],
+                )
                 self.summary.append(tf.summary.histogram("layer1/biases", B1))
                 W2 = self._variable(
+                    "W2",
                     [layers[0], layers[1]],
-                    layers[0], name="W2")
+                    layers[0]
+                )
                 self.summary.append(tf.summary.histogram("layer2/weights", W2))
                 B2 = self._variable(
+                    "B2",
                     [layers[1]],
-                    layers[0], name="B2")
+                    layers[0]
+                )
                 self.summary.append(tf.summary.histogram("layer2/biases", B2))
-                W3 = tf.Variable(
-                    tf.random_uniform(
+                W3 = tf.get_variable(
+                    "W3",
+                    initializer=tf.random_uniform(
                         [layers[1], self.action_space.shape[0]],
                         -3e-3,
-                        3e-3), name="W3")
+                        3e-3)
+                )
                 self.summary.append(tf.summary.histogram("output/weights", W3))
-                B3 = tf.Variable(
-                    tf.random_uniform(
+                B3 = tf.get_variable(
+                    "B3",
+                    initializer=tf.random_uniform(
                         [self.action_space.shape[0]],
                         -3e-3,
-                        3e-3), name="B3")
+                        3e-3)
+                )
                 self.summary.append(tf.summary.histogram("output/biases", B3))
 
                 if not batch_norm:
@@ -175,37 +191,55 @@ class Critic(AbstractActorCritic):
                         name='action_input')
 
                 W1 = self._variable(
-                        [self.observation_space.shape[0], layers[0]],
-                        self.observation_space.shape[0], name="W1")
+                    "W1",
+                    [self.observation_space.shape[0], layers[0]],
+                    self.observation_space.shape[0],
+                    reg=l2_reg
+                )
                 self.summary.append(tf.summary.histogram("layer1/weights", W1))
                 B1 = self._variable(
-                        [layers[0]],
-                        self.observation_space.shape[0], name="B1")
+                    "B1",
+                    [layers[0]],
+                    self.observation_space.shape[0],
+                )
                 self.summary.append(tf.summary.histogram("layer1/biases", B1))
                 W2 = self._variable(
-                        [layers[0], layers[1]],
-                        layers[0] + self.action_space.shape[0], name="W2")
+                    "W2",
+                    [layers[0], layers[1]],
+                    layers[0] + self.action_space.shape[0],
+                    reg=l2_reg
+                )
                 self.summary.append(tf.summary.histogram("layer2/weights", W2))
                 W2_action = self._variable(
+                    "W2_action",
                     [self.action_space.shape[0], layers[1]],
-                    layers[0] + self.action_space.shape[0], name="W2_action")
+                    layers[0] + self.action_space.shape[0],
+                    reg=l2_reg
+                )
                 self.summary.append(
                     tf.summary.histogram("layer_action/weights", W2_action))
                 B2 = self._variable(
+                    "B2",
                     [layers[1]],
-                    layers[0] + self.action_space.shape[0], name="B2")
+                    layers[0] + self.action_space.shape[0],
+                )
                 self.summary.append(tf.summary.histogram("layer2/biases", B2))
-                W3 = tf.Variable(
-                    tf.random_uniform(
+                W3 = tf.get_variable(
+                    "W3",
+                    initializer=tf.random_uniform(
                         [layers[1], 1],
                         -3e-3,
-                        3e-3), name="W3")
+                        3e-3),
+                    regularizer=l2_reg
+                )
                 self.summary.append(tf.summary.histogram("layer3/weights", W3))
-                B3 = tf.Variable(
-                    tf.random_uniform(
+                B3 = tf.get_variable(
+                    "B3",
+                    initializer=tf.random_uniform(
                         [1],
                         -3e-3,
-                        3e-3), name="B3")
+                        3e-3)
+                )
                 self.summary.append(tf.summary.histogram("layer3/biases", B3))
 
                 if not batch_norm:
@@ -232,6 +266,7 @@ class Critic(AbstractActorCritic):
 
                 with tf.variable_scope("train"):
                     self.loss = tf.div(tf.reduce_mean(tf.squared_difference(
-                        self.true_target_ph, self.Q)), self.batch_size)
+                        self.true_target_ph, self.Q)), self.batch_size) + \
+                        tf.losses.get_regularization_loss()
                     self.opt = tf.train.AdamOptimizer(
                         self.lr).minimize(self.loss)
