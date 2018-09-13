@@ -14,7 +14,7 @@ class AbstractActorCritic(ABC):
         """
         self.observation_space = observation_space
         self.action_space = action_space
-
+    
         self.lr = lr
 
         self.tau = tau

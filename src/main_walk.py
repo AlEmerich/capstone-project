@@ -6,7 +6,7 @@ from walk.agents.abstract_humanoid import AbstractHumanoidEnv
 from walk.agents.abstract_bipedal import AbstractBipedalEnv
 from walk.agents.abstract_inverted_pendulum import AbstractInvertedPendulumEnv
 
-# from walk.agents.random_policy import RandomPolicy
+from walk.agents.random_policy import RandomPolicy
 
 
 def launch_tensorboard(log_dir):
@@ -39,8 +39,11 @@ def load_param_from_json():
                         help="Name of the current run")
     parser.add_argument("--env", type=str, default="AbstractHumanoidEnv",
                         help="Name of the class holding environment.")
+    parser.add_argument("--benchmark", type=str2bool, default="f",
+                        help="True if launch random agent, False if not.")
     args = vars(parser.parse_args())
-    return (json.load(open(args['params'])), args["name_run"], args['env'])
+    return (json.load(open(args['params'])), args["name_run"],
+            args['env'], args['benchmark'])
 
 
 def load_param_from_cli():
@@ -53,7 +56,7 @@ def load_param_from_cli():
         help="t to render the environment, f if not. (default: f)")
     parser.add_argument(
         "--plot", type=str, default=None,
-        help="show library to plot metrics,matplotlib or tensorflow (default: None)")
+        help="show library to plot metrics,matplotlib or tensorflow.")
 
     # Hyper parameters
     parser.add_argument(
@@ -67,11 +70,11 @@ def load_param_from_cli():
         help="Size of batch to get from memory at every step. (default: 32)")
     parser.add_argument(
         "--epochs", type=int, default=100,
-        help="Number of maximum loop before reset at each train_pass. (default: 1000)")
+        help="Number of maximum loop before reset at each train_pass.")
 
     parser.add_argument(
         "--epsilon", type=float, default=0.8,
-        help="Epsilon value to make random decisions sometimes. (default: 0.8)")
+        help="Epsilon value to make random decisions sometimes.")
     parser.add_argument(
         "--epsilon_decay", type=float, default=0.001,
         help="Decay to decrease epsilon. (default: 0.001)")
@@ -80,7 +83,7 @@ def load_param_from_cli():
         help="How fast the model will learn. (default: 0.01)")
     parser.add_argument(
         "--tau", type=float, default=0.01,
-        help="How much target modes will be updated from models. (default: 0.01)")
+        help="How much target modes will be updated from models.")
     parser.add_argument(
         "--gamma", type=float, default=0.1,
         help="Discount factor. (default: 0.01)")
@@ -91,10 +94,13 @@ def main(args):
     """Entry point of the program.
     """
     # Send args to the actor and let it train
-    args, name_run, env = (args)
+    args, name_run, env, benchmark = (args)
     factory = environmentFactory(eval(env))
     agent = factory(args, name_run)
-    agent.run()
+    if benchmark:
+        agent.benchmark()
+    else:
+        agent.run()
 
 
 if __name__ == "__main__":

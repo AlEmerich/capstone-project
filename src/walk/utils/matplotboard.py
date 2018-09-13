@@ -106,7 +106,7 @@ class MatplotBoard(Board):
         self.figure.canvas.draw()
         self.figure.canvas.flush_events()
 
-    def on_reset(self, t):
+    def on_reset(self, t, rewards):
         """Call when the environment is reset.
         It draws red line at the t to show when
         the env had been resetted.

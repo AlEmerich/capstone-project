@@ -131,6 +131,46 @@ class AbstractHumanoidEnv(AbstractEnv, ABC):
         if self.params.render:
             self.env.render()
 
+    def benchmark(self):
+        print(self.params)
+
+        seed = 42
+        np.random.seed(seed)
+        self.env.seed(seed)
+        state = None
+
+        for j in range(self.params.epochs):
+            # Reset the environment if done
+            if self.params.reset or state is None:
+                state = self.reset()
+
+            for i in range(self.params.steps):
+                print("EPOCH:", j, "STEP:", i)
+
+                # Render the environment
+                self.render()
+
+                action = self.act_random()
+
+                new_state, reward, done, _ = self.env.step(action)
+
+                # Plot needed values
+                self.plotting(state=state,
+                              c_loss=0,
+                              a_loss=0,
+                              reward=reward,
+                              epoch=j)
+
+                if done:
+                    break
+
+                # Change current state
+                state = new_state
+        self.board.save()
+
+    def act_random(self):
+        return self.env.action_space.sample()
+
     @abstractmethod
     def act(self, state):
         pass

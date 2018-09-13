@@ -7,11 +7,11 @@ class RandomPolicy(AbstractHumanoidEnv):
     not learning anything.
     Will be use as benchmark.
     """
-    def __init__(self, args):
+    def __init__(self, args, name_run):
         """Create the title before calling the super class
         and create the labels of the plot before initializing it.
         """
-        super(RandomPolicy, self).__init__(args)
+        super(RandomPolicy, self).__init__(args, name_run)
         self.use_matplotlib("Random Policy")
 
     def act(self, state):
@@ -37,7 +37,7 @@ class RandomPolicy(AbstractHumanoidEnv):
             self.plotting(state=state, reward=reward)
 
             # Reset the environment when done if asked to
-            self.reset(done)
+            self.reset()
         self.board.save()
 
 

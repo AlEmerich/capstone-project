@@ -286,9 +286,6 @@ def environmentFactory(abstract_env):
                 self.tf_run_op(self.update_actor_target)
                 self.tf_run_op(self.update_critic_target)
 
-        def act_random(self):
-            return self.env.action_space.sample()
-
         def act(self, state):
             """Return action given a state.
             Implements epsilon-greedy exploration.
@@ -359,6 +356,9 @@ def environmentFactory(abstract_env):
                     print("ACTION WITH NOISE:", action)
 
                     new_state, reward, done, _ = self.env.step(action)
+                    if new_state[0] < 0.25:
+                        done = True
+
                     print("REWARD:", reward,
                           "MULTIPLY:", self.params.reward_multiply,
                           "DONE:", done)
@@ -389,14 +389,6 @@ def environmentFactory(abstract_env):
                                               weights_biases_critic,
                                               weights_biases_actor_t,
                                               weights_biases_critic_t])
-
-                    # fetched_timeline = timeline.Timeline(
-                    #     self.run_metadata.step_stats)
-                    # chrome_trace = fetched_timeline
-                    # .generate_chrome_trace_format()
-
-                    # with open('trace/timeline_%d.json' % i, 'w') as f:
-                    #     f.write(chrome_trace)
 
                     if done:
                         break
