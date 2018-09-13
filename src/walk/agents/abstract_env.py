@@ -40,8 +40,9 @@ class AbstractEnv(ABC):
         return r_path
 
     def _save_params_info(self, path):
+        print("LAAAAA", path)
         if os.path.exists(path):
-            with open(path+'params.json', 'w') as f:
+            with open(os.path.join(path, 'params.json'), 'w') as f:
                 json.dump(self.params._asdict(), f)
 
     @abstractmethod
