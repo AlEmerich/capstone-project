@@ -1,15 +1,15 @@
 {	
-    "device": "gpu",	
-    "plot": "tensorflow",	
-    "render": false,	
-    "reset": true,	
-    "train": true,	
-    "load_weights": null,	
+    "device": "gpu",
+    "plot": "tensorflow",
+    "render": false,
+    "reset": true,
+    "train": true,
+    "load_weights": null,
 
     "epochs": 10000,
     "steps": 200,
-    "batch_size": 64,
-    "warm_up_step": 64,
+    "batch_size": 128,
+    "warm_up_step": 128,
     "actor_layers": [
         400,
         300
@@ -25,12 +25,13 @@
     "gamma": 0.99,
     "dropout": 0,
 
+    "epsilon_greedy": false,
     "initial_noise_scale": null,
-    "noise_threshold_epoch": 200,
+    "noise_threshold_epoch": 0,
     "noise_decay": null,
 
     "reward_multiply": 1,
-    "sigma": 0.2,
+    "sigma": 0.3,
     "tau": 0.001,
     "theta": 0.15
 }

@@ -4,6 +4,7 @@ https://arxiv.org/pdf/1607.07086.pdf
 import os
 import tensorflow as tf
 import numpy as np
+import math
 from ..utils.array_utils import scale
 from ..utils.memory import Memory
 from ..models.actor_critic import Actor, Critic
@@ -297,9 +298,19 @@ def environmentFactory(abstract_env):
             # Predict action from state
             reshaped_state = state.reshape(
                 1, self.env.observation_space.shape[0])
-            feed = {self.actor_model.input_ph: reshaped_state}
-            return scale(self.tf_run_op(self.actor_model.output, feed)[0],
-                         self.act_low, self.act_high)
+            feed_A = {self.actor_model.input_ph: reshaped_state}
+            action = scale(self.tf_run_op(self.actor_model.output, feed_A),
+                           self.act_low, self.act_high)
+            if self.params.epsilon_greedy:
+                feed_Q = {self.critic_model.input_state_ph: reshaped_state,
+                          self.critic_model.input_action_ph: action}
+                Q = self.tf_run_op(self.critic_model.Q, feed_Q)[0]
+                epsilon = 1 / max(1, Q)
+                rand = np.random.rand()
+                print("EPSILON, Q, rand:", epsilon, Q, rand)
+                if epsilon > rand:
+                    return self.act_random()
+            return action[0]
 
         def reset(self):
             super(AC_Policy, self).reset()
@@ -356,7 +367,7 @@ def environmentFactory(abstract_env):
                     print("ACTION WITH NOISE:", action)
 
                     new_state, reward, done, _ = self.env.step(action)
-                    if new_state[0] < 0.25:
+                    if new_state[0] < 0.2:
                         done = True
 
                     print("REWARD:", reward,
