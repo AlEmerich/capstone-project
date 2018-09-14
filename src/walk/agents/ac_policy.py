@@ -367,7 +367,7 @@ def environmentFactory(abstract_env):
                     print("ACTION WITH NOISE:", action)
 
                     new_state, reward, done, _ = self.env.step(action)
-                    if new_state[0] < 0.2:
+                    if new_state[0] < 0.1:
                         done = True
 
                     print("REWARD:", reward,

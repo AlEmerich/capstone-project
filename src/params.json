@@ -26,9 +26,9 @@
     "dropout": 0,
 
     "epsilon_greedy": false,
-    "initial_noise_scale": null,
+    "initial_noise_scale": 0.1,
     "noise_threshold_epoch": 0,
-    "noise_decay": null,
+    "noise_decay": 0.99,
 
     "reward_multiply": 1,
     "sigma": 0.3,

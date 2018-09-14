@@ -14,7 +14,7 @@ class AbstractActorCritic(ABC):
         """
         self.observation_space = observation_space
         self.action_space = action_space
-    
+
         self.lr = lr
 
         self.tau = tau
@@ -146,7 +146,7 @@ class Actor(AbstractActorCritic):
                     self.actor_gradients = list(
                         map(lambda x: tf.div(
                             x, self.batch_size),
-                            self.actor_gradients))
+                            self.printed))
                     self.opt = tf.train.AdamOptimizer(
                         self.lr).apply_gradients(
                             zip(self.actor_gradients,
@@ -265,8 +265,8 @@ class Critic(AbstractActorCritic):
                         self.Q, self.input_action_ph, name="action_gradients")
 
                 with tf.variable_scope("train"):
-                    self.loss = tf.div(tf.reduce_mean(tf.squared_difference(
-                        self.true_target_ph, self.Q)), self.batch_size) + \
+                    self.loss = tf.reduce_mean(tf.squared_difference(
+                        self.true_target_ph, self.Q)) + \
                         tf.losses.get_regularization_loss()
                     self.opt = tf.train.AdamOptimizer(
                         self.lr).minimize(self.loss)
