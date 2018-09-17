@@ -362,8 +362,8 @@ def environmentFactory(abstract_env):
                             action += self.noise() * noise_scale
                         else:
                             action += self.noise()
-                            action = np.clip(
-                                action, self.act_low, self.act_high)
+                    action = np.clip(
+                        action, self.act_low, self.act_high)
                     print("ACTION WITH NOISE:", action)
 
                     new_state, reward, done, _ = self.env.step(action)
