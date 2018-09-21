@@ -7,9 +7,9 @@
     "load_weights": null,
 
     "epochs": 10000,
-    "steps": 200,
-    "batch_size": 128,
-    "warm_up_step": 128,
+    "steps": 500,
+    "batch_size": 64,
+    "warm_up_step": 64,
     "actor_layers": [
         400,
         300
@@ -26,12 +26,11 @@
     "dropout": 0,
 
     "epsilon_greedy": false,
-    "initial_noise_scale": 0.1,
-    "noise_threshold_epoch": 0,
-    "noise_decay": 0.99,
+    "noise_threshold_epoch": 2000,
+    "noise_decay": 0.001,
 
     "reward_multiply": 1,
-    "sigma": 0.3,
+    "sigma": 0.2,
     "tau": 0.001,
     "theta": 0.15
 }
