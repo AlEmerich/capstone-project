@@ -338,12 +338,18 @@ def environmentFactory(abstract_env):
             tf.set_random_seed(seed)
             self.env.seed(seed)
             state = None
-
+            step_decay = 1
+            
             for j in range(self.params.epochs):
                 # Reset the environment if done
                 if self.params.reset or state is None:
                     state = self.reset()
 
+                if j != 0 and j%(100*step_decay) == 0:
+                    self.actor_model.decay_lr()
+                    self.critic_model.decay_lr()
+                    step_decay += 1
+                    
                 for i in range(self.params.steps):
                     print("EPOCH:", j, "STEP:", i)
 
