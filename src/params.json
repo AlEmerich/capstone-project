@@ -7,7 +7,7 @@
     "load_weights": null,
 
     "epochs": 10000,
-    "steps": 200,
+    "steps": 500,
     "batch_size": 64,
     "warm_up_step": 64,
     "actor_layers": [
@@ -26,9 +26,14 @@
     "dropout": 0,
 
     "epsilon_greedy": false,
+<<<<<<< HEAD
     "initial_noise_scale": false,
     "noise_threshold_epoch": 500,
     "noise_decay": false,
+=======
+    "noise_threshold_epoch": 2000,
+    "noise_decay": 0.001,
+>>>>>>> f86958d758453cee19d58b8b287c2053b41231e2
 
     "reward_multiply": 1,
     "sigma": 0.2,

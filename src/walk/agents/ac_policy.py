@@ -30,16 +30,10 @@ def environmentFactory(abstract_env):
 
             self.__init_session__()
 
-            self.noise = Noise(mu=np.zeros(self.env.action_space.shape[0]),
-                               sigma=self.params.sigma,
-                               theta=self.params.theta)
+            self.noise = None
+
             self.actor_file = "actor"
             self.critic_file = "critic"
-
-            self.decaying_noise = True
-            if not self.params.initial_noise_scale or \
-               not self.params.noise_decay:
-                self.decaying_noise = False
 
             self.__init_networks__()
 
@@ -314,7 +308,8 @@ def environmentFactory(abstract_env):
 
         def reset(self):
             super(AC_Policy, self).reset()
-            self.noise.reset()
+            if self.noise:
+                self.noise.reset()
             return self.env.reset()
 
         def run(self):
@@ -345,18 +340,25 @@ def environmentFactory(abstract_env):
                 if self.params.reset or state is None:
                     state = self.reset()
 
-                if j != 0 and j%(100*step_decay) == 0:
-                    self.actor_model.decay_lr()
-                    self.critic_model.decay_lr()
-                    step_decay += 1
+#                if j != 0 and j%(100*step_decay) == 0:
+#                    self.actor_model.decay_lr()
+#                    self.critic_model.decay_lr()
+#                    step_decay += 1
                     
+                noise_scale = 1.
+
+                if self.params.noise_decay:
+                    noise_scale = np.exp(-j * self.params.noise_decay)
+
+                print("******************************\n",
+                      "Noise scale:", noise_scale)
+
+                self.noise = Noise(mu=np.zeros(self.env.action_space.shape[0]),
+                                   sigma=self.params.sigma * noise_scale,
+                                   theta=self.params.theta)
+
                 for i in range(self.params.steps):
                     print("EPOCH:", j, "STEP:", i)
-
-                    if self.decaying_noise:
-                        noise_scale = (self.params.initial_noise_scale *
-                                       self.params.noise_decay ** i) * (
-                                           self.act_high - self.act_low)
 
                     # Render the environment
                     self.render()
@@ -364,12 +366,9 @@ def environmentFactory(abstract_env):
                     action = self.act(state)
                     print("ACTION:", action)
                     if j < self.params.noise_threshold_epoch:
-                        if self.decaying_noise:
-                            action += self.noise() * noise_scale
-                        else:
-                            action += self.noise()
-                    action = np.clip(
-                        action, self.act_low, self.act_high)
+                        action += self.noise()
+                        action = np.clip(
+                            action, self.act_low, self.act_high)
                     print("ACTION WITH NOISE:", action)
 
                     new_state, reward, done, _ = self.env.step(action)
