@@ -30,6 +30,14 @@ class AbstractActorCritic(ABC):
         self.summary = []
 
     def _variable(self, name, shape, dim, init=None, reg=None):
+        """ Utility function to create or retrieve variable.
+        :param name: the name of the variable to create or retrieve.
+        :param shape: the shape of the variable.
+        :param dim: the dimension in order to initialize the variable.
+        :param init: initializer.
+        :param reg: regularizer.
+        :return the variable as a Tensor.
+        """
         if init is None:
             init = tf.random_uniform(
                 shape,
@@ -43,6 +51,17 @@ class AbstractActorCritic(ABC):
     def _fc_layer(self, layer, nb_input,
                   units, w_init=None, b_init=None,
                   w_reg=None, b_reg=None):
+        """ Utility function to create a fully-connected layer
+        with weights and biases.
+        :param layer: the id of the layer to create.
+        :param nb_input: the input shape.
+        :param units: the number of units in the layer.
+        :param w_init: weights initializer.
+        :param w_reg: wieghts regularizer.
+        :param b_init: biases initializer.
+        :param b_reg: biases regularizer.
+        :return weights and biases as Tensor.
+        """
         W = self._variable(
             "W"+layer,
             [nb_input, units],
@@ -62,6 +81,10 @@ class AbstractActorCritic(ABC):
         return W, B
 
     def _summary_layer(self, name):
+        """Utility function to plot weights and biases of the
+        specified layer.
+        :param name: the name of the layer to plot.
+        """
         scope = tf.get_variable_scope().name
         var = tf.global_variables(scope=scope+"/"+name)
         weights = var[0]

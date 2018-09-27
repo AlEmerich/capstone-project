@@ -33,6 +33,11 @@ class Critic(AbstractActorCritic):
             self._create_training_function()
 
     def _create_network(self, layers, batch_norm):
+        """ Build the network.
+        :params layers: the list of layers to build
+        :params batch_norm: boolean, to add batch normalization or not.
+        :return the created variables.
+        """
         with tf.variable_scope("critic"):
             with tf.variable_scope("model"):
                 with tf.variable_scope("placeholder"):
@@ -109,6 +114,8 @@ class Critic(AbstractActorCritic):
         return [W1, B1, W2, W2_action, B2, W3, B3]
 
     def _create_training_function(self):
+        """ Create the training tensorflow operation.
+        """
         with tf.variable_scope("gradients"):
             self.action_gradients = tf.gradients(
                 self.Q, self.input_action_ph, name="action_gradients")
