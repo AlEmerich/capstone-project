@@ -19,17 +19,18 @@
 \BOOKMARK [3][-]{subsubsection.3.2.4}{Training}{subsection.3.2}% 19
 \BOOKMARK [3][-]{subsubsection.3.2.5}{Noise}{subsection.3.2}% 20
 \BOOKMARK [3][-]{subsubsection.3.2.6}{The Agent}{subsection.3.2}% 21
-\BOOKMARK [2][-]{subsection.3.3}{Refinement}{section.3}% 22
-\BOOKMARK [3][-]{subsubsection.3.3.1}{Noise}{subsection.3.3}% 23
-\BOOKMARK [3][-]{subsubsection.3.3.2}{Network definition}{subsection.3.3}% 24
-\BOOKMARK [3][-]{subsubsection.3.3.3}{Hyper Parameters}{subsection.3.3}% 25
-\BOOKMARK [1][-]{section.4}{Results}{}% 26
-\BOOKMARK [2][-]{subsection.4.1}{Model Evaluation and Validation}{section.4}% 27
-\BOOKMARK [3][-]{subsubsection.4.1.1}{Implementation}{subsection.4.1}% 28
-\BOOKMARK [3][-]{subsubsection.4.1.2}{Tweaking the model}{subsection.4.1}% 29
-\BOOKMARK [3][-]{subsubsection.4.1.3}{Evaluation}{subsection.4.1}% 30
-\BOOKMARK [2][-]{subsection.4.2}{Justification}{section.4}% 31
-\BOOKMARK [1][-]{section.5}{Conclusion}{}% 32
-\BOOKMARK [2][-]{subsection.5.1}{Free-Form Visualization}{section.5}% 33
-\BOOKMARK [2][-]{subsection.5.2}{Reflection}{section.5}% 34
-\BOOKMARK [2][-]{subsection.5.3}{Improvement}{section.5}% 35
+\BOOKMARK [3][-]{subsubsection.3.2.7}{Implementation complication}{subsection.3.2}% 22
+\BOOKMARK [2][-]{subsection.3.3}{Refinement}{section.3}% 23
+\BOOKMARK [3][-]{subsubsection.3.3.1}{Hyper Parameters}{subsection.3.3}% 24
+\BOOKMARK [3][-]{subsubsection.3.3.2}{Baselines}{subsection.3.3}% 25
+\BOOKMARK [3][-]{subsubsection.3.3.3}{Batch size}{subsection.3.3}% 26
+\BOOKMARK [3][-]{subsubsection.3.3.4}{Noise decay}{subsection.3.3}% 27
+\BOOKMARK [3][-]{subsubsection.3.3.5}{Learning rate decay}{subsection.3.3}% 28
+\BOOKMARK [3][-]{subsubsection.3.3.6}{Reward scale}{subsection.3.3}% 29
+\BOOKMARK [1][-]{section.4}{Results}{}% 30
+\BOOKMARK [2][-]{subsection.4.1}{Model Evaluation and Validation}{section.4}% 31
+\BOOKMARK [2][-]{subsection.4.2}{Justification}{section.4}% 32
+\BOOKMARK [1][-]{section.5}{Conclusion}{}% 33
+\BOOKMARK [2][-]{subsection.5.1}{Free-Form Visualization}{section.5}% 34
+\BOOKMARK [2][-]{subsection.5.2}{Reflection}{section.5}% 35
+\BOOKMARK [2][-]{subsection.5.3}{Improvement}{section.5}% 36

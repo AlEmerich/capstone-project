@@ -5,6 +5,7 @@
 \usepackage{glossaries}
 \usepackage{hyperref}
 \usepackage{graphicx}
+\usepackage{wrapfig}
 \usepackage{subcaption}
 \usepackage{xcolor}
 \usepackage{amsmath}
@@ -16,6 +17,7 @@
 \usepackage{dirtree}
 \usepackage[T1]{fontenc}
 \usepackage[font=scriptsize]{caption}
+\usepackage[margin=0.9in]{geometry}
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -285,17 +287,17 @@ represents the \verb?more? and \verb?j? vector presented earlier in section
 
 In DDPG, instead of compute manually the $Q$ value and the $\mu$, we
 use neural networks, one for the actor and one for the critic. The figure
-\ref{fig:actor-critic} shows how such a model can train.
+\ref{fig:actor-critic} shows how such a model can train. First, the environment
+gives the first state to the actor and it chose the action following the policy.
+The action is given back to the environment and a reward is computed, meaning
+how good the action was for that state, and sent to the critic network. The
+critic computes the $Q$ value of that action by minimizing the loss and gives
+the error to the actor in order to let him train on it.
 
-\begin{figure}[ht]
+\begin{figure}[ht!]
   \centering
-  \includegraphics[width=.5\textwidth]{actor-critic}
-  \caption{First, the environment gives the first state to the actor and it chose the
-action following the policy. The action is given back to the environment and a
-reward is computed, meaning how good the action was for that state, and sent to
-the critic network. The critic computes the $Q$ value of that action by
-minimizing the loss and gives the error to the actor in order to let him train
-on it.}
+  \includegraphics[width=.28\textwidth]{actor-critic}
+  \caption{Actor-critic algorithm}
   \label{fig:actor-critic}
 \end{figure}
 
@@ -315,23 +317,25 @@ $\theta^Q$ by the following formula called ``soft update'':
 
 Not using target networks will cause divergence and none of the model will learn
 a good policy or a good $Q$-value function.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=.5\textwidth]{algoDDPG}
+  \caption{Algorithm from \citeauthor{journals/corr/LillicrapHPHETS15} paper}
+  \label{fig:algoDDPG}
+\end{figure}
+
 \paragraph{}
 We need to also design a Replay buffer to store transition $(s_t, a, r,
 s_{t+1})$ and train over minibatch of random transition. In that way, we break
 temporal correlations between transition and minimize variance between our
 possible bad predictions.
+
 \paragraph{}
 A last thing we need to introduce is exploration noise. We want to add some noise to the
 action the actor take during training in order to let it explore its world with
 some randomness. A good way to compute noise is the Ornstein–Uhlenbeck process,
 which is also known as Brownian motion. 
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width=\textwidth]{algoDDPG}
-  \caption{Algorithm from \citeauthor{journals/corr/LillicrapHPHETS15} paper}
-  \label{fig:algoDDPG}
-\end{figure}
 
 The figure \ref{fig:algoDDPG} describes the algorithm in a pseudo-code. The
 reader can see that the actor doesn't learn the classical way, i.e. by
@@ -345,7 +349,7 @@ happen in a worse case scenario ?
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=\textwidth]{randompolicy}
+  \includegraphics[width=.8\textwidth]{randompolicy}
   \caption{Random Policy}
   \label{fig:randompolicy}
 \end{figure}
@@ -365,7 +369,7 @@ different algorithm including DDPG.
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=\textwidth]{benchmark}
+  \includegraphics[width=.8\textwidth]{benchmark}
   \caption{Average return over episodes in HalfCheetah-v1 and Humanoid-v1 during
     learning, comparing Q-Prop against other model-free algorithms. Q-Prop with
     vanilla policy gradient outperforms TRPO on HalfCheetah. Q-Prop
@@ -379,6 +383,7 @@ hyper-parameters changes. I still want to try to teach a robot to walk with that
 algorithm by increasing the depth of the networks for example and see what
 happened.  
 
+\newpage
 \section{Methodology}
 
 \subsection{Data Preprocessing}
@@ -394,8 +399,9 @@ the same for action space but the value is clipped between -1 and 1.
 
 \subsubsection{Project Structure}
 
-I present you below the structure of my project:
+I present you on the fig. \ref{fig:structure} the structure of my project.
 
+\begin{figure}[ht]
 \dirtree{%
 .1 /.
 .2 params.json.
@@ -418,6 +424,9 @@ I present you below the structure of my project:
 .4 noise.py.
 .4 tensorboard.py.
 }
+\caption{Project structure}
+\label{fig:structure}
+\end{figure}
 
 In the \verb?agents? folder, the \verb?abstract_env.py? file is meant to be the
 super class of every policy I could implement, managing operation that every
@@ -454,8 +463,9 @@ The second needed method to define is the one to get samples from the queue rand
 def samples(self, batch_size)
 \end{lstlisting}
 
-We need to get random sample, not last one or older one, but random, in order to
-break their correlations which would lead to decrease the performance of the model.
+We need to get random samples, not last one or older one, but random, in order to
+break their temporal correlations which would lead to decrease the performance
+of the model.
 
 \subsubsection{Neural networks: Actor and Critic}
 
@@ -700,54 +710,37 @@ for j in range(self.params.epochs):
 
 \footnotetext{Roboschool has a bug which lead to give vector of \textit{inf} after the second reset when rendering, so when I train the networks, I don't render it.}
 
-\subsection{Refinement}
+\subsubsection{Implementation complication}
 
-\subsubsection{Noise}
-
-To find the best tuning for my training, I changed the way I added the noise
-into the action, the learning operation of my actor network and its layer
-defintion. For the noise, I added it every steps. It then produces a bad
-training making the loss of the critic network going up at around 1000 steps,
-which corresponds to around 50 epochs. Removing that noise at this moment does
-not removing the loss decreasing, as shown in the Fig. \ref{fig:noise_cancellation}.
+\paragraph{}
+When I start to train my humanoid agent, it nerver learns anything. I then
+decided to test on a simpler environment to see if this came from the difficulty
+of the environment or from my implementation. In other words, I wanted to make
+sure the way I implemented Deep Deterministic Policy Gradients was correct. I
+then try to perform it the
+Pendulum\footnote{\url{https://github.com/openai/gym/wiki/Pendulum-v0}}
+environment. The goal of that environment is to make the pendulum standing up in
+balance. At first, it didn't succeed so I had to review my code to notice the
+way computed the loss of my critic. The problem was that the
+$tf.mean\_squared\_error$ function (or equivalent) sum the squared difference
+but without divided by batch size like in the paper. I took a lot of time to
+notice and when I did, my network succeed to make the pendulum stay as shown in
+the Fig. \ref{fig:result_pendulum}.
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=.5\textwidth]{noise_cancellation}
-  \caption{The light blue line is the run with noise removed at step 50, and the
-  dark blue is with noise always added.}
-  \label{fig:noise_cancellation}
+  \includegraphics[width=.5\textwidth]{avg_per_episode_pendulum}
+  \caption{Results of pendulum environment}
+  \label{fig:result_pendulum}
 \end{figure}
 
-Since it does not affect the training (the reward is not affected either), I
-will keep adding noise until some convergence starts to occur. In the later
-work, I won't keep a good eye on the loss of the critic. The study of the noise
-addition makes me think that it is normal if the loss is increasing, since the
-environment is moving and the reward more and more difficult to compute.
-However, I added noise decay to decrease the noise over time. Since the agent
-learn over time, it should not need as mush noise as the beggining to learn a
-good policy. For that, I am scaling the noise with the a scale computed by the
-follwing formula:
-
-\begin{equation}
-NS = (I * \alpha^{t}) * (high - low) 
-\end{equation}
-
-, $I$ being the initial noise scale gave in parameters, $\alpha^{t}$ the noise
-decay factor ponderate over time and everything is scaled by the bound of
-actions.
-
-\subsubsection{Network definition} 
-
 \paragraph{}
-Thanks to the architecture of my code, I am able to change the model of the networks easyly so I
-tuned these parameter a lot. A lot of paper written about DDPG \cite{journals/corr/LillicrapHPHETS15}
-\cite{DBLP:journals/corr/abs-1801-10425} used layers of 400 and 300 units with action added at the second
-layer in the critic network. I then decided to follow that benchmark since it gave good results with
-a lot of environment. In order to have a learning more efficient and to see how a modification would effect,
-I changed the depth or the number of units. I found out that decreasing the number of units doesn't affect
-the quality of the learning but decreases the speed and building the networks deeper make the critic loss
-diverges very fast.
+It shows the pendulum learn a good policy, the rewards is going up to converge
+at 4000 epochs. The rewards is defined in the range -inf to 0 so it is totally
+normal that the graph never shows a positive reward. In the render, the pendulum
+runs-up and when it is up, it keeps the position until the end of 100 epochs.
+
+\subsection{Refinement}
 
 \subsubsection{Hyper Parameters}
 \label{subsubsec:hp_params}
@@ -764,31 +757,30 @@ training.
       \textbf{Name} & \textbf{Description} & \textbf{Value for training} \\
       \hline
       device & Choose CPU or GPU to perform TF operation & \verb?gpu? \\
-      reset & Reset the environment at final states & \verb?true? \\ 
-      render & Render the environment\footnotemark & false \\
       plot & Choose the plotting library & \verb?tensorflow? \\
+      render & Render the environment\footnotemark & false \\
+      reset & Reset the environment at final states & \verb?true? \\ 
       train & Train network & \verb?true? \\
-      noisy & Add noise to action outputs & \verb?true? \\
       load\_weights & Load previously saved weights & \verb?false? \\
-      batch\_size & Number of samples to train from the momery & 128 \\
       epochs & Number of epochs & 10000 \\
       steps & Number of action during one epoch & 100 \\ 
-      noise\_threshold & At which epochs the program stops adding noise to actions & 500 \\
-      warm\_up\_step & Epoch to wait before training & 128 \\
-      sigma & Used in the computation of noise, representing the variance & 0.2 \\
-      theta & Used in the computation of noise, representing the center & 0.15 \\
-      initial\_noise\_scale & the initial noise scale used in the computation of noise decay & 0.1 \\
-      noise\_decay & The noise decay factor & 0.99 \\
-      actor\_learning\_rate & Learning rate for the actor & 0.0001 \\
-      critic\_learning\_rate & Learning rate for the critic & 0.001 \\
-      actor\_batch\_norm & Add batch normalization after dense layers of the actor network & \verb?true? \\
-      critic\_batch\_norm & Add batch normalization after dense layers of the critic network & \verb?true? \\
-      tau & Used in soft target update function & 0.001 \\
-      gamma & Discounted factor & 0.99 \\
+      batch\_size & Number of samples to train from the momery & 64 \\
+      warm\_up\_step & Epoch to wait before training & 64 \\
       actor\_layers & Structure of actor network, depth and number of units in each layer & \verb?[400, 300]? \\
       critic\_layers & Structure of critic network, depth and number of units in each layer & \verb?[400, 300]? \\
-      reward\_multiply & Multiply every reward with to reward more when good action is taken and less when a bad one is taken. & 1 \\
+      actor\_batch\_norm & Add batch normalization after dense layers of the actor network & \verb?true? \\
+      critic\_batch\_norm & Add batch normalization after dense layers of the critic network & \verb?true? \\
+      actor\_learning\_rate & Learning rate for the actor & 0.0001 \\
+      critic\_learning\_rate & Learning rate for the critic & 0.001 \\
+      gamma & Discounted factor & 0.99 \\
       dropout & percent of dropout to use after dense layers & 0 \\
+      epsilon\_greedy & use epsilon-greedy exploration process & false \\
+      noise\_threshold & At which epochs the program stops adding noise to actions & 500 \\
+      noise\_decay & The noise decay factor & 0.99 \\
+      reward\_multiply & Multiply every reward with to reward more when good action is taken and less when a bad one is taken. & 1 \\
+      sigma & Used in the computation of noise, representing the variance & 0.2 \\
+      tau & Used in soft target update function & 0.001 \\
+      theta & Used in the computation of noise, representing the center & 0.15 \\
       \hline
     \end{tabular}
   \end{adjustbox}
@@ -796,66 +788,99 @@ training.
   \label{tab:hyperparams}
 \end{table}
 
+\subsubsection{Baselines}
+
+First of all, we can show the results in fig. \ref{fig:baselines} of my
+implemenation with parameters used in the original paper, summarized in
+\ref{subsubsec:hp_params}.
+
+\begin{figure}[ht]
+  \centering
+  \begin{subfigure}[b]{.3\textwidth}
+    \includegraphics[width=\textwidth]{baselines_loss}
+    \caption{Critic loss}
+  \end{subfigure}
+  ~
+  \begin{subfigure}[b]{.3\textwidth}
+    \includegraphics[width=\textwidth]{baselines_reward}
+    \caption{Reward per episod}
+  \end{subfigure}
+  ~
+  \begin{subfigure}[b]{.3\textwidth}
+    \includegraphics[width=\textwidth]{baselines_avg_reward}
+    \caption{Average reward per episod}
+  \end{subfigure}
+  \caption{Results with parameters from original paper}
+  \label{fig:baselines}
+\end{figure}
+
+The two lines in the figure is describing is two different run, to validate the stability.
+That first attempt to solve the problem is not conclusive but the agent still
+learns something until around 3000 epochs but nothing after. At that epochs, the
+loss doesn't decrease anymore either. It seems that the agent learn to stay
+stand but doesn't learn to go forward. To do that, I need to play with
+hyper-parameters or by adding some new logic. The noise may be decreased over
+time to get better rewards, the learning rate can also be decayed to prevent the
+decreased of the critic loss or the reward can be scaled by a factor, for
+instance.
+
+\paragraph{}
+Another explanation is that the agent needs more epochs to learn a good policy.
+The goal of tweaking parameters will then be to improve the learning speed, in
+order to not wait one million epoch to get a good policy.
+
+\subsubsection{Batch size}
+
+First, I tested the effect of differents lengths of batch size to see if it can
+improve the learning or decrease the time when convergence happens. The fig.
+\ref{fig:study_bs} shows the reward given by each episod and that the batch size
+length does not affect the training. I will then stay on 128 like in the paper of
+\citeauthor{journals/corr/LillicrapHPHETS15}.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.5\textwidth]{study_batch_size}
+  \caption{Reward per episode - Study of batch size length effect on training}
+  \label{fig:study_bs}
+\end{figure}
+
+\subsubsection{Noise decay}
+
+I added noise decay to decrease the noise over time. Since the agent learn over
+time, it should not need as much noise as the beggining to learn a good policy.
+For that, I am scaling the noise with the a scale computed by the follwing
+formula:
+
+\begin{equation}
+N = e^{-j * \alpha}
+\end{equation}
+
+, $j$ being the current number of epoch, $\alpha$ the noise decay factor. To
+choose the best $\alpha$, I plotted the $N$ for each epochs during
+10000 epochs and choose the $\alpha$ who plot the better line. The chosen one is
+0.0005 and plots the line in fig. \ref{fig:noise_decay_factor}.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=.3\textwidth]{noise_decay_function}
+  \caption{Value of noise decay factor over time when $\alpha$ is 0.0005}
+  \label{fig:noise_decay_factor}
+\end{figure}
+
+\subsubsection{Learning rate decay}
+
+\subsubsection{Reward scale}
+
+\newpage
 \section{Results}
 
 \subsection{Model Evaluation and Validation}
-
-\subsubsection{Implementation}
-
-\paragraph{}
-Before validating the model, I wanted to make sure the way I implemented Deep
-Deterministic Policy Gradients was correct. I then try to perform it on a
-simpler environment such as
-Pendulum\footnote{\url{https://github.com/openai/gym/wiki/Pendulum-v0}}
-environment. The goal of that environment is to make the pendulum standing up in
-balance. My network succeed to make the pendulum stay as shown in the Fig. \ref{fig:result_pendulum}.
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width=.5\textwidth]{avg_per_episode_pendulum}
-  \caption{Results of pendulum environment}
-  \label{fig:result_pendulum}
-\end{figure}
-
-\paragraph{}
-It shows the pendulum learn a good policy, the rewards is going up to converge
-at 4000 epochs. The rewards is defined in the range -inf to 0 so it is totally
-normal that the graph never shows a positive reward. In the render, the pendulum
-runs-up and when it is up, it keeps the position until the end of 100 epochs.
-
-\paragraph{}
-About validating the model, I designed it in tensorflow and plot in TensorBoard
-in order to check its structure.
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width=.5\textwidth]{soft_target}
-  \caption{Soft target update operations graph}
-  \label{fig:softtargetgraph}
-\end{figure}
-
-We can see in the fig. \ref{fig:softtargetgraph} the operations which handle the
-soft target update from networks to target networks.
-
-\subsubsection{Tweaking the model}
-\paragraph{}
-
-Initially, I trained the model with batch normalization because it has shown in
-many cases that it can improve learning speed without decreasing the
-performance. However, the soft target update must be made differently for the
-batch normalization layer than the dense one. So first of all, it is interesting
-to see how well it will performed without it. For dropout layer, I don't think
-forgetting some informations is a good trick to tackle that kind of problem
-because usually, this technique is used to prevent overfitting. Since DDPG is a
-deterministic policy, I don't think overfitting will be a crucial issue but it
-could help to not have the Q output in a local maxima.
-
-\subsubsection{Evaluation}
 
 
 
 \subsection{Justification}
 
+\newpage
 \section{Conclusion}
 
 \subsection{Free-Form Visualization}

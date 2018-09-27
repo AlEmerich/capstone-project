@@ -4,10 +4,10 @@ https://arxiv.org/pdf/1607.07086.pdf
 import os
 import tensorflow as tf
 import numpy as np
-import math
 from ..utils.array_utils import scale
 from ..utils.memory import Memory
-from ..models.actor_critic import Actor, Critic
+from ..models.actor import Actor
+from ..models.critic import Critic
 from ..utils.noise import Noise
 # from tensorflow.python.client import timeline
 
