@@ -26,8 +26,10 @@
     "dropout": 0,
 
     "epsilon_greedy": false,
-    "noise_threshold_epoch": 2000,
+
+    "initial_noise_scale": false,
     "noise_decay": false,
+    "noise_threshold_epoch": 2000,
 
     "reward_multiply": 0.01,
     "sigma": 0.3,
