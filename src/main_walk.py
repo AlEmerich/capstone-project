@@ -5,7 +5,6 @@ from walk.agents.ac_policy import environmentFactory
 from walk.agents.abstract_humanoid import AbstractHumanoidEnv
 from walk.agents.abstract_bipedal import AbstractBipedalEnv
 from walk.agents.abstract_inverted_pendulum import AbstractInvertedPendulumEnv
-
 from walk.agents.random_policy import RandomPolicy
 
 

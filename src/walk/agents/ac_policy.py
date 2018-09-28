@@ -334,7 +334,7 @@ def environmentFactory(abstract_env):
             self.env.seed(seed)
             state = None
             step_decay = 1
-            
+
             for j in range(self.params.epochs):
                 # Reset the environment if done
                 if self.params.reset or state is None:
@@ -344,7 +344,7 @@ def environmentFactory(abstract_env):
 #                    self.actor_model.decay_lr()
 #                    self.critic_model.decay_lr()
 #                    step_decay += 1
-                    
+
                 noise_scale = 1.
 
                 if self.params.noise_decay:
