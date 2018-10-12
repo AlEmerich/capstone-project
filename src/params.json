@@ -1,0 +1,38 @@
+{	
+    "device": "cpu",
+    "plot": "tensorflow",
+    "render": false,
+    "reset": true,
+    "train": true,
+    "load_weights": null,
+
+    "epochs": 10000,
+    "steps": 500,
+    "batch_size": 128,
+    "warm_up_step": 128,
+    "actor_layers": [
+        400,
+        300
+    ],
+    "critic_layers": [
+        400,
+        300
+    ],
+    "actor_batch_norm": false,
+    "critic_batch_norm": false,
+    "actor_learning_rate": 0.0001,
+    "critic_learning_rate": 0.001,
+    "gamma": 0.995,
+    "dropout": 0,
+
+    "epsilon_greedy": false,
+
+    "initial_noise_scale": false,
+    "noise_decay": false,
+    "noise_threshold_epoch": 2000,
+
+    "reward_multiply": 1,
+    "sigma": 0.2,
+    "tau": 0.001,
+    "theta": 0.15
+}

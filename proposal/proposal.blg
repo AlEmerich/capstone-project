@@ -1,46 +1,49 @@
-This is BibTeX, Version 0.99d (TeX Live 2015/Debian)
-Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+This is BibTeX, Version 0.99d (TeX Live 2017)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
 The top-level auxiliary file: proposal.aux
 The style file: plainnat.bst
 Database file #1: proposal.bib
-You've used 5 entries,
+Warning--empty year in doi:10.1002/rob.21559
+Warning--empty year in doi:10.1002/rob.21559
+You've used 7 entries,
             2773 wiz_defined-function locations,
-            631 strings with 6173 characters,
-and the built_in function-call counts, 3373 in all, are:
-= -- 268
-> -- 312
+            645 strings with 6810 characters,
+and the built_in function-call counts, 4705 in all, are:
+= -- 375
+> -- 434
 < -- 0
-+ -- 104
-- -- 99
-* -- 334
-:= -- 545
-add.period$ -- 15
-call.type$ -- 5
-change.case$ -- 48
-chr.to.int$ -- 5
-cite$ -- 10
-duplicate$ -- 99
-empty$ -- 199
-format.name$ -- 104
-if$ -- 670
++ -- 144
+- -- 137
+* -- 466
+:= -- 762
+add.period$ -- 24
+call.type$ -- 7
+change.case$ -- 66
+chr.to.int$ -- 7
+cite$ -- 16
+duplicate$ -- 145
+empty$ -- 282
+format.name$ -- 144
+if$ -- 940
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 4
-newline$ -- 33
-num.names$ -- 20
-pop$ -- 91
+missing$ -- 6
+newline$ -- 45
+num.names$ -- 30
+pop$ -- 131
 preamble$ -- 1
-purify$ -- 43
+purify$ -- 59
 quote$ -- 0
-skip$ -- 93
+skip$ -- 124
 stack$ -- 0
-substring$ -- 116
-swap$ -- 8
+substring$ -- 141
+swap$ -- 10
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 55
-warning$ -- 0
-while$ -- 19
+type$ -- 77
+warning$ -- 2
+while$ -- 27
 width$ -- 0
-write$ -- 71
+write$ -- 101
+(There were 2 warnings)

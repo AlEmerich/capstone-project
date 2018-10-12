@@ -1,4 +1,4 @@
-\begin{thebibliography}{5}
+\begin{thebibliography}{7}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -11,11 +11,29 @@ Greg Brockman, Vicki Cheung, Ludwig Pettersson, Jonas Schneider, John Schulman,
   Jie Tang, and Wojciech Zaremba.
 \newblock Openai gym, 2016.
 
+\bibitem[Feng et~al.()Feng, Whitman, Xinjilefu, and
+  Atkeson]{doi:10.1002/rob.21559}
+Siyuan Feng, Eric Whitman, X.~Xinjilefu, and Christopher~G. Atkeson.
+\newblock Optimizationâbased full body control for the darpa robotics
+  challenge.
+\newblock \emph{Journal of Field Robotics}, 32\penalty0 (2):\penalty0 293--312.
+\newblock \doi{10.1002/rob.21559}.
+\newblock URL \url{https://onlinelibrary.wiley.com/doi/abs/10.1002/rob.21559}.
+
 \bibitem[Geijtenbeek et~al.(2013)Geijtenbeek, van~de Panne, and van~der
   Stappen]{2013-TOG-MuscleBasedBipeds}
 Thomas Geijtenbeek, Michiel van~de Panne, and A.~Frank van~der Stappen.
 \newblock Flexible muscle-based locomotion for bipedal creatures.
 \newblock \emph{ACM Transactions on Graphics}, 32\penalty0 (6), 2013.
+
+\bibitem[Kidzi\'nski et~al.(2018)Kidzi\'nski, Mohanty, Ong, Hicks, Francis,
+  Levine, Salath\'e, and Delp]{kidzinski2018learningtorun}
+{\L}ukasz Kidzi\'nski, Sharada~P Mohanty, Carmichael Ong, Jennifer Hicks, Sean
+  Francis, Sergey Levine, Marcel Salath\'e, and Scott Delp.
+\newblock Learning to run challenge: Synthesizing physiologically accurate
+  motion using deep reinforcement learning.
+\newblock In Sergio Escalera and Markus Weimer, editors, \emph{NIPS 2017
+  Competition Book}. Springer, Springer, 2018.
 
 \bibitem[Nagasaka et~al.(1999)Nagasaka, Inoue, and Inaba]{1999-KHR-2}
 Ken'ichiro Nagasaka, Hirochika Inoue, and Masayuki Inaba.
