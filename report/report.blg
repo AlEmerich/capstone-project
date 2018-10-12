@@ -3,9 +3,10 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: report.aux
 The style file: plainnat.bst
 Database file #1: report.bib
+Warning--I didn't find a database entry for "Schaul2015PrioritizedER"
 You've used 3 entries,
             2773 wiz_defined-function locations,
-            611 strings with 5619 characters,
+            613 strings with 5665 characters,
 and the built_in function-call counts, 1885 in all, are:
 = -- 144
 > -- 189
@@ -44,3 +45,4 @@ warning$ -- 0
 while$ -- 9
 width$ -- 0
 write$ -- 47
+(There was 1 warning)

@@ -1,5 +1,5 @@
 {	
-    "device": "gpu",
+    "device": "cpu",
     "plot": "tensorflow",
     "render": false,
     "reset": true,
@@ -11,12 +11,12 @@
     "batch_size": 128,
     "warm_up_step": 128,
     "actor_layers": [
-        256,
-        128
+        400,
+        300
     ],
     "critic_layers": [
-        256,
-        128
+        400,
+        300
     ],
     "actor_batch_norm": false,
     "critic_batch_norm": false,
@@ -32,7 +32,7 @@
     "noise_threshold_epoch": 2000,
 
     "reward_multiply": 1,
-    "sigma": 0.3,
+    "sigma": 0.2,
     "tau": 0.001,
     "theta": 0.15
 }
