@@ -1,9 +1,9 @@
 # Capstone Project: Train a 3D avatar to walk
 ---
 - author: Alan Guitard
-- Proposal: [https://github.com/AlEmerich/capstone-project/blob/master/proposal/proposal.pdf](proposal)
-- Proposal Review: [https://review.udacity.com/#!/reviews/1139640](Review)
-- Final report: [report/report.pdf](report)
+- Proposal: [proposal](proposal/proposal.pdf)
+- Proposal Review: [Review](https://review.udacity.com/#!/reviews/1139640)
+- Final report: [report](report/report.pdf)
 
 Installation and Usage
 ======================
