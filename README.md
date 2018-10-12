@@ -6,6 +6,35 @@
 - bibliography:
     - 'proposal/proposal.bib'
 
+Installation and Usage
+======================
+This implementation use the Roboschool environment, an alternative of 
+Mujoco environment. To install Roboschool, please refer to the Github
+repository [AlEmerich/roboschool](https://github.com/AlEmerich/roboschool/tree/master).
+
+The main dependency of the project is: 
+
+- Tensorflow >= 1.9.0
+- PyOpenGL >= 3.1.0
+- gym >= 0.10.5
+- numpy >= 1.15.0
+- Pillow >= 5.2.0
+
+
+Usage: 
+```
+main_walk.py [-h] [--params PARAMS] [--name_run NAME_RUN] [--env ENV]
+                    [--benchmark BENCHMARK]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --params PARAMS       File holding the paramet of the program.
+  --name_run NAME_RUN   Name of the current run
+  --env ENV             Name of the class holding environment.
+  --benchmark BENCHMARK
+                        True if launch random agent, False if not.
+```
+
 Domain Background
 =================
 
